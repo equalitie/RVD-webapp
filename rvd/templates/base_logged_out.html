@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="background_left"></div>
+
+    <div class="dashboard_left">
+
+    </div>
+
+    <div class="dashboard_right">
+
+
+        <div id="content_header">
+        {% block content_header %}
+                <h2 class="top_title">Rights Violation Documentation</h2>
+        {% endblock %}
+        </div>
+
+        <div class="section_item_title">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+
+    </div>
+
+{% endblock %}

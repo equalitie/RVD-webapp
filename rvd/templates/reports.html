@@ -1,0 +1,51 @@
+{% extends "base_logged_in.html" %}
+
+{% block left_bar %}
+<h3 class="data_filters"><i class="fa fa-filter"></i> {{ _("Data filters") }}</h3>
+
+<div class="filters_items">
+    <div class="filter_title">Violation type</div>
+    <ul>
+        <li><input type="checkbox" id="option1" class="filter_option" name=""><label for="option1">Type 1</label></li>
+        <li><input type="checkbox" id="option2" class="filter_option" name=""><label for="option2">Type 2</label></li>
+        <li><input type="checkbox" id="option3" class="filter_option" name=""><label for="option3">Type 3</label></li>
+    </ul>
+
+    <div class="filter_title">Source</div>
+
+    <ul>
+        <li><input type="checkbox" id="source1" class="filter_option" name=""><label for="source1">Source 1</label></li>
+        <li><input type="checkbox" id="source2" class="filter_option" name=""><label for="source2">Source 2</label></li>
+        <li><input type="checkbox" id="source3" class="filter_option" name=""><label for="source3">Source 3</label></li>
+    </ul>
+
+    <div class="filter_title">Date range</div>
+
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+    <script src="{{ url_for('static', filename='js/plugins/d3.v3.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reports.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/plugins/ol.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='js/plugins/ol.js') }}"></script>
+
+    <div class="section_item_title">
+        Number of violations in time, by type
+    </div>
+
+    <div id="multi_series"></div>
+    <div class="privacy_tools_loading"><img src="/static/images/loading.gif"></div>
+    <p class="click_drag_instructions">Click and drag here to zoom</p>
+
+    <div class="section_item_title">
+        Violations map
+    </div>
+
+    <div id="map" class="map"></div>
+
+    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+
+{% endblock %}

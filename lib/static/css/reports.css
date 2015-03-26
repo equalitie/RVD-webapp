@@ -1,0 +1,101 @@
+path{
+    fill: #F7F781;
+}
+.axis path,
+.axis line,
+.axis1 path,
+.axis1 line {
+    fill: none;
+    stroke: #E6E7E8;
+    shape-rendering: crispEdges;
+}
+
+.x.axis path, .x.axis1 path {
+    display: none;
+}
+
+.line {
+    fill: none;
+    stroke-width: 1.5px;
+}
+
+.legend-box {
+    cursor: pointer;
+}
+
+#mouse-tracker {
+    stroke: none;
+    stroke-width: 1px;
+    border: none;
+}
+
+.hover-line {
+    stroke: #E6E7E8;
+    fill: none;
+    stroke-width: 1px;
+    left: 10px;
+    shape-rendering: crispEdges;
+    opacity: 1;
+}
+
+.hover-text {
+    stroke: none;
+    font-size: 30px;
+    font-weight: bold;
+    fill: #000000;
+}
+
+.tooltip {
+    font-weight: normal;
+}
+
+.brush .extent {
+    stroke: #fff;
+    stroke-width: 0;
+    shape-rendering: crispEdges;
+}
+text.tooltip{
+    opacity:1;
+}
+path.area{
+    stroke: none;
+}
+#content h3.reachability_title{
+    margin:30px 0;
+}
+#multi_series{
+    height: 500px;
+}
+#multi_series .tick{
+    font-size: 10px;
+}
+.privacy_tools_loading{
+    position: absolute;
+    margin-top: -300px;
+    margin-left: 350px;
+    display: none;
+}
+.click_drag_instructions{
+    position: absolute;
+    margin-top: -55px;
+    margin-left: 50px;
+}
+div#multi_series svg g g.context g.x.axis1 g.tick text{
+    fill: #9c9c9c;
+}
+.map {
+    height: 400px;
+    max-width: 940px;
+}
+.filter_title{
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+.filters_items ul{
+    margin-left: 10px;
+ }
+.filters_items ul label{
+    font-weight: normal;
+    padding-left: 5px;
+}

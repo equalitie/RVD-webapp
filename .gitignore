@@ -1,0 +1,4 @@
+instance/config.py
+*.pyc
+*.idea
+instance/keyfile.asc

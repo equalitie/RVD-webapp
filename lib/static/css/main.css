@@ -1,0 +1,124 @@
+@font-face {
+    font-family: opensans_light;
+    src: url(../fonts/OpenSans-Light.ttf);
+}
+@font-face {
+    font-family: opensans_regular;
+    src: url(../fonts/OpenSans-Regular.ttf);
+}
+body{
+    background:#EDEDE3;
+    background-color: #ffffff;
+    font-family: opensans_regular, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+header{
+    height: 40px;
+    background: #948C7C;
+    padding: 7px 0;
+    color: #FFF;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    font-variant: small-caps;
+    border-bottom: 4px solid #BCB5AB;
+}
+a{
+    color: #258FC4;
+    text-decoration: underline;
+}
+.top{
+    position: absolute;
+    height:4px;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+    background-color: #A7C7EB;
+}
+.dashboard_left{
+    position: absolute;
+    margin-top:4px;
+    width:300px;
+    top: 0;
+    left: 0;
+    padding: 0 30px 30px 30px;
+    color: #909090;
+    background-color: #FAFAFA;
+}
+.background_left{
+    position: fixed;
+    top:0;
+    left:0;
+    background-color: #FAFAFA;
+    height: 100%;
+    width: 300px;
+}
+.dashboard_left h3{
+    font-size: 20px;
+    display: block;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 8px 6px 6px 0;
+    border-radius: 4px;
+    margin-top:75px;
+}
+.dashboard_right{
+    margin-top:4px;
+    margin-left: 300px;
+    padding: 10px 50px 30px 50px;
+    width: auto;
+}
+.dashboard_left ul li, .dashboard_left ul{
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+.dashboard_left ul li{
+    line-height: 2em;
+    font-size: 13px;
+}
+ul li.normal:before{
+    content:"-";
+    position:relative;
+    left:2px;
+}
+.top_title{
+    font-family: opensans_light, Helvetica, Arial, sans-serif;
+    font-size: 48px;
+    margin-top:25px;
+    padding-bottom:15px;
+    color: #85ACD6;
+    float:left;
+}
+#settings{
+    float:right;
+    margin-top: 60px;
+}
+.section_item_title{
+    margin-top: 40px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    width: 100%;
+    color: #909090;
+}
+#content_header{
+    border-bottom: 1px solid #E0E0E0;
+    overflow: hidden;
+}
+.form_field_error{
+    font-size: 12px;
+    margin-top: 10px;
+    color: #940000;
+}
+#settings ul li{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    display:inline;
+    margin-left: 12px;
+}
+#settings ul li i{
+    margin-right: 2px;
+}
+#settings a{
+    text-decoration: none;
+}
