@@ -35,9 +35,7 @@ def load_user(user_id):
     """
     Required for the login manager
     """
-    from db import users
-    user_data = users.get_user_by_id(112)
-    user = User(user_data)
+    user = User({"id": 0})
     return user
 
 

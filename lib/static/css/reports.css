@@ -99,3 +99,6 @@ div#multi_series svg g g.context g.x.axis1 g.tick text{
     font-weight: normal;
     padding-left: 5px;
 }
+#reportrange{
+    font-size: 85%;
+}

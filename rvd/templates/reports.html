@@ -1,36 +1,46 @@
 {% extends "base_logged_in.html" %}
 
 {% block left_bar %}
+
+<script src="{{ url_for('static', filename='js/plugins/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/daterangepicker.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/plugins/daterangepicker-bs3.css') }}" />
+
+<script src="{{ url_for('static', filename='js/plugins/d3.v3.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reports.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/plugins/ol.css') }}" type="text/css">
+<script src="{{ url_for('static', filename='js/plugins/ol.js') }}"></script>
+
 <h3 class="data_filters"><i class="fa fa-filter"></i> {{ _("Data filters") }}</h3>
 
 <div class="filters_items">
     <div class="filter_title">Violation type</div>
-    <ul>
-        <li><input type="checkbox" id="option1" class="filter_option" name=""><label for="option1">Type 1</label></li>
-        <li><input type="checkbox" id="option2" class="filter_option" name=""><label for="option2">Type 2</label></li>
-        <li><input type="checkbox" id="option3" class="filter_option" name=""><label for="option3">Type 3</label></li>
+    <ul class="filter_types">
+        <li><input value="type1" type="checkbox" id="option1" class="filter_option" name=""><label for="option1">Type 1</label></li>
+        <li><input value="type2" type="checkbox" id="option2" class="filter_option" name=""><label for="option2">Type 2</label></li>
+        <li><input value="type3" type="checkbox" id="option3" class="filter_option" name=""><label for="option3">Type 3</label></li>
     </ul>
 
     <div class="filter_title">Source</div>
 
-    <ul>
-        <li><input type="checkbox" id="source1" class="filter_option" name=""><label for="source1">Source 1</label></li>
-        <li><input type="checkbox" id="source2" class="filter_option" name=""><label for="source2">Source 2</label></li>
-        <li><input type="checkbox" id="source3" class="filter_option" name=""><label for="source3">Source 3</label></li>
+    <ul class="filter_sources">
+        <li><input value="source1" type="checkbox" id="org1" class="filter_option" name=""><label for="org1">Organization 1</label></li>
+        <li><input value="source2" type="checkbox" id="org2" class="filter_option" name=""><label for="org2">Organization 2</label></li>
+        <li><input value="source3" type="checkbox" id="org3" class="filter_option" name=""><label for="org3">Organization 3</label></li>
     </ul>
 
     <div class="filter_title">Date range</div>
+
+    <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+        <span class="report_result"></span> <b class="caret"></b>
+    </div>
 
 </div>
 
 {% endblock %}
 
 {% block content %}
-
-    <script src="{{ url_for('static', filename='js/plugins/d3.v3.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/reports.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/plugins/ol.css') }}" type="text/css">
-    <script src="{{ url_for('static', filename='js/plugins/ol.js') }}"></script>
 
     <div class="section_item_title">
         Number of violations in time, by type
