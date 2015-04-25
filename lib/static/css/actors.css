@@ -1,0 +1,58 @@
+.form_actor_label{
+    float: left;
+    width: 150px;
+    font-weight: bold;
+}
+.form_actor_field{
+    float: left;
+    min-width: 250px;
+}
+.no_width{
+    min-width: 0px;
+    margin-left: 3px;
+}
+.form_actor_field input{
+    margin-bottom: 8px;
+}
+.form-group{
+    overflow:hidden;
+}
+.new_actor_form{
+    margin-top: 40px;
+}
+.telephone input{
+    margin-bottom: 8px;
+}
+.telephone input.form-control{
+    display:inline;
+    width: 150px;
+}
+.form_actor_field input.country_code, .form_actor_field input.area_code{
+    width: 46px;
+}
+.new_actor_form .form-group label ul{
+    list-style-type: none;
+    margin:0;
+    padding:0;
+    margin-bottom: 20px;
+}
+.new_actor_bt{
+    margin-left: 150px;
+}
+.validation_error{
+    background: #f2dede;
+    float:left;
+    margin-left: 20px;
+    height: 35px;
+    padding: 8px 10px;
+    border-radius: 5px;
+}
+.gender_label, .is_activist_label{
+    float:left;
+    width: 250px;
+}
+.new_actor_success{
+    font-size: 15px;
+    padding: 8px 12px;
+    margin-top: 20px;
+}

@@ -101,4 +101,6 @@ div#multi_series svg g g.context g.x.axis1 g.tick text{
 }
 #reportrange{
     font-size: 85%;
+    position:absolute;
+    left: 30px;
 }

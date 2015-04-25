@@ -10,6 +10,7 @@ from lib.models.User import User
 import config.check_config as check
 from views.login import login_bp
 from views.reports import reports_bp
+from views.actors import actors_bp
 
 # FLASK APP
 static_paths = [os.getcwd(), '/lib/static']
@@ -19,6 +20,7 @@ app = check.check_config(app)
 # BLUEPRINTS
 app.register_blueprint(login_bp)
 app.register_blueprint(reports_bp)
+app.register_blueprint(actors_bp)
 
 # LOCALIZED CONTENT
 babel = Babel(app)
@@ -27,9 +29,8 @@ babel = Babel(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+
 # flask overrides
-
-
 @login_manager.user_loader
 def load_user(user_id):
     """

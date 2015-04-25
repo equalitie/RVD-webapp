@@ -1,0 +1,111 @@
+{% extends "base_logged_in.html" %}
+
+{% block left_bar %}
+
+{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
+
+    {% if request.args.get('success') %}
+        <p class="bg-success new_actor_success">Successfully added new actor.</p>
+    {% endif %}
+
+    {{ form.hidden_tag() }}
+    <div class="new_actor_form">
+
+        <form method="POST" action="?" class="" role="form">
+
+
+            <!--
+
+                The template actually renders fields 1 by 1. It's quite verbose and although it's possible to just loop
+                through the form fields, you still need a bunch of exceptions and class injections to get the layout
+                right. The looping method is good if you have one, maybe two types of fields.
+                I prefer things to be a bit more explicit even if lengthy, but it can easily be changed in the template.
+                i.e.
+
+                {% for f in form %}
+                  {{ f.label }}
+                  {{ f.field_name }}
+                {% endfor %}
+
+            -->
+
+            {{ form.csrf_token }}
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.name.label }}</div>
+                <div class="form_actor_field {% if form.name.errors %}has-error{% endif %}">{{ form.name(class_="form-control", placeholder=form.name.description.placeholder|safe)}}</div>
+                {% if form.name.errors %}<div class="validation_error">{% for e in form.name.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.birth_date.label }}</div>
+                <div class="form_actor_field {% if form.birth_date.errors %}has-error{% endif %}">{{ form.birth_date(class_="form-control", placeholder=form.birth_date.description.placeholder|safe)}}</div>
+                {% if form.birth_date.errors %}<div class="validation_error">{% for e in form.birth_date.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group telephone">
+                <div class="form_actor_label">Telephone</div>
+                <div class="form_actor_field {% if form.telephone_country_code.errors %}has-error{% endif %} no_width">{{ form.telephone_country_code(class_="form-control country_code", placeholder=form.telephone_country_code.description.placeholder|safe)}}</div>
+                <div class="form_actor_field {% if form.telephone_area_code.errors %}has-error{% endif %} no_width">{{ form.telephone_area_code(class_="form-control area_code", placeholder=form.telephone_area_code.description.placeholder|safe)}}</div>
+                <div class="form_actor_field {% if form.telephone_number.errors %}has-error{% endif %} no_width">{{ form.telephone_number(class_="form-control", placeholder=form.telephone_number.description.placeholder|safe)}}</div>
+
+                {% if form.telephone_country_code.errors %}
+                    <div class="validation_error">{% for e in form.telephone_country_code.errors %}{{e}}{% endfor %}</div>
+                {% elif form.telephone_area_code.errors %}
+                    <div class="validation_error">{% for e in form.telephone_area_code.errors %}{{e}}{% endfor %}</div>
+                {% elif form.telephone_number.errors %}
+                    <div class="validation_error">{% for e in form.telephone_number.errors %}{{e}}{% endfor %}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.address.label }}</div>
+                <div class="form_actor_field {% if form.address.errors %}has-error{% endif %}">{{ form.address(class_="form-control", placeholder=form.address.description.placeholder|safe)}}</div>
+                {% if form.address.errors %}<div class="validation_error">{% for e in form.address.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.organisations.label }}</div>
+                <div class="form_actor_field {% if form.organisations.errors %}has-error{% endif %}">{{ form.organisations(class_="form-control")}}</div>
+                {% if form.organisations.errors %}<div class="validation_error">{% for e in form.organisations.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.location.label }}</div>
+                <div class="form_actor_field {% if form.location.errors %}has-error{% endif %}">{{ form.location(class_="form-control")}}</div>
+                {% if form.location.errors %}<div class="validation_error">{% for e in form.location.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.gender.label }}</div>
+                <label class="gender_label {% if form.gender.errors %}has-error{% endif %}">{{ form.gender }}</label>
+                {% if form.gender.errors %}<div class="validation_error">{% for e in form.gender.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.profession.label }}</div>
+                <div class="form_actor_field {% if form.profession.errors %}has-error{% endif %}">{{ form.profession(class_="form-control")}}</div>
+                {% if form.profession.errors %}<div class="validation_error">{% for e in form.profession.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.is_activist.label }}</div>
+                <label class="is_activist_label {% if form.is_activist.errors %}has-error{% endif %}">{{ form.is_activist }}</label>
+                {% if form.is_activist.errors %}<div class="validation_error">{% for e in form.is_activist.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <div class="form_actor_label">{{ form.activist_info.label }}</div>
+                <div class="form_actor_field {% if form.activist_info.errors %}has-error{% endif %}">{{ form.activist_info(class_="form-control")}}</div>
+                {% if form.activist_info.errors %}<div class="validation_error">{% for e in form.activist_info.errors %}{{e}}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="form_actor_field"><input type="submit" value="save" class="new_actor_bt btn btn-success"></div>
+
+        </form>
+    </div>
+
+{% endblock %}

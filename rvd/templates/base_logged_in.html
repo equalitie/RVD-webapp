@@ -5,7 +5,12 @@
     <div class="background_left"></div>
 
     <div class="dashboard_left">
-
+        <div class="actors_menu">
+            <h3 class="data_filters"><i class="fa fa-user"></i> {{ _("Actors") }}</h3>
+            <ul>
+                <li><a href="/actors/add"><i class="fa fa-caret-right"></i> Add actor</a></li>
+            </ul>
+        </div>
         {% block left_bar %}
         {% endblock %}
 
