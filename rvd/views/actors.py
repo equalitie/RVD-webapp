@@ -9,9 +9,9 @@ actors_bp = Blueprint('actors', __name__)
 @actors_bp.route('/actors/add', methods=('GET', 'POST'))
 @login_required
 def actors():
-    actor_form = ActorForm(request.form, csrf_enabled=True)
 
-    # you can set form values from here instead of the form class directly
+    actor_form = ActorForm(request.form)
+
     actor_form.organisations.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
     actor_form.location.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
     actor_form.profession.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
