@@ -1,4 +1,8 @@
 instance/config.py
 *.pyc
 *.idea
+*.swp
+.pyc
+.idea
+.swp
 instance/keyfile.asc
