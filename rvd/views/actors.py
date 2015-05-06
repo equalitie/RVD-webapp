@@ -3,9 +3,13 @@ from flask_login import login_required
 from rvd.forms.Actor import ActorForm
 from flask_admin import helpers
 from collections import defaultdict
+from rvd.models import session
+import datetime
+
 actors_bp = Blueprint('actors', __name__)
 
 from ..models import Actor, Organisation, Location, Profession
+
 
 @actors_bp.route('/actors/add', methods=('GET', 'POST'))
 @login_required
@@ -19,8 +23,8 @@ def actors():
         organisations = request.form.getlist('organisations')
         test_org_loc = [Location(name='Test Location', longitude=44.0123, latitude=23.235)]
         organisations = [
-          Organisation(name=actor_form.organisations.choices[i][1], description='test', locations=test_org_loc)
-          for i in map(int, organisations)]
+            Organisation(name=actor_form.organisations.choices[i][1], description='test', locations=test_org_loc)
+            for i in map(int, organisations)]
         actor_dict['organisations'] = organisations
         locations = request.form.getlist('locations')
         locations = [
@@ -36,14 +40,13 @@ def actors():
         # Convert the types of boolean fields
         actor_dict['gender'] = bool(actor_dict['gender'])
         actor_dict['is_activist'] = bool(actor_dict['is_activist'])
+        actor_dict['birth_date'] = datetime.datetime.strptime(actor_dict['birth_date'], "%Y-%m-%d").date()
 
         # you probably want to do something like actor = Actor(**actor_dict)
-        print actor_dict
-        print 'Choices for organisations'
         actor_instance = Actor(**actor_dict)
         print 'Created actor with name ' + actor_instance.name
-        # I made it defaultdict in case keys change, things like this won't break
-        print actor_dict['123abd']
+        session.add(actor_instance)
+        session.commit()
 
         return redirect('/actors/add?success=1')
 

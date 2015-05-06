@@ -3,8 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-from sqlalchemy_utils import PhoneNumberType, ChoiceType
-engine = create_engine('sqlite:///:memory:')
+engine = create_engine('sqlite:///:memory:', echo=True)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
