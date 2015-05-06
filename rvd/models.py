@@ -41,10 +41,10 @@ class Action(Base):
         'label': ___('Complaint to international authority')})
     response_from_international_authority = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Response from international authority')})
-    state_body_approached = relationship('StateAuthority', secondary=action_state, backref='actions')
-    international_body_approached = relationship(
+    state_bodies_approached = relationship('StateAuthority', secondary=action_state, backref='actions')
+    international_bodies_approached = relationship(
       'InternationalAuthority', secondary=action_international, backref='actions')
-    event = relationship('Event', secondary=action_event, backref='actions')
+    events = relationship('Event', secondary=action_event, backref='actions')
 
 
 #################
@@ -71,22 +71,18 @@ class Actor(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
     birth_date = sa.Column(sa.Date, nullable=False, info={'description': ___('Name'), 'label': ___('Date of birth')})
+    #telephone = sa.Column(PhoneNumberType(), info={
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
-    #telephone = sa.Column(PhoneNumberType(), info={
-    #    'description': ___('+1 819 987-6543'), 'label': ___('Phone number')}
-    #)
     address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
-    organisation = relationship('Organisation', secondary=actor_organisation, backref='members')
-    profession = relationship('Profession', secondary=actor_profession, backref='practitioners')
-    location = relationship('Location', secondary=actor_location, backref='locals')
+    organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
+    professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
+    locations = relationship('Location', secondary=actor_location, backref='locals')
     gender = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
-    is_activist = sa.Column(
-        sa.Boolean, nullable=False, info={'description': ___('Is activist'), 'label': ___('Is activist')}
-    )
-    activist_info = sa.Column(
-        sa.Text, nullable=True, info={'description': ___('Activist info'), 'label': ___('Activist info')}
-    )
+    is_activist = sa.Column(sa.Boolean, nullable=False, info={
+        'description': ___('Is activist'), 'label': ___('Is activist')})
+    activist_info = sa.Column(sa.Text, nullable=True, info={
+        'description': ___('Activist info'), 'label': ___('Activist info')})
 
 
 #################
@@ -240,7 +236,7 @@ class Organisation(Base):
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
     description = sa.Column(sa.Text, nullable=True, 
                             info={'description': ___('Description'), 'label': ___('Description')})
-    location = relationship('Location', secondary=org_location, backref='organisations')
+    locations = relationship('Location', secondary=org_location, backref='organisations')
 
 
 ##################
@@ -263,8 +259,8 @@ class Prison(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={
         'description': ___('Name'), 'label': ___('Name')})
-    location = relationship('Location', secondary=prison_location, backref='prisons')
-    prison_type = relationship('PrisonType', secondary=prison_ptype, backref='prisons')
+    locations = relationship('Location', secondary=prison_location, backref='prisons')
+    prison_types = relationship('PrisonType', secondary=prison_ptype, backref='prisons')
 
 
 #######################
