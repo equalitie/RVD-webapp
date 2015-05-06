@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('mysql://user:password?@localhost/rvd', echo=True)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -233,7 +233,7 @@ class Organisation(Base):
 
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
-    description = sa.Column(sa.Text, nullable=True, 
+    description = sa.Column(sa.Text, nullable=True,
                             info={'description': ___('Description'), 'label': ___('Description')})
     locations = relationship('Location', secondary=org_location, backref='organisations')
 
