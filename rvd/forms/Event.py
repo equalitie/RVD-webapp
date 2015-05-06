@@ -38,3 +38,20 @@ class EventForm(ModelForm):
         (str(i), v) for i, v in enumerate(['Greg Housh', 'Jeremy Hammond', 'Barret Brown'])])
     perpetrators = fields.SelectMultipleField(choices=[
         (str(i), p) for i, p in enumerate(['NYC Police', 'Obama', 'Bush'])])
+
+    psych_assist = fields.RadioField(___('Psychological assistance provided'), 
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    material_assist = fields.RadioField(___('Material assistance provided'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    was_activist = fields.RadioField(___('Was an activist'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    victim_is_complainant = fields.RadioField(___('Victim is complainant'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    allow_storage = fields.RadioField(___('Allows storage of information'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    allow_publishing = fields.RadioField(___('Allows publishing of information'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    allow representation = fields.RadioField(___('Allows legal representation'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    data_is_sensitive = representation = fields.RadioField(___('Data is hyper sensitive'),
+        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
