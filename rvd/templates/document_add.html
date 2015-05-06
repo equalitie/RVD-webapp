@@ -1,0 +1,20 @@
+{% extends "base_logged_in.html" %}
+
+{% block left_bar %}
+
+{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/documents.css') }}" />
+
+    {% if request.args.get('success') %}
+        <p class="bg-success new_actor_success">Successfully added new document.</p>
+    {% endif %}
+
+    <div class="new_actor_form">
+
+        <h3>Upload new document</h3>
+
+    </div>
+
+{% endblock %}
