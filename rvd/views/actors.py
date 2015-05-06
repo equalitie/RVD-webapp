@@ -9,13 +9,7 @@ actors_bp = Blueprint('actors', __name__)
 @actors_bp.route('/actors/add', methods=('GET', 'POST'))
 @login_required
 def actors():
-
     actor_form = ActorForm(request.form)
-
-    actor_form.organisations.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
-    actor_form.location.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
-    actor_form.profession.choices = [('{}'.format(x), 'Org {}'.format(x)) for x in xrange(10)]
-
     if helpers.validate_form_on_submit(actor_form):
         # the values are now accessible here
         actor_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})

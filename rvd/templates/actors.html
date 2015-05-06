@@ -23,7 +23,9 @@
                     <label class="gender_label {% if form.gender.errors %}has-error{% endif %}">{{ field }}</label>
                 {% else %}
                     <div class="form_actor_label">{{ field.label }}</div>
-                    <div class="form_actor_field {% if field.errors %}has-error{% endif %}">{{ field(class_="form-control", placeholder=field.description)}}</div>
+                    <div class="form_actor_field {% if field.errors %}has-error{% endif %}">
+                      {{ field(class_="form-control", placeholder=field.description, rows=0)}}
+                    </div>
                 {% endif %}
                 {% if field.errors %}<div class="validation_error">{{ field.errors[0] }}</div>{% endif %}
 
