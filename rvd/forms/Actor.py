@@ -14,7 +14,7 @@ class ActorForm(ModelForm):
     # if you move/change fields, they HAVE to be added here, until this code is made better...
     __order = (
         'name', 'birth_date', 'gender', 'telephone', 'address', 'is_activist',
-        'activist_info', 'organisations', 'profession', 'location'
+        'activist_info', 'organisations', 'professions', 'locations'
     )
 
     def __iter__(self):
@@ -26,13 +26,11 @@ class ActorForm(ModelForm):
     # these are overrides.
     organisations = fields.SelectMultipleField(choices=[
         ('0', "The Guardian"), ('1', "Propublica"), ('2', "The Intercept"), ('3', "The Washington Post")])
-    profession = fields.SelectMultipleField(choices=[
+    professions = fields.SelectMultipleField(choices=[
         ('0', "Programmer"), ('1', "Journalist"), ('2', "Writer"), ('3', "Wizard")])
-    location = fields.SelectMultipleField(choices=[
+    locations = fields.SelectMultipleField(choices=[
         ('0', "Montreal, QC"), ('1', "Toronto, ON"), ('2', "San Francisco, CA"), ('3', "Vancouver, BC")])
     gender = fields.RadioField(___('Gender'), validators=[validators.required()], choices=[
-        ('True', ___('Male')), ('False', ___('Female'))]
-    )
+        ('True', ___('Male')), ('False', ___('Female'))])
     is_activist = fields.RadioField(___('Is activist'), validators=[validators.required()], choices=[
-        ('True', ___('Yes')), ('False', ___('No'))]
-    )
+        ('True', ___('Yes')), ('False', ___('No'))])
