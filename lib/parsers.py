@@ -205,8 +205,8 @@ _post_collection_handlers = {
 }
 
 _parsers = {
-    CCDHRN_DOCX: _parse_org1_docx,
-    CIHPRESS_DOCX: _parse_org2_docx,
+    ORG1_DOCX: _parse_org1_docx,
+    ORG2_DOCX: _parse_org2_docx,
     EXCEL_DOC: _parse_excel_template
 }
 
