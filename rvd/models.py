@@ -3,8 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-#engine = create_engine('mysql://redwire:test@localhost/rvd', echo=True)
-engine = create_engine('postgresql://redwire:test@localhost/rvd', echo=True)
+engine = create_engine('mysql://user:password@localhost/rvd', echo=True)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
