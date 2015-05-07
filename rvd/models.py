@@ -3,8 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-#engine = create_engine('mysql://redwire:test@localhost/rvd', echo=True)
-engine = create_engine('postgresql://redwire:test@localhost/rvd', echo=True)
+engine = create_engine('mysql://username:password@localhost/rvd', echo=True)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -84,6 +83,17 @@ class Actor(Base):
     activist_info = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Activist info'), 'label': ___('Activist info')})
 
+##################
+## Report Model ##
+##################
+
+class Report(Base):
+    __tablename__ = 'reports'
+
+    id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
+    text = sa.Column(sa.Text, nullable=False, info={
+        'description': ___('Content of report'), 'label': ___('Content of report')})
+    describes = relationship('Event')
 
 #################
 ## Event Model ##
@@ -129,6 +139,10 @@ class Event(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     title = sa.Column(sa.Unicode(200), nullable=False, info={
         'description': ___('Title'), 'label': ___('Title')})
+    # The beginning of docx files have a report section that will contain a
+    # big blob of text, a sort of meta-analysis of the event
+    report = sa.Column(sa.Text, nullable=True, info={
+        'description': ___('Report'), 'label': ___('Report')})
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
     charges = sa.Column(sa.Text, nullable=True, info={
@@ -163,6 +177,7 @@ class Event(Base):
     data_is_sensitive = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Data is hyper sensitive'),
         'label': ___('Data is hyper sensitive')})
+    report_id = sa.Column(sa.BigInteger, ForeignKey('reports.id'))
     release_types = relationship('ReleaseType', secondary=event_releasetype, backref='events')
     locations = relationship('Location', secondary=event_location, backref='events')
     prisons = relationship('Prison', secondary=event_prison, backref='events')
