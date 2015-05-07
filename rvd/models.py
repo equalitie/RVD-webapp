@@ -170,7 +170,7 @@ class Event(Base):
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
-    rights_violation_id = sa.Column(sa.Integer, ForeignKey('rightsviolations.id'))
+    rights_violation_id = sa.Column(sa.BigInteger, ForeignKey('rightsviolations.id'))
     rights_violation = relationship('RightsViolation', backref='events')
     #related = relationship('Event', secondary=event_event, backref='related_to')
 
