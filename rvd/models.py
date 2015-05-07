@@ -3,7 +3,8 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-engine = create_engine('mysql://user:password?@localhost/rvd', echo=True)
+#engine = create_engine('mysql://redwire:test@localhost/rvd', echo=True)
+engine = create_engine('postgresql://redwire:test@localhost/rvd', echo=True)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -169,6 +170,8 @@ class Event(Base):
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
+    rights_violation_id = sa.Column(sa.Integer, ForeignKey('rightsviolations.id'))
+    rights_violation = relationship('RightsViolation', backref='events')
     #related = relationship('Event', secondary=event_event, backref='related_to')
 
 
@@ -309,8 +312,6 @@ class RightsViolation(Base):
         'description': ___('Name'), 'label': ___('Name')})
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
-    event_id = sa.Column(sa.Integer, ForeignKey('events.id'))
-    event = relationship('Event', backref=backref('rights_violations', order_by=id))
 
 
 ##################
