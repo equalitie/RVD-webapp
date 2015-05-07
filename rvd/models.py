@@ -3,7 +3,11 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-engine = create_engine('mysql://username:password@localhost/rvd', echo=True)
+from instance import config
+
+engine = create_engine(
+    'mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME), echo=True
+)
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -16,16 +20,18 @@ session = Session()
 # Association tables
 
 action_state = Table('action_state-authority', Base.metadata,
-    sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
-    sa.Column('state_authority_id', sa.BigInteger, ForeignKey('stateauthorities.id')))
+                     sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
+                     sa.Column('state_authority_id', sa.BigInteger, ForeignKey('stateauthorities.id')))
 
 action_international = Table('action_international-authority', Base.metadata,
-    sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
-    sa.Column('international_authority_id', sa.BigInteger, ForeignKey('internationalauthorities.id')))
+                             sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
+                             sa.Column('international_authority_id', sa.BigInteger,
+                                       ForeignKey('internationalauthorities.id')))
 
 action_event = Table('action_event', Base.metadata,
-    sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')))
+                     sa.Column('action_id', sa.BigInteger, ForeignKey('actions.id')),
+                     sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')))
+
 
 class Action(Base):
     __tablename__ = 'actions'
@@ -42,7 +48,7 @@ class Action(Base):
         'description': ___('Response from international authority')})
     state_bodies_approached = relationship('StateAuthority', secondary=action_state, backref='actions')
     international_bodies_approached = relationship(
-      'InternationalAuthority', secondary=action_international, backref='actions')
+        'InternationalAuthority', secondary=action_international, backref='actions')
     events = relationship('Event', secondary=action_event, backref='actions')
 
 
@@ -53,16 +59,17 @@ class Action(Base):
 # Association tables
 
 actor_location = Table('actor_location', Base.metadata,
-    sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
-    sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+                       sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
+                       sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
 
 actor_organisation = Table('actor_organisation', Base.metadata,
-    sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
-    sa.Column('organisation_id', sa.BigInteger, ForeignKey('organisations.id')))
+                           sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
+                           sa.Column('organisation_id', sa.BigInteger, ForeignKey('organisations.id')))
 
 actor_profession = Table('actor_profession', Base.metadata,
-    sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
-    sa.Column('profession_id', sa.BigInteger, ForeignKey('professions.id')))
+                         sa.Column('actor_id', sa.BigInteger, ForeignKey('actors.id')),
+                         sa.Column('profession_id', sa.BigInteger, ForeignKey('professions.id')))
+
 
 class Actor(Base):
     __tablename__ = 'actors'
@@ -70,7 +77,7 @@ class Actor(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
     birth_date = sa.Column(sa.Date, nullable=False, info={'description': ___('Name'), 'label': ___('Date of birth')})
-    #telephone = sa.Column(PhoneNumberType(), info={
+    # telephone = sa.Column(PhoneNumberType(), info={
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
     address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
@@ -82,6 +89,7 @@ class Actor(Base):
         'description': ___('Is activist'), 'label': ___('Is activist')})
     activist_info = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Activist info'), 'label': ___('Activist info')})
+
 
 ##################
 ## Report Model ##
@@ -102,34 +110,34 @@ class Report(Base):
 # Association tables
 
 event_source = Table('event_source', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('source_id', sa.BigInteger, ForeignKey('sources.id')))
+                     sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                     sa.Column('source_id', sa.BigInteger, ForeignKey('sources.id')))
 
 event_releasetype = Table('event_release-type', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('release_type_id', sa.BigInteger, ForeignKey('releasetypes.id')))
+                          sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                          sa.Column('release_type_id', sa.BigInteger, ForeignKey('releasetypes.id')))
 
 event_prison = Table('event_prison', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')))
+                     sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                     sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')))
 
 event_location = Table('event_location', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+                       sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                       sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
 
 event_witness = Table('event_witness', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('witness_id', sa.BigInteger, ForeignKey('actors.id')))
+                      sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                      sa.Column('witness_id', sa.BigInteger, ForeignKey('actors.id')))
 
 event_victim = Table('event_victim', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('victim_id', sa.BigInteger, ForeignKey('actors.id')))
+                     sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                     sa.Column('victim_id', sa.BigInteger, ForeignKey('actors.id')))
 
 event_perp = Table('event_perpetrator', Base.metadata,
-    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-    sa.Column('perpetrator_id', sa.BigInteger, ForeignKey('actors.id')))
+                   sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                   sa.Column('perpetrator_id', sa.BigInteger, ForeignKey('actors.id')))
 
-#event_event = Table('event_event', Base.metadata,
+# event_event = Table('event_event', Base.metadata,
 #    sa.Column('event1_id', sa.BigInteger, ForeignKey('events.id')),
 #    sa.Column('event2_id', sa.BigInteger, ForeignKey('events.id')))
 
@@ -161,7 +169,7 @@ class Event(Base):
         'label': ___('Material assistance provided')})
     consequences = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Consequences'), 'label': ___('Consequences')})
-    was_activist= sa.Column(sa.Boolean, nullable=False, info={
+    was_activist = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Was an activist'), 'label': ___('Was an activist')})
     victim_is_complainant = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Victim is complainant'), 'label': ___('Victim is complainant')})
@@ -243,8 +251,9 @@ class Location(Base):
 # Association tables
 
 org_location = Table('organisation_location', Base.metadata,
-    sa.Column('organisation_id', sa.BigInteger, ForeignKey('organisations.id')),
-    sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+                     sa.Column('organisation_id', sa.BigInteger, ForeignKey('organisations.id')),
+                     sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+
 
 class Organisation(Base):
     __tablename__ = 'organisations'
@@ -263,12 +272,13 @@ class Organisation(Base):
 # Association tables
 
 prison_ptype = Table('prison_prison-type', Base.metadata,
-    sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')),
-    sa.Column('prison_type_id', sa.BigInteger, ForeignKey('prisontypes.id')))
+                     sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')),
+                     sa.Column('prison_type_id', sa.BigInteger, ForeignKey('prisontypes.id')))
 
 prison_location = Table('prison_location', Base.metadata,
-    sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')),
-    sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+                        sa.Column('prison_id', sa.BigInteger, ForeignKey('prisons.id')),
+                        sa.Column('location_id', sa.BigInteger, ForeignKey('locations.id')))
+
 
 class Prison(Base):
     __tablename__ = 'prisons'
