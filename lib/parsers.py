@@ -8,6 +8,7 @@ import docx
 import xlrd
 
 import utils
+from rvd.models import *
 
 # Constants
 
@@ -43,7 +44,7 @@ def _parse_org1_docx_events(doc):
         for name in names:
             parsed = {'actor': {}, 'location': {}, 'source': {}}
             parsed['actor']['name'] = name.strip()
-            parsed['actor']['organisation'] = organisation
+            parsed['actor']['organisations'] = [organisation]
             parsed['report_date'] = time.strptime(row[0].text.strip(), '%d.%m.%y')
             parsed['report_date'] = utils.to_datetime(parsed['report_date'])
             parsed['location']['name'] = row[1].text.strip()
@@ -54,11 +55,39 @@ def _parse_org1_docx_events(doc):
             events.append(parsed)
     return events
 
+def _org1_events_to_model(events):
+    '''Convert a collection of events into instances of the Event model'''
+    for i in range(len(events)):
+        event = events[i]
+        actor = Actor(name=event['actor'])
+        del event['actor']
+        geocoded = utils.geocodes(event['location']['name'], include_importance=True)
+        geocoded = utils.max_by(geocoded, lambda gc: gc.importance)
+        location = Location(name=geocoded['name'],
+            latitude=geocoded['latitude'], longitude=geocoded['latitude'])
+        del event['location']
+        events[i] = Event(**event)
+        events[i].actor = actor
+        events[i].location = location
+    return events
+
+def _org1_report_to_model(report, events):
+    '''Convert a report text into an instance of the Report model'''
+    report = Report(text=report)
+    for i in range(events):
+        events[i].report_id = report
+    report.events = events
+    return report
+
 def _parse_org1_docx(_file):
     doc = docx.Document(_file)
+    report = _parse_org1_docx_report(doc)
+    events = _parse_org1_docx_events(doc)
+    events = _org1_events_to_model(events)
+    report = _org1_report_to_model(report, events)
     return {
-        'report': _parse_org1_docx_report(doc),
-        'events': _parse_org1_docx_events(doc)
+        'report': report,
+        'events': events
     }
 
 
@@ -100,8 +129,45 @@ def _parse_org2_docx_events(doc):
             events.append(parsed)
     return events
 
+def _org2_events_to_model(events):
+    '''Convert parsed event data to model instances'''
+    for i in range(len(events)):
+        event = events[i]
+        actor = event['actor']
+        organisation = actor['organisation']
+        actor = Actor(name=actor['name'])
+        organisation = Organisation(name=organisation)
+        actor.organisations = [organisation]
+        location = event['location']
+        geocodes = utils.geocodes(location, include_importance=True)
+        location = utils.max_by(geocodes, lambda gc: gc['importance'])
+        location = Location(name=location['name'],
+            latitude=location['latitude'], longitude=location['longitude'])
+        source = event['source']
+        source = Source(name=source['name'])
+        del event['actor']
+        del event['location']
+        del event['source']
+        event['victims'] = [actor]
+        event['locations'] = [location]
+        event['sources']  = [source]
+        events[i] = Event(**event)
+    return events
+
+def _org2_report_to_model(report, events):
+    '''Convert parsed report data to a model instnace'''
+    report = Report(text=report)
+    for i in range(len(events)):
+        events[i].report_id = report.id
+    report.events = events
+    return report
+
 def _parse_org2_docx(_file):
     doc = docx.Document(_file)
+    report = _parse_org2_docx_report(doc)
+    events = _parse_org2_docx_events(doc)
+    events = _org2_events_to_model(events)
+    report = _org2_report_to_model(report, events)
     return {
         'report': _parse_org2_docx_report(doc),
         'events': _parse_org2_docx_events(doc)
