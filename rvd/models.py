@@ -5,9 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from instance import config
 
-engine = create_engine(
-    'mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME), echo=True
-)
+engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -84,7 +82,7 @@ class Actor(Base):
     organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
     professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
     locations = relationship('Location', secondary=actor_location, backref='locals')
-    gender = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
+    gender = sa.Column(sa.Text, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
     is_activist = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Is activist'), 'label': ___('Is activist')})
     activist_info = sa.Column(sa.Text, nullable=True, info={

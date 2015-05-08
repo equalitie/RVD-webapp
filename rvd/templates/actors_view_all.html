@@ -1,0 +1,23 @@
+{% extends "base_logged_in.html" %}
+
+{% block left_bar %}
+
+{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
+
+    <h3>All actors</h3>
+
+    <table class="table">
+        {% for actor in actors %}
+            <tr>
+                <td>{{actor['name']}}</td>
+                <td>{{actor['id']}}</td>
+                <td><a href="/actors/{{actor['id']}}">View</a></td>
+                <td><a href="/actors/{{actor['id']}}/edit">Edit</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

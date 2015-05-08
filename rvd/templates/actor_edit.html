@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
 
     {% if request.args.get('success') %}
-        <p class="bg-success new_actor_success">Successfully added new actor.</p>
+        <p class="bg-success new_actor_success">Operation successful.</p>
     {% endif %}
 
-    <div class="new_actor_form">
+    {% if action=='add' %}<h3>Add new actor</h3>{% else %}<h3>Edit actor</h3>{% endif %}
 
-        <form method="POST" action="/actors/add?" class="" role="form">
+    <div class="new_event_form">
+
+        <form method="POST" action="{% if action=='add' %}/actors/add?{% else %}/actors/{{ actor.id }}/edit{% endif %}" class="" role="form">
 
             {% for field in form %}
 

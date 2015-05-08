@@ -12,6 +12,7 @@ from views.login import login_bp
 from views.reports import reports_bp
 from views.actors import actors_bp
 from views.documents import documents_bp
+from views.events import events_bp
 
 # FLASK APP
 static_paths = [os.getcwd(), '/lib/static']
@@ -23,6 +24,7 @@ app.register_blueprint(login_bp)
 app.register_blueprint(reports_bp)
 app.register_blueprint(actors_bp)
 app.register_blueprint(documents_bp)
+app.register_blueprint(events_bp)
 
 # LOCALIZED CONTENT
 babel = Babel(app)
