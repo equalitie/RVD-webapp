@@ -135,6 +135,10 @@ event_perp = Table('event_perpetrator', Base.metadata,
                    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
                    sa.Column('perpetrator_id', sa.BigInteger, ForeignKey('actors.id')))
 
+event_violations = Table('event_rights-violation', Base.metadata,
+                         sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                         sa.Column('rights_violation_id', sa.BigInteger, ForeignKey('rightsviolations.id')))
+
 # event_event = Table('event_event', Base.metadata,
 #    sa.Column('event1_id', sa.BigInteger, ForeignKey('events.id')),
 #    sa.Column('event2_id', sa.BigInteger, ForeignKey('events.id')))
@@ -191,8 +195,7 @@ class Event(Base):
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
-    rights_violation_id = sa.Column(sa.BigInteger, ForeignKey('rightsviolations.id'))
-    rights_violation = relationship('RightsViolation', backref='events')
+    rights_violation = relationship('RightsViolation', secondary=event_violations, backref='events')
     #related = relationship('Event', secondary=event_event, backref='related_to')
 
 
