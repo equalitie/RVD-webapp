@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
+from rvd.models import session
+from werkzeug.utils import secure_filename
+import os
 from flask_login import login_required
-from werkzeug import secure_filename
-from ....lib import parsers
-from ..models import *
+from lib import parsers
 
 documents_bp = Blueprint('documents', __name__)
 
@@ -21,7 +22,7 @@ def documents_add():
 @documents_bp.route('/document/upload', methods=('POST'))
 @login_required
 def documents_uploads():
-    uploaded_files = flask.request.files.getlist("file[]") 
+    uploaded_files = request.files.getlist("file[]")
 
     if uploaded_files:
         for file in uploaded_files:
@@ -29,7 +30,7 @@ def documents_uploads():
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
                 f = os.path.join(UPLOAD_FOLDER, filename)
-                org_name = flask.request.form['organisation_name']
+                org_name = request.form['organisation_name']
                 print 'Got organisation name ' + org_name
                 parsed = parsers.parse(f, org_name)
                 if 'error' in parsed:
@@ -44,9 +45,11 @@ def documents_uploads():
                         
     return render_template("document_add.html", 'success')
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
 
 def only_supplies_event(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in EVENT_ONLY
