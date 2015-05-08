@@ -3,6 +3,12 @@
     width: 150px;
     font-weight: bold;
 }
+.form_event_label{
+    float: left;
+    width: 250px;
+    margin-right: 20px;
+    font-weight: bold;
+}
 .form_actor_field{
     float: left;
     min-width: 250px;
@@ -39,6 +45,9 @@
 .new_actor_bt{
     margin-left: 150px;
 }
+.new_event_bt{
+    margin-left: 270px;
+}
 .validation_error{
     background: #f2dede;
     float:left;
@@ -55,4 +64,8 @@
     font-size: 15px;
     padding: 8px 12px;
     margin-top: 20px;
+}
+.dashboard_right h3{
+    margin-bottom: 40px;
+    margin-top: 40px;
 }

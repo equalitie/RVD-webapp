@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import re
 import time
 import datetime
@@ -8,6 +7,7 @@ import docx
 import xlrd
 
 import utils
+from models import *
 
 # Constants
 
@@ -28,6 +28,7 @@ def _parse_org1_docx_report(doc):
             report += para + '\n'
     return report
 
+
 def _parse_org1_docx_events(doc):
     events = []
     table = doc.tables[0]
@@ -38,27 +39,57 @@ def _parse_org1_docx_events(doc):
         # Organisation names are provided in parentheses at the end of the list of names
         orgindex = names[-1].find('(')
         if orgindex >= 0:
-            organisation = names[-1][orgindex + 1 : names[-1].find(')')]
+            organisation = names[-1][orgindex + 1: names[-1].find(')')]
             names[-1] = names[-1][:orgindex]
         for name in names:
             parsed = {'actor': {}, 'location': {}, 'source': {}}
             parsed['actor']['name'] = name.strip()
-            parsed['actor']['organisation'] = organisation
+            parsed['actor']['organisations'] = [organisation]
             parsed['report_date'] = time.strptime(row[0].text.strip(), '%d.%m.%y')
             parsed['report_date'] = utils.to_datetime(parsed['report_date'])
             parsed['location']['name'] = row[1].text.strip()
             # TODO
             # Think of how this field fits into the schema we have.
-            #parsed['type'] = row[3].text.strip()
+            # parsed['type'] = row[3].text.strip()
             parsed['source']['name'] = row[4].text.strip()
             events.append(parsed)
     return events
 
+def _org1_events_to_model(events):
+    '''Convert a collection of events into instances of the Event model'''
+    for i in range(len(events)):
+        event = events[i]
+        actor = Actor(name=event['actor']['name'])
+        del event['actor']
+        source = Source(name=event['source']['name'])
+        del event['source']
+        geocoded = utils.geocodes(event['location']['name'], include_importance=True)
+        geocoded = utils.max_by(geocoded, lambda gc: gc['importance'])
+        location = Location(name=geocoded['name'],
+            latitude=geocoded['latitude'], longitude=geocoded['latitude'])
+        del event['location']
+        events[i] = Event(**event)
+        events[i].actor = actor
+        events[i].location = location
+    return events
+
+def _org1_report_to_model(report, events):
+    '''Convert a report text into an instance of the Report model'''
+    report = Report(text=report)
+    for i in range(len(events)):
+        events[i].report_id = report
+    report.events = events
+    return report
+
 def _parse_org1_docx(_file):
     doc = docx.Document(_file)
+    report = _parse_org1_docx_report(doc)
+    events = _parse_org1_docx_events(doc)
+    events = _org1_events_to_model(events)
+    report = _org1_report_to_model(report, events)
     return {
-        'report': _parse_org1_docx_report(doc),
-        'events': _parse_org1_docx_events(doc)
+        'report': report,
+        'events': events
     }
 
 
@@ -70,6 +101,7 @@ def _parse_org2_docx_report(doc):
             break
         report += p.text + '\n'
     return report
+
 
 # parse the list of event descriptions
 def _parse_org2_docx_events(doc):
@@ -83,29 +115,71 @@ def _parse_org2_docx_events(doc):
             # TODO
             # Decide if we want to include this extra field that does not follow
             # the schema description
-            #parsed['notes'] = ' '.join(doc.paragraphs[i + 3].text.split(':')[1:]).strip()
+            # parsed['notes'] = ' '.join(doc.paragraphs[i + 3].text.split(':')[1:]).strip()
             parsed['source']['name'] = ' '.join(doc.paragraphs[i + 4].text.split(':')[1:]).strip()
             parsed['detention_date'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
             parsed['report_date'] = ' '.join(doc.paragraphs[i + 6].text.split(':')[1:]).strip()
             if parsed['detention_date']:
                 parsed['detention_date'] = parsed['detention_date'].replace(' ', '').replace('.', '')
-                try: parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%Y')
-                except: parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%y')
+                try:
+                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%Y')
+                except:
+                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%y')
                 parsed['detention_date'] = utils.to_datetime(parsed['detention_date'])
             if parsed['report_date']:
                 parsed['report_date'] = parsed['report_date'].replace(' ', '').replace('.', '')
-                try: parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%Y')
-                except: parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%y')
+                try:
+                    parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%Y')
+                except:
+                    parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%y')
                 parsed['report_date'] = utils.to_datetime(parsed['report_date'])
             events.append(parsed)
     return events
 
+def _org2_events_to_model(events):
+    '''Convert parsed event data to model instances'''
+    for i in range(len(events)):
+        event = events[i]
+        actor = event['actor']
+        organisation = actor['organisation']
+        actor = Actor(name=actor['name'])
+        organisation = Organisation(name=organisation)
+        actor.organisations = [organisation]
+        location = event['location']['name']
+        geocodes = utils.geocodes(location, include_importance=True)
+        location = utils.max_by(geocodes, lambda gc: gc['importance'])
+        location = Location(name=location['name'],
+            latitude=location['latitude'], longitude=location['longitude'])
+        source = event['source']
+        source = Source(name=source['name'])
+        del event['actor']
+        del event['location']
+        del event['source']
+        event['victims'] = [actor]
+        event['locations'] = [location]
+        event['sources']  = [source]
+        events[i] = Event(**event)
+    return events
+
+def _org2_report_to_model(report, events):
+    '''Convert parsed report data to a model instnace'''
+    report = Report(text=report)
+    for i in range(len(events)):
+        events[i].report_id = report.id
+    report.events = events
+    return report
+
 def _parse_org2_docx(_file):
     doc = docx.Document(_file)
+    report = _parse_org2_docx_report(doc)
+    events = _parse_org2_docx_events(doc)
+    events = _org2_events_to_model(events)
+    report = _org2_report_to_model(report, events)
     return {
-        'report': _parse_org2_docx_report(doc),
-        'events': _parse_org2_docx_events(doc)
+        'report': report,
+        'events': events
     }
+
 
 # This function will do generic parsing of the content in an excel workbook
 # but we will leave it to other handler functions to do entity-specific manipulation
@@ -141,14 +215,18 @@ def _parse_excel_template(filename):
     entities[current_entity_name] = handler(entities[current_entity_name], book)
     return entities
 
+
 def _parse_error(stream):
-    return { 'error': 'No parser exists for the provided filetype.' }
+    return {'error': 'No parser exists for the provided filetype.'}
+
 
 def _id(x, *args, **kwargs):
     return x
 
+
 def _excel_parse_date(datefloat, workbook):
     return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
+
 
 def _event_entity_handler(events, wb):
     for i in range(len(events)):
@@ -160,17 +238,21 @@ def _event_entity_handler(events, wb):
         events[i]['Location'] = best_location
     return events
 
+
 def _actor_entity_handler(actors, wb):
     for i in range(len(actors)):
         actors[i]['Date of birth'] = _excel_parse_date(actors[i]['Date of birth'], wb)
         orgs = actors[i]['Organisations']
         actors[i]['Organisations'] = [s.strip() for s in orgs.split(',')]
-        try: actors[i]['Age'] = int(actors[i]['Age'])
-        except: pass
+        try:
+            actors[i]['Age'] = int(actors[i]['Age'])
+        except:
+            pass
         locations = utils.geocodes(actors[i]['Address'], include_importance=True)
         best_location = utils.max_by(locations, lambda loc: loc['importance'])
         actors[i]['Address'] = best_location
     return actors
+
 
 def _prison_entity_handler(prisons, wb):
     for i in range(len(prisons)):
@@ -179,11 +261,13 @@ def _prison_entity_handler(prisons, wb):
         prisons[i]['Location'] = best_location
     return prisons
 
+
 def _source_entity_handler(sources, wb):
     for i in range(len(sources)):
         orgs = sources[i]['Organisations']
         sources[i]['Organisations'] = [s.strip() for s in orgs.split(',')]
     return sources
+
 
 def _organisation_entity_handler(organisations, wb):
     # Each organisation can have multiple locations
@@ -196,6 +280,7 @@ def _organisation_entity_handler(organisations, wb):
         organisations[i]['Locations'] = geocoded
     return organisations
 
+
 _post_collection_handlers = {
     'Events': _event_entity_handler,
     'Actors': _actor_entity_handler,
@@ -205,8 +290,8 @@ _post_collection_handlers = {
 }
 
 _parsers = {
-    CCDHRN_DOCX: _parse_org1_docx,
-    CIHPRESS_DOCX: _parse_org2_docx,
+    ORG1_DOCX: _parse_org1_docx,
+    ORG2_DOCX: _parse_org2_docx,
     EXCEL_DOC: _parse_excel_template
 }
 

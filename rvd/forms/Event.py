@@ -1,9 +1,10 @@
 from flask_babel import lazy_gettext as ___
 
-from wtforms_alchemy import ModelForm, ModelFieldList
+from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
 
 from .. import models
+
 
 class EventForm(ModelForm):
     
@@ -19,9 +20,9 @@ class EventForm(ModelForm):
     )
 
     def __iter__(self):
-        f = list(super(ModelForm, self).__init__())
-        gf = lambda fid: next((fld for fld in f if fld.id == fid))
-        return (gf(fid) for fid in self.__order)
+        f = list(super(ModelForm, self).__iter__())
+        get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
+        return (get_field(field_id) for field_id in self.__order)
    
     # Use some example data for populating the form before we have some data to work with
     release_types = fields.SelectMultipleField(choices=[
@@ -51,7 +52,7 @@ class EventForm(ModelForm):
         validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
     allow_publishing = fields.RadioField(___('Allows publishing of information'),
         validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    allow representation = fields.RadioField(___('Allows legal representation'),
+    allow_representation = fields.RadioField(___('Allows legal representation'),
         validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
     data_is_sensitive = representation = fields.RadioField(___('Data is hyper sensitive'),
         validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
