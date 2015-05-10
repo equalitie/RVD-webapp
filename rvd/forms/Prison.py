@@ -1,24 +1,20 @@
-from flask_babel import lazy_gettext as ___
+from wtforms_alchemy import ModelForm
+from rvd.models import Prison
+from rvd.forms import location_factory, prison_type_factory
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
-from wtforms_alchemy import ModelForm, ModelFieldList
-from wtforms import fields, validators
-
-from .. import models
 
 class PrisonForm(ModelForm):
 
     class Meta:
-        model = models.Prison
-   
+        model = Prison
+
     __order = ('name', 'locations', 'prison_types')
 
     def __iter__(self):
-        f = list(super(ModelForm, self).__init__())
-        gf = lambda fid: next((fld for fld in f if fld.id == fid))
-        return (gf(fid) for fid in self.__order)
-    
-    locations = fields.SelectMultipleField(choices=[
-        (str(i), l) for i, l in enumerate(['Cuba', 'Spain', 'Germany', 'United States'])])
-    prison_types = fields.SelectMultipleField(choices=[
-        (str(i), p) for i, p in enumerate(['Solitary', 'Torturing', 'Holding'])])
+        f = list(super(ModelForm, self).__iter__())
+        get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
+        return (get_field(field_id) for field_id in self.__order)
 
+    locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name')
+    prison_types = QuerySelectMultipleField(query_factory=prison_type_factory, get_label='name')

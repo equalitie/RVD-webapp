@@ -1,16 +1,56 @@
 from flask import Blueprint, render_template, request, redirect
 from flask_login import login_required
-from rvd.forms.Event import EventForm 
+from rvd.forms.Event import EventForm
 from flask_admin import helpers
-from rvd.models import session
-
+from collections import defaultdict
+from rvd.models import session, Event
+from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
+from rvd.forms import perpetrators_factory, victims_factory
+from copy import copy
+names = {
+    'name': 'event',
+    'plural': 'events',
+    'slug': 'event',
+    'plural_slug': 'events'
+}
 events_bp = Blueprint('events', __name__)
 
-from rvd.models import Event
+
+def get_name_from_id(needle, things):
+    for thing in things:
+        if int(thing.id) == int(needle):
+            return thing
 
 
-def gather_form_data(event_form, new_event=True, current_event=None):
-    pass
+def gather_form_data():
+    event_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
+
+    location_ids = request.form.getlist('locations')
+    event_dict['locations'] = [get_name_from_id(x, location_factory()) for x in location_ids]
+
+    prison_ids = request.form.getlist('prisons')
+    event_dict['prisons'] = [get_name_from_id(x, prison_factory()) for x in prison_ids]
+
+    release_types_ids = request.form.getlist('release_types')
+    event_dict['release_types'] = [get_name_from_id(x, release_type_factory()) for x in release_types_ids]
+
+    sources_ids = request.form.getlist('sources')
+    event_dict['sources'] = [get_name_from_id(x, source_factory()) for x in sources_ids]
+
+    witnesses_ids = request.form.getlist('witnesses')
+    event_dict['witnesses'] = [get_name_from_id(x, witnesses_factory()) for x in witnesses_ids]
+
+    victims_ids = request.form.getlist('victims')
+    event_dict['victims'] = [get_name_from_id(x, victims_factory()) for x in victims_ids]
+
+    perpetrators_ids = request.form.getlist('perpetrators')
+    event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
+
+    event_instance = Event(**event_dict)
+    session.add(event_instance)
+    session.commit()
+
+    return event_instance
 
 
 @events_bp.route('/events/add', methods=('GET', 'POST'))
@@ -18,28 +58,61 @@ def gather_form_data(event_form, new_event=True, current_event=None):
 def events():
     event_form = EventForm(request.form)
     if helpers.validate_form_on_submit(event_form):
-        event_instance = gather_form_data(event_form)
-        return redirect('/events/{}'.format(event_instance.id))
+        event_instance = gather_form_data()
+        return redirect('/events/{}?success=1'.format(event_instance.id))
 
-    return render_template("event_edit.html", form=event_form, action='add')
+    data = copy(names)
+    return render_template("item_edit.html", form=event_form, action='add', data=data)
+
+
+def get_attr(a):
+    if hasattr(a, 'name'):
+        return a.name
+    if hasattr(a, 'type_code'):
+        return str(a.type_code)
+
+
+def flatten_instance(obj):
+    fields = {'id': obj.id}
+    for c in obj.__table__.columns:
+        fields[c.info.get('label')] = getattr(obj, c.key)
+    from sqlalchemy.inspection import inspect
+
+    for r in inspect(Event).relationships:
+        associated_data = getattr(obj, r.key)
+        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
+    return fields
 
 
 @events_bp.route('/events/<int:event_id>')
 @login_required
 def view_event(event_id):
     event = session.query(Event).get(event_id)
-    event = {k: v for k, v in event.__dict__.iteritems() if k != "_sa_instance_state"}
+    fields = flatten_instance(event)
+    data = copy(names)
+    data['data'] = fields
 
-    return render_template("event_view.html", event=event)
+    return render_template("item_view_single.html", data=data)
 
 
 @events_bp.route('/events/all')
 @login_required
 def view_all_events():
     all_events = session.query(Event).all()
-    all_events = [{k: v for k, v in x.__dict__.iteritems() if k != "_sa_instance_state"} for x in all_events]
+    all_events = [{k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_events]
+    data = copy(names)
+    data['data'] = all_events
 
-    return render_template("events_view_all.html", events=all_events)
+    return render_template("item_view_all.html", data=data)
+
+
+@events_bp.route('/events/<int:event_id>/delete')
+@login_required
+def delete_event(event_id):
+    event = session.query(Event).get(event_id)
+    session.delete(event)
+    session.commit()
+    return redirect('/events/all?success=1')
 
 
 @events_bp.route('/events/<int:event_id>/edit', methods=('GET', 'POST'))
@@ -49,7 +122,10 @@ def edit_event(event_id):
     event_form = EventForm(request.form, obj=event)
 
     if helpers.validate_form_on_submit(event_form):
-        gather_form_data(event_form, new_event=False, current_event=event)
-        return redirect('/events/{}'.format(event_id))
+        event_form.populate_obj(event)
+        return redirect('/events/{}?success=1'.format(event_id))
 
-    return render_template("event_edit.html", event=event, form=event_form, action='edit')
+    data = copy(names)
+    data['data'] = event
+
+    return render_template("item_edit.html", data=data, form=event_form, action='edit')
