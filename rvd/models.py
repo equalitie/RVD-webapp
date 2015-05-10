@@ -79,7 +79,7 @@ class Actor(Base):
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
     address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
-    organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
+    organisations = relationship('Organisation', secondary=actor_organisation, backref='members', info={'label': ___('Organisations')})
     professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
     locations = relationship('Location', secondary=actor_location, backref='locals')
     gender = sa.Column(sa.Text, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
