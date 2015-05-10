@@ -1,16 +1,16 @@
 from flask_babel import lazy_gettext as ___
-
 from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
-
-from .. import models
+from rvd.models import Event
+from rvd.forms import location_factory, release_type_factory, prison_factory, source_factory, witnesses_factory
+from rvd.forms import victims_factory, perpetrators_factory
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
 
 class EventForm(ModelForm):
-    
     class Meta:
-        model = models.Event
-    
+        model = Event
+
     __order = (
         'title', 'description', 'detention_date', 'release_date', 'report_date',
         'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
@@ -23,36 +23,45 @@ class EventForm(ModelForm):
         f = list(super(ModelForm, self).__iter__())
         get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
         return (get_field(field_id) for field_id in self.__order)
-   
-    # Use some example data for populating the form before we have some data to work with
-    release_types = fields.SelectMultipleField(choices=[
-        (str(i), t) for i, t in enumerate(['type1', 'type2', 'type3'])])
-    locations = fields.SelectMultipleField(choices=[
-        (str(i), l) for i, l in enumerate(['California', 'Ontario', 'Montreal', 'Washington'])])
-    prisons = fields.SelectMultipleField(choices=[
-        (str(i), p) for i, p in enumerate(['Guantanamo', 'Bordeaux'])])
-    sources = fields.SelectMultipleField(choices=[
-        (str(i), s) for i, s in enumerate(['John Smith', 'Jane Doe', 'Bob Grant', 'Alice McDonald'])])
-    witnesses = fields.SelectMultipleField(choices=[
-        (str(i), w) for i, w in enumerate(['Jane Grace', 'Flander Flowers', 'Sarah Noble'])])
-    victims = fields.SelectMultipleField(choices=[
-        (str(i), v) for i, v in enumerate(['Greg Housh', 'Jeremy Hammond', 'Barret Brown'])])
-    perpetrators = fields.SelectMultipleField(choices=[
-        (str(i), p) for i, p in enumerate(['NYC Police', 'Obama', 'Bush'])])
 
-    psych_assist = fields.RadioField(___('Psychological assistance provided'), 
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    material_assist = fields.RadioField(___('Material assistance provided'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    was_activist = fields.RadioField(___('Was an activist'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    victim_is_complainant = fields.RadioField(___('Victim is complainant'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    allow_storage = fields.RadioField(___('Allows storage of information'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    allow_publishing = fields.RadioField(___('Allows publishing of information'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    allow_representation = fields.RadioField(___('Allows legal representation'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
-    data_is_sensitive = representation = fields.RadioField(___('Data is hyper sensitive'),
-        validators=[validators.required()], choices=[('True', ___('Yes')), ('False', ___('No'))])
+    # Use some example data for populating the form before we have some data to work with
+    release_types = QuerySelectMultipleField(query_factory=release_type_factory, get_label='type_code')
+    locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name')
+    prisons = QuerySelectMultipleField(query_factory=prison_factory, get_label='name')
+    sources = QuerySelectMultipleField(query_factory=source_factory, get_label='name')
+    witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label='name')
+    victims = QuerySelectMultipleField(query_factory=victims_factory, get_label='name')
+    perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label='name')
+
+    psych_assist = fields.SelectField(___('Psychological assistance provided'),
+                                      validators=[validators.required()],
+                                      choices=[
+                                          (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    material_assist = fields.SelectField(___('Material assistance provided'),
+                                         validators=[validators.required()],
+                                         choices=[
+                                             (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    was_activist = fields.SelectField(___('Was an activist'),
+                                      validators=[validators.required()],
+                                      choices=[
+                                          (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    victim_is_complainant = fields.SelectField(___('Victim is complainant'),
+                                               validators=[validators.required()],
+                                               choices=[
+                                                   (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    allow_storage = fields.SelectField(___('Allows storage of information'),
+                                       validators=[validators.required()],
+                                       choices=[
+                                           (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    allow_publishing = fields.SelectField(___('Allows publishing of information'),
+                                          validators=[validators.required()],
+                                          choices=[
+                                              (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    allow_representation = fields.SelectField(___('Allows legal representation'),
+                                              validators=[validators.required()],
+                                              choices=[
+                                                  (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    data_is_sensitive = fields.SelectField(___('Data is hyper sensitive'),
+                                           validators=[validators.required()],
+                                           choices=[
+                                               (1, ___('Yes')), (0, ___('No'))], coerce=bool)

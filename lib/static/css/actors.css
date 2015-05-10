@@ -1,6 +1,6 @@
 .form_actor_label{
     float: left;
-    width: 150px;
+    width: 250px;
     font-weight: bold;
 }
 .form_event_label{
@@ -36,14 +36,14 @@
 .form_actor_field input.country_code, .form_actor_field input.area_code{
     width: 46px;
 }
-.new_actor_form .form-group label ul{
+.new_actor_form .form-group label ul, .new_event_form .form-group label ul{
     list-style-type: none;
     margin:0;
     padding:0;
     margin-bottom: 20px;
 }
 .new_actor_bt{
-    margin-left: 150px;
+    margin-left: 250px;
 }
 .new_event_bt{
     margin-left: 270px;

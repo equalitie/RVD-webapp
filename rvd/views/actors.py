@@ -3,40 +3,39 @@ from flask_login import login_required
 from rvd.forms.Actor import ActorForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session
+from rvd.models import session, Actor
 import datetime
-
+from rvd.forms import organisation_factory, location_factory, profession_factory
+from copy import copy
+names = {
+    'name': 'actor',
+    'plural': 'actors',
+    'slug': 'actor',
+    'plural_slug': 'actors'
+}
 actors_bp = Blueprint('actors', __name__)
 
-from rvd.models import Actor, Organisation, Location, Profession
+
+def get_name_from_id(needle, things):
+    for thing in things:
+        if int(thing.id) == int(needle):
+            return thing
 
 
-def gather_form_data(actor_form, new_actor=True, current_actor=None):
+def gather_form_data():
     actor_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
-
-    organisations = request.form.getlist('organisations')
-    test_org_loc = [Location(name='Test Location', longitude=44.0123, latitude=23.235)]
-    organisations = [
-        Organisation(name=actor_form.organisations.choices[i][1], description='test', locations=test_org_loc)
-        for i in map(int, organisations)]
-    actor_dict['organisations'] = organisations
+    organisation_ids = request.form.getlist('organisations')
+    actor_dict['organisations'] = [get_name_from_id(x, organisation_factory()) for x in organisation_ids]
     locations = request.form.getlist('locations')
-    locations = [
-        Location(name=actor_form.locations.choices[i][1], latitude=41.123, longitude=67.15)
-        for i in map(int, locations)]
-    actor_dict['locations'] = locations
+    actor_dict['locations'] = [get_name_from_id(x, location_factory()) for x in locations]
     professions = request.form.getlist('professions')
-    professions = [Profession(name=actor_form.professions.choices[i][1]) for i in map(int, professions)]
-    actor_dict['professions'] = professions
-
+    actor_dict['professions'] = [get_name_from_id(x, profession_factory()) for x in professions]
     actor_dict['gender'] = actor_dict['gender']
     actor_dict['is_activist'] = actor_dict['is_activist']
     actor_dict['birth_date'] = datetime.datetime.strptime(actor_dict['birth_date'], "%Y-%m-%d").date()
 
     actor_instance = Actor(**actor_dict)
-    if new_actor:
-        session.add(actor_instance)
-
+    session.add(actor_instance)
     session.commit()
 
     return actor_instance
@@ -47,28 +46,54 @@ def gather_form_data(actor_form, new_actor=True, current_actor=None):
 def actors():
     actor_form = ActorForm(request.form)
     if helpers.validate_form_on_submit(actor_form):
-        actor_instance = gather_form_data(actor_form)
+        actor_instance = gather_form_data()
         return redirect('/actors/{}?success=1'.format(actor_instance.id))
 
-    return render_template("actor_edit.html", form=actor_form, action='add')
+    data = copy(names)
+    return render_template("item_edit.html", form=actor_form, action='add', data=data)
+
+
+def flatten_instance(obj):
+    fields = {'id': obj.id}
+    for c in obj.__table__.columns:
+        fields[c.info.get('label')] = getattr(obj, c.key)
+    from sqlalchemy.inspection import inspect
+
+    for r in inspect(Actor).relationships:
+        associated_data = getattr(obj, r.key)
+        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
+    return fields
 
 
 @actors_bp.route('/actors/<int:actor_id>')
 @login_required
 def view_actor(actor_id):
     actor = session.query(Actor).get(actor_id)
-    actor = {k: v for k, v in actor.__dict__.iteritems() if k != "_sa_instance_state"}
+    fields = flatten_instance(actor)
+    data = copy(names)
+    data['data'] = fields
 
-    return render_template("actor_view.html", actor=actor)
+    return render_template("item_view_single.html", data=data)
 
 
 @actors_bp.route('/actors/all')
 @login_required
 def view_all_actors():
     all_actors = session.query(Actor).all()
-    all_actors = [{k: v for k, v in x.__dict__.iteritems() if k != "_sa_instance_state"} for x in all_actors]
+    all_actors = [{k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_actors]
+    data = copy(names)
+    data['data'] = all_actors
 
-    return render_template("actors_view_all.html", actors=all_actors)
+    return render_template("item_view_all.html", data=data)
+
+
+@actors_bp.route('/actors/<int:actor_id>/delete')
+@login_required
+def delete_actor(actor_id):
+    actor = session.query(Actor).get(actor_id)
+    session.delete(actor)
+    session.commit()
+    return redirect('/actors/all?success=1')
 
 
 @actors_bp.route('/actors/<int:actor_id>/edit', methods=('GET', 'POST'))
@@ -78,7 +103,10 @@ def edit_actor(actor_id):
     actor_form = ActorForm(request.form, obj=actor)
 
     if helpers.validate_form_on_submit(actor_form):
-        gather_form_data(actor_form, new_actor=False, current_actor=actor)
+        actor_form.populate_obj(actor)
         return redirect('/actors/{}?success=1'.format(actor_id))
 
-    return render_template("actor_edit.html", actor=actor, form=actor_form, action='edit')
+    data = copy(names)
+    data['data'] = actor
+
+    return render_template("item_edit.html", data=data, form=actor_form, action='edit')

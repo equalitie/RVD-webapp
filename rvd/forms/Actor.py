@@ -1,15 +1,15 @@
 from flask_babel import lazy_gettext as ___
-
-from wtforms_alchemy import ModelForm, ModelFieldList
+from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
-
-from .. import models
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from rvd.models import Actor
+from rvd.forms import organisation_factory, location_factory, profession_factory
 
 
 class ActorForm(ModelForm):
 
     class Meta:
-        model = models.Actor
+        model = Actor
 
     __order = (
         'name', 'birth_date', 'gender', 'telephone', 'address', 'is_activist',
@@ -21,12 +21,9 @@ class ActorForm(ModelForm):
         get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
         return (get_field(field_id) for field_id in self.__order)
 
-    organisations = fields.SelectMultipleField(choices=[
-        ('0', "The Guardian"), ('1', "Propublica"), ('2', "The Intercept"), ('3', "The Washington Post")])
-    professions = fields.SelectMultipleField(choices=[
-        ('0', "Programmer"), ('1', "Journalist"), ('2', "Writer"), ('3', "Wizard")])
-    locations = fields.SelectMultipleField(choices=[
-        ('0', "Montreal, QC"), ('1', "Toronto, ON"), ('2', "San Francisco, CA"), ('3', "Vancouver, BC")])
+    organisations = QuerySelectMultipleField(query_factory=organisation_factory, get_label='name', allow_blank=True)
+    professions = QuerySelectMultipleField(query_factory=profession_factory, get_label='name', allow_blank=True)
+    locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name', allow_blank=True)
     gender = fields.SelectField(___('Gender'), validators=[validators.required()], choices=[
         ('M', ___('Male')), ('F', ___('Female'))])
     is_activist = fields.SelectField(___('Is activist'), validators=[validators.required()], choices=[

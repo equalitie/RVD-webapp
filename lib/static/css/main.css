@@ -121,9 +121,9 @@ ul li.normal:before{
 #settings a{
     text-decoration: none;
 }
-.actors_menu ul li, .upload_menu ul li, .reports_menu ul li, .events_menu ul li{
+.actors_menu ul li, .upload_menu ul li, .reports_menu ul li, .events_menu ul li, .meta_menu ul li{
     margin-left: 10px;
 }
-.actors_menu ul li i, .upload_menu ul li i .reports_menu ul li, .events_menu ul li i{
+.actors_menu ul li i, .upload_menu ul li i .reports_menu ul li, .events_menu ul li i, .meta_menu ul li i{
     margin-right: 5px;
 }

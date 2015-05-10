@@ -1,0 +1,28 @@
+{% extends "base_logged_in.html" %}
+
+{% block left_bar %}
+
+{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
+    {% if request.args.get('success') %}
+        <p class="bg-success new_actor_success">Operation successful.</p>
+    {% endif %}
+    <h3>all {{ data['plural'] }}</h3>
+
+    <table class="table">
+        {% for item in data['data'] %}
+            <tr>
+                <td>{{item['name'] or item['title']}}</td>
+                <td>{{item['id']}}</td>
+                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}">View</a></td>
+                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/edit">Edit</a></td>
+                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/delete">Delete</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="/{{ data['plural_slug'] }}/add">Add a new {{ data['name'] }}</a></p>
+
+{% endblock %}
