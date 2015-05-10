@@ -190,16 +190,15 @@ def _parse_excel_template(filename):
     entities = {}
     current_entity_fields = []
     current_entity_name = ''
-    # The first row contains just the table name, so we skip it
-    for row_num in range(1, sheet.nrows):
+    for row_num in range(sheet.nrows):
         # When we encounter a row like ['Event', 'Title', 'Description', ...]
         # We are looking at the outline of a new entity type (in example, it's 'Event')
         if sheet.row(row_num)[0].value != '':
             # Before transitioning to the next entity, apply any special handlers
             # We might want to use to do extra work with the current entity's data
-            if current_entity_name != '':
-                handler = _post_collection_handlers.get(current_entity_name, _id)
-                entities[current_entity_name] = handler(entities[current_entity_name], book)
+            #if current_entity_name != '':
+            #    handler = _post_collection_handlers.get(current_entity_name, _id)
+            #    entities[current_entity_name] = handler(entities[current_entity_name], book)
             entity_name = sheet.row(row_num)[0].value
             entities[entity_name] = []
             current_entity_name = entity_name
@@ -227,66 +226,29 @@ def _id(x, *args, **kwargs):
 def _excel_parse_date(datefloat, workbook):
     return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
 
+#################################
+## Model building transformers ##
+#################################
 
-def _event_entity_handler(events, wb):
-    for i in range(len(events)):
-        events[i]['Date of detention'] = _excel_parse_date(events[i]['Date of detention'], wb)
-        events[i]['Date of release'] = _excel_parse_date(events[i]['Date of release'], wb)
-        events[i]['Date of report'] = _excel_parse_date(events[i]['Date of report'], wb)
-        locations = utils.geocodes(events[i]['Location'], include_importance=True)
-        best_location = utils.max_by(locations, lambda loc: loc['importance'])
-        events[i]['Location'] = best_location
-    return events
-
-
-def _actor_entity_handler(actors, wb):
-    for i in range(len(actors)):
-        actors[i]['Date of birth'] = _excel_parse_date(actors[i]['Date of birth'], wb)
-        orgs = actors[i]['Organisations']
-        actors[i]['Organisations'] = [s.strip() for s in orgs.split(',')]
-        try:
-            actors[i]['Age'] = int(actors[i]['Age'])
-        except:
-            pass
-        locations = utils.geocodes(actors[i]['Address'], include_importance=True)
-        best_location = utils.max_by(locations, lambda loc: loc['importance'])
-        actors[i]['Address'] = best_location
-    return actors
-
-
-def _prison_entity_handler(prisons, wb):
-    for i in range(len(prisons)):
-        locations = utils.geocodes(prisons[i]['Location'], include_importance=True)
-        best_location = utils.max_by(locations, lambda loc: loc['importance'])
-        prisons[i]['Location'] = best_location
-    return prisons
-
-
-def _source_entity_handler(sources, wb):
-    for i in range(len(sources)):
-        orgs = sources[i]['Organisations']
-        sources[i]['Organisations'] = [s.strip() for s in orgs.split(',')]
-    return sources
-
-
-def _organisation_entity_handler(organisations, wb):
-    # Each organisation can have multiple locations
-    for i in range(len(organisations)):
-        geocoded = []
-        for location in organisations[i]['Locations']:
-            locations = utils.geocodes(location, include_importance=True)
-            best_location = utils.max_by(locations, lambda loc: loc['importance'])
-            geocoded.append(best_location)
-        organisations[i]['Locations'] = geocoded
-    return organisations
-
+def _action_h(actions, state_auths, intern_auths):
+    for i in range(len(actions)):
+        action = actions[i]
 
 _post_collection_handlers = {
-    'Events': _event_entity_handler,
-    'Actors': _actor_entity_handler,
-    'Prisons': _prison_entity_handler,
-    'Sources': _source_entity_handler,
-    'Organisations': _organisation_entity_handler
+    'Actions': _action_h,
+    'Actors': _actor_h,
+    'Events': _event_h,
+    'Reports': _report_h,
+    'International Authorities': _inter_auth_h,
+    'State Authorities': _state_auth_h,
+    'Organisations': _organisation_h,
+    'Professions': _profession_h,
+    'Locations': _location_h,
+    'Release Types': _location_h,
+    'Rights Violations': _rights_violation_h,
+    'Sources': _source_h,
+    'Prison Types': _prison_type_h,
+    'Prisons': _prison_h
 }
 
 _parsers = {
