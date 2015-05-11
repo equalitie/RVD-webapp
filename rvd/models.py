@@ -74,7 +74,7 @@ class Actor(Base):
 
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
-    birth_date = sa.Column(sa.Date, nullable=False, info={'description': ___('Name'), 'label': ___('Date of birth')})
+    birth_date = sa.Column(sa.Date, nullable=False, info={'description': ___('Date of birth'), 'label': ___('Date of birth')})
     # telephone = sa.Column(PhoneNumberType(), info={
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
