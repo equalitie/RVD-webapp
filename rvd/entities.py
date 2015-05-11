@@ -79,7 +79,7 @@ source = {
     u'Organisations': 'organisations'
 }
 
-prisons_type = {
+prison_type = {
     u'Name': 'name'
 }
 
