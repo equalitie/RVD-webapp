@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect
 from flask_login import login_required, current_user, login_user, logout_user
 from flask_admin import helpers
 from rvd.forms.Login import LoginForm
+import logging
 login_bp = Blueprint('login', __name__)
 
 
@@ -14,6 +15,7 @@ def login():
         try:
             login_user(login_form.user)
         except:
+            logging.error("Could not log in.")
             redirect('/')
         return redirect("/reports")
 

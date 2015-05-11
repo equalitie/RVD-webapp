@@ -388,7 +388,7 @@ class User(Base, UserMixin):
     email = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Email'), 'label': ___('Email')})
     password = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Password'), 'label': ___('Password')})
     organisation = relationship('UserOrganisation', backref=backref('members', order_by=id))
-    organisation_id = sa.Column(sa.BigInteger, ForeignKey('user_organisations.id'))
+    organisation_id = sa.Column(sa.BigInteger, ForeignKey('user_organisations.id'), nullable=True)
     is_admin = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Is admin'), 'label': ___('Is admin')})
 
 ## Create the database tables ##

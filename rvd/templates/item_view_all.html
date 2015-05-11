@@ -6,23 +6,29 @@
 
 {% block content %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
-    {% if request.args.get('success') %}
-        <p class="bg-success new_actor_success">Operation successful.</p>
+
+    {% if needs_admin and not current_user.is_admin %}
+        <div class="only_admin">Only administrators can access this section.</div>
+    {% else %}
+
+        {% if request.args.get('success') %}
+            <p class="bg-success new_actor_success">Operation successful.</p>
+        {% endif %}
+        <h3>all {{ data['plural'] }}</h3>
+
+        <table class="table">
+            {% for item in data['data'] %}
+                <tr>
+                    <td>{{item['name'] or item['title'] or item['email'] }}</td>
+                    <td>{{item['id']}}</td>
+                    <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}">View</a></td>
+                    <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/edit">Edit</a></td>
+                    <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/delete">Delete</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <p><a href="/{{ data['plural_slug'] }}/add">Add a new {{ data['name'] }}</a></p>
+
     {% endif %}
-    <h3>all {{ data['plural'] }}</h3>
-
-    <table class="table">
-        {% for item in data['data'] %}
-            <tr>
-                <td>{{item['name'] or item['title'] or item['email'] }}</td>
-                <td>{{item['id']}}</td>
-                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}">View</a></td>
-                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/edit">Edit</a></td>
-                <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/delete">Delete</a></td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <p><a href="/{{ data['plural_slug'] }}/add">Add a new {{ data['name'] }}</a></p>
 
 {% endblock %}

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect
 from flask_login import login_required
 from rvd.forms.User import UserForm
 from flask_admin import helpers
+from flask_login import current_user
 from collections import defaultdict
 from rvd.models import session, User
 from rvd.forms import user_org_factory
@@ -47,7 +48,7 @@ def users():
         return redirect('/users/{}?success=1'.format(user_instance.id))
 
     data = copy(names)
-    return render_template("item_edit.html", form=user_form, action='add', data=data)
+    return render_template("item_edit.html", form=user_form, action='add', data=data, needs_admin=1, user=current_user)
 
 
 def flatten_instance(obj):
@@ -73,7 +74,7 @@ def view_user(user_id):
     data = copy(names)
     data['data'] = fields
 
-    return render_template("item_view_single.html", data=data)
+    return render_template("item_view_single.html", data=data, needs_admin=1, user=current_user)
 
 
 @users_bp.route('/users/all')
@@ -84,7 +85,7 @@ def view_all_users():
     data = copy(names)
     data['data'] = all_users
 
-    return render_template("item_view_all.html", data=data)
+    return render_template("item_view_all.html", data=data, needs_admin=1, user=current_user)
 
 
 @users_bp.route('/users/<int:user_id>/delete')
@@ -109,4 +110,4 @@ def edit_user(user_id):
     data = copy(names)
     data['data'] = user
 
-    return render_template("item_edit.html", data=data, form=user_form, action='edit')
+    return render_template("item_edit.html", data=data, form=user_form, action='edit', needs_admin=1, user=current_user)
