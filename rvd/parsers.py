@@ -249,6 +249,7 @@ def _parse_excel_template(filename):
             handler = _post_collection_handlers.get(entity_name, _id)
             entities = handler(entities, book)
             entities['finished'].append(entity_name)
+    del entities['finished']
     return entities
 
 

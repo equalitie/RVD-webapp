@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from rvd.models import session
+import rvd.models
 from werkzeug.utils import secure_filename
 import os
 from flask_login import login_required
@@ -8,7 +8,7 @@ from rvd import parsers
 documents_bp = Blueprint('documents', __name__)
 
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/path/to/uploads'
 ALLOWED_EXTENSIONS = set(['docx', 'doc', 'xlsx', 'xls'])
 
 # Document types that only provide information about events.
@@ -31,23 +31,25 @@ def documents_uploads():
             print '### Found file ' + file.filename
             if allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+                print '### Trying to save ' + filename
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
+                print '### Saved'
                 f = os.path.join(UPLOAD_FOLDER, filename)
-                org_name = request.form['organisation_name']
-                print '### Got organisation name ' + org_name
-                parsed = parsers.parse(f, org_name)
+                #org_name = request.form['organisation_name']
+                #print '### Got organisation name ' + org_name
+                parsed = parsers.parse(f, parsers.EXCEL_DOC) #org_name)
                 print '### Succeeding in parsing document'
                 if 'error' in parsed:
                     print '### ' + parsed['error']
                     return render_template('document_add.html', 'failure')
                 elif only_supplies_event(file.filename):
-                    session.add_all(parsed['events'])
+                    rvd.models.session.add_all(parsed['events'])
                     print '### Added all parsed events'
                 else:
                     for entity in parsed:
-                        session.add_all(parsed[entity])
+                        rvd.models.session.add_all(parsed[entity])
                     print '### Added all parsed entities'
-                session.commit()
+                rvd.models.session.commit()
                         
     return render_template("document_add.html", 'success')
 
