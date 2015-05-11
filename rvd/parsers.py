@@ -244,11 +244,10 @@ def _parse_excel_template(filename):
     # Call on each entity's respective model instance builder.
     entity_names = entities.keys()
     for entity_name in entity_names:
-        handler = _post_collection_handlers.get(entity_name, _id)
-        print handler
-        entities = handler(entities, book)
-    print '#######################################'
-    print '#######################################'
+        print entities['finished'], entity_name
+        if entity_name not in entities['finished']:
+            handler = _post_collection_handlers.get(entity_name, _id)
+            entities = handler(entities, book)
     return entities
 
 
@@ -273,7 +272,7 @@ def _make_indices(indices, array_len):
         except ValueError:
             indices[i] = '{0} not a valid integer.'.format(indices[i])
             continue
-        if v < 0 or v >= array_len:
+        if v < 1 or v > array_len:
             indices[i] = 'Index ({0}) must be between 1 and {1} inclusive'.format(
                 v, array_len)
         else:
@@ -296,6 +295,10 @@ def _take(array, indices):
 # Extract elements from the provided array being indexed into and outputting
 # any errors that occur.
 def _from_indices(ind_list, other_entities):
+    # If a single index value is provided, it will be converted to a float.
+    # So it is necessary to convert it back to a string-int.
+    if isinstance(ind_list, float):
+        ind_list = str(int(ind_list))
     indices = _make_indices(ind_list.split(','), len(other_entities))
     values = _take(other_entities, indices)
     return values
@@ -313,12 +316,23 @@ def _from_indices(ind_list, other_entities):
 # !!! IMPORTANT !!!
 # All handlers are *required* to maintain the order of entities in value fields.
 
+def p_dict(d, level=0):
+    keys = sorted(d.keys())
+    for key in keys:
+        if isinstance(d[key], dict):
+            print ('\t' * level) + key + ' =>'
+            p_dict(d[key], level + 1)
+        else:
+            print ('\t' * level) + '{0} => {1}'.format(key, d[key])
+
 # Handles building entities upon which others depend.
 def _pre_handle(parsed, wb, *entity_names):
     for entity in entity_names:
         if entity not in parsed['finished']:
             parsed = _post_collection_handlers[entity](parsed, wb)
             parsed['finished'].append(entity)
+    print '_-_-_ End of pre handle _-_-_'
+    p_dict(parsed)
     return parsed
 
 def _action_h(parsed, wb):
@@ -375,8 +389,10 @@ def _event_h(parsed, wb):
     return parsed
 
 def _report_h(parsed, wb):
+    parsed = _pre_handle(parsed, wb, EVENTS)
     for i in range(len(parsed[REPORTS])):
         report = entities.translate_fields(parsed[REPORTS][i], entities.report)
+        report['events'] = _from_indices(report['events'], parsed[EVENTS])
         parsed[REPORTS][i] = Report(**report)
     return parsed 
 
@@ -423,9 +439,7 @@ def _source_h(parsed, wb):
     parsed = _pre_handle(parsed, wb, ORGANISATIONS)
     for i in range(len(parsed[SOURCES])):
         source = entities.translate_fields(parsed[SOURCES][i], entities.source)
-        source['organisation'] = _from_indices(source['organisation'], parsed[ORGANISATIONS])
-        if len(source['organisation']) > 0:
-            source['organisation'] = source['organisation'][0]
+        source['organisations'] = _from_indices(source['organisations'], parsed[ORGANISATIONS])
         parsed[SOURCES][i] = Source(**source)
     return parsed
 

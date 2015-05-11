@@ -2,8 +2,6 @@
 document types to the names of attributes in each model.
 '''
 
-from flask_babel import lazy_gettext as ___
-
 import datetime
 
 def translate_fields(parsed, mapping):
@@ -19,105 +17,105 @@ def excel_parse_date(datefloat):
     return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, excel_workbook.datemode))
 
 international_authority = {
-    ___('Name'): 'name',
-    ___('Description'): 'description'
+    u'Name': 'name',
+    u'Description': 'description'
 }
 
 state_authority = {
-    ___('Name'): 'name',
-    ___('Description'): 'description'
+    u'Name': 'name',
+    u'Description': 'description'
 }
 
 action = {
-    ___('State authorities approached'): 'state_bodies_apprached',
-    ___('Complaint to state authority'): 'complaint_to_state_authority',
-    ___('Response from state authority'): 'response_from_state_authority',
-    ___('International authorities approached'): 'international_bodies_approached',
-    ___('Complaint to international authority'): 'complaint_to_international_authority',
-    ___('Response from international authority'): 'response_from_international_authority',
-    ___('Events'): 'events'
+    u'State authorities approached': 'state_bodies_apprached',
+    u'Complaint to state authority': 'complaint_to_state_authority',
+    u'Response from state authority': 'response_from_state_authority',
+    u'International authorities approached': 'international_bodies_approached',
+    u'Complaint to international authority': 'complaint_to_international_authority',
+    u'Response from international authority': 'response_from_international_authority',
+    u'Events': 'events'
 }
 
 organisation = {
-    ___('Name'): 'name',
-    ___('Description'): 'description',
-    ___('Locations'): 'locations'
+    u'Name': 'name',
+    u'Description': 'description',
+    u'Locations': 'locations'
 }
 
 profession = {
-    ___('Name'): 'name'
+    u'Name': 'name'
 }
 
 location = {
-    ___('Name'): 'name',
-    ___('Latitude'): 'latitude',
-    ___('Latitude'): 'longitude'
+    u'Name': 'name',
+    u'Latitude': 'latitude',
+    u'Latitude': 'longitude'
 }
 
 actor = {
-    ___('Name'): 'name',
-    ___('Birth date'): 'birth_date',
-    ___('Telephone number'): 'telephone',
-    ___('Address'): 'address',
-    ___('Gender'): 'gender',
-    ___('Is an activist'): 'is_activist',
-    ___('Activist info'): 'activist_info',
-    ___('Organisations'): 'organisations',
-    ___('Professions'): 'professions',
-    ___('Locations'): 'locations'
+    u'Name': 'name',
+    u'Birth date': 'birth_date',
+    u'Telephone number': 'telephone',
+    u'Address': 'address',
+    u'Gender': 'gender',
+    u'Is an activist': 'is_activist',
+    u'Activist info': 'activist_info',
+    u'Organisations': 'organisations',
+    u'Professions': 'professions',
+    u'Locations': 'locations'
 }
 
 release_type = {
-    ___('Type code'): 'type_code'
+    u'Type code': 'type_code'
 }
 
 rights_violation = {
-    ___('Name'): 'name',
-    ___('Description'): 'description'
+    u'Name': 'name',
+    u'Description': 'description'
 }
 
 source = {
-    ___('Name'): 'name',
-    ___('Organisations'): 'organisations'
+    u'Name': 'name',
+    u'Organisations': 'organisations'
 }
 
 prisons_type = {
-    ___('Name'): 'name'
+    u'Name': 'name'
 }
 
 prison = {
-    ___('Name'): 'name',
-    ___('Locations'): 'locations',
-    ___('Prison types'): 'prison_types'
+    u'Name': 'name',
+    u'Locations': 'locations',
+    u'Prison types': 'prison_types'
 }
 
 event = {
-    ___('Title'): 'title',
-    ___('Description'): 'description',
-    ___('Charges'): 'charges',
-    ___('Consequencess'): 'consequences',
-    ___('Detention date'): 'detention_date',
-    ___('Release date'): 'release_date',
-    ___('Report date'): 'report_date',
-    ___('Psychological assistance provided'): 'psych_assist',
-    ___('Material assistance provided'): 'material_assist',
-    ___('Was an activist'): 'was_activist',
-    ___('Victim is complainant'): 'victim_is_complainant',
-    ___('Allows storage of case details'): 'allow_storage',
-    ___('Allows publishing of case details'): 'allow_publishing',
-    ___('Allows legal representation'): 'allow_representation',
-    ___('Victims may be harmed if data is published'): 'data_is_sensitive',
-    ___('Release types'): 'release_types',
-    ___('Locations'): 'locations',
-    ___('Prisons'): 'prisons',
-    ___('Sources'): 'sources',
-    ___('Witnesses'): 'witnesses',
-    ___('Victims'): 'victims',
-    ___('Perpetrators'): 'perpetrators',
-    ___('Rights violations'): 'rights_violations'
+    u'Title': 'title',
+    u'Description': 'description',
+    u'Charges': 'charges',
+    u'Consequencess': 'consequences',
+    u'Detention date': 'detention_date',
+    u'Release date': 'release_date',
+    u'Report date': 'report_date',
+    u'Psychological assistance provided': 'psych_assist',
+    u'Material assistance provided': 'material_assist',
+    u'Was an activist': 'was_activist',
+    u'Victim is complainant': 'victim_is_complainant',
+    u'Allows storage of case details': 'allow_storage',
+    u'Allows publishing of case details': 'allow_publishing',
+    u'Allows legal representation': 'allow_representation',
+    u'Victims may be harmed if data is published': 'data_is_sensitive',
+    u'Release types': 'release_types',
+    u'Locations': 'locations',
+    u'Prisons': 'prisons',
+    u'Sources': 'sources',
+    u'Witnesses': 'witnesses',
+    u'Victims': 'victims',
+    u'Perpetrators': 'perpetrators',
+    u'Rights violations': 'rights_violations'
 }
 
 report = {
-    ___('Text'): 'text',
-    ___('Events'): 'events'
+    u'Text': 'text',
+    u'Events': 'events'
 }
