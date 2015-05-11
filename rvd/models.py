@@ -3,9 +3,10 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-from instance import config
+#from instance import config
 
-engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
+#engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
+engine = create_engine('mysql://root:s0ciusP()tens@localhost/rvd')
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -79,7 +80,7 @@ class Actor(Base):
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
     address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
-    organisations = relationship('Organisation', secondary=actor_organisation, backref='members', info={'label': ___('Organisations')})
+    organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
     professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
     locations = relationship('Location', secondary=actor_location, backref='locals')
     gender = sa.Column(sa.Text, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
@@ -134,6 +135,10 @@ event_victim = Table('event_victim', Base.metadata,
 event_perp = Table('event_perpetrator', Base.metadata,
                    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
                    sa.Column('perpetrator_id', sa.BigInteger, ForeignKey('actors.id')))
+
+event_violations = Table('event_rights-violation', Base.metadata,
+                         sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                         sa.Column('rights_violation_id', sa.BigInteger, ForeignKey('rightsviolations.id')))
 
 # event_event = Table('event_event', Base.metadata,
 #    sa.Column('event1_id', sa.BigInteger, ForeignKey('events.id')),
@@ -191,8 +196,7 @@ class Event(Base):
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
-    rights_violation_id = sa.Column(sa.BigInteger, ForeignKey('rightsviolations.id'))
-    rights_violation = relationship('RightsViolation', backref='events')
+    rights_violations = relationship('RightsViolation', secondary=event_violations, backref='events')
     #related = relationship('Event', secondary=event_event, backref='related_to')
 
 

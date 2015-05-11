@@ -3,7 +3,7 @@ from rvd.models import session
 from werkzeug.utils import secure_filename
 import os
 from flask_login import login_required
-from lib import parsers
+from rvd import parsers
 
 documents_bp = Blueprint('documents', __name__)
 
@@ -32,6 +32,7 @@ def documents_uploads():
                 f = os.path.join(UPLOAD_FOLDER, filename)
                 org_name = request.form['organisation_name']
                 print 'Got organisation name ' + org_name
+                '''
                 parsed = parsers.parse(f, org_name)
                 if 'error' in parsed:
                     print parsed['error']
@@ -42,6 +43,7 @@ def documents_uploads():
                     for entity in parsed:
                         session.add_all(parsed[entity])
                 session.commit()
+                '''
                         
     return render_template("document_add.html", 'success')
 
