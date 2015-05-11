@@ -8,7 +8,7 @@ from rvd import parsers
 documents_bp = Blueprint('documents', __name__)
 
 
-UPLOAD_FOLDER = '/path/to/the/uploads'
+UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['docx', 'doc', 'xlsx', 'xls'])
 
 # Document types that only provide information about events.
@@ -19,31 +19,35 @@ EVENT_ONLY = set(['docx', 'doc'])
 def documents_add():
     return render_template("document_add.html")
 
-@documents_bp.route('/document/upload', methods=('POST'))
+@documents_bp.route('/document/upload', methods=('POST',))
 @login_required
 def documents_uploads():
+    print '### In documents_uploads()'
     uploaded_files = request.files.getlist("file[]")
 
+    print '### Got uploaded files ' + str(uploaded_files)
     if uploaded_files:
         for file in uploaded_files:
+            print '### Found file ' + file.filename
             if allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
                 f = os.path.join(UPLOAD_FOLDER, filename)
                 org_name = request.form['organisation_name']
-                print 'Got organisation name ' + org_name
-                '''
+                print '### Got organisation name ' + org_name
                 parsed = parsers.parse(f, org_name)
+                print '### Succeeding in parsing document'
                 if 'error' in parsed:
-                    print parsed['error']
+                    print '### ' + parsed['error']
                     return render_template('document_add.html', 'failure')
                 elif only_supplies_event(file.filename):
                     session.add_all(parsed['events'])
+                    print '### Added all parsed events'
                 else:
                     for entity in parsed:
                         session.add_all(parsed[entity])
+                    print '### Added all parsed entities'
                 session.commit()
-                '''
                         
     return render_template("document_add.html", 'success')
 
