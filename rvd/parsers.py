@@ -30,20 +30,20 @@ FEMALE = ___('female')
 
 # Entity names, as presented in the excel document template
 
-ACTIONS = ___('Actions')
-ACTORS = ___('Actors')
-REPORTS = ___('Reports')
-EVENTS = ___('Events')
-INTERNATIONAL_AUTHORITIES = ___('International Authorities')
-LOCATIONS = ___('Locations')
-ORGANISATIONS = ___('Organisations')
-PRISONS = ___('Prisons')
-PRISON_TYPES = ___('Prison Types')
-PROFESSIONS = ___('Professions')
-RELEASE_TYPES = ___('Release Types')
-RIGHTS_VIOLATIONS = ___('Rights Violations')
-SOURCES = ___('Sources')
-STATE_AUTHORITIES = ___('State Authorities')
+ACTIONS = u'Actions'
+ACTORS = u'Actors'
+REPORTS = u'Reports'
+EVENTS = u'Events'
+INTERNATIONAL_AUTHORITIES = u'International Authorities'
+LOCATIONS = u'Locations'
+ORGANISATIONS = u'Organisations'
+PRISONS = u'Prisons'
+PRISON_TYPES = u'Prison Types'
+PROFESSIONS = u'Professions'
+RELEASE_TYPES = u'Release Types'
+RIGHTS_VIOLATIONS = u'Rights Violations'
+SOURCES = u'Sources'
+STATE_AUTHORITIES = u'State Authorities'
 
 # Private - Should not be called externally
 
@@ -227,11 +227,6 @@ def _parse_excel_template(filename):
         # When we encounter a row like ['Event', 'Title', 'Description', ...]
         # We are looking at the outline of a new entity type (in example, it's 'Event')
         if sheet.row(row_num)[0].value != '':
-            # Before transitioning to the next entity, apply any special handlers
-            # We might want to use to do extra work with the current entity's data
-            #if current_entity_name != '':
-            #    handler = _post_collection_handlers.get(current_entity_name, _id)
-            #    entities[current_entity_name] = handler(entities[current_entity_name], book)
             entity_name = sheet.row(row_num)[0].value
             entities[entity_name] = []
             current_entity_name = entity_name
@@ -242,9 +237,18 @@ def _parse_excel_template(filename):
         for i in range(len(current_entity_fields)):
             field_name = current_entity_fields[i]
             new_instance[field_name] = values[i]
+        if '' in new_instance:
+            del new_instance['']
         entities[current_entity_name].append(new_instance)
-    handler = _post_collection_handlers.get(current_entity_name, _id)
-    entities[current_entity_name] = handler(entities[current_entity_name], book)
+    entities['finished'] = [] 
+    # Call on each entity's respective model instance builder.
+    entity_names = entities.keys()
+    for entity_name in entity_names:
+        handler = _post_collection_handlers.get(entity_name, _id)
+        print handler
+        entities = handler(entities, book)
+    print '#######################################'
+    print '#######################################'
     return entities
 
 
@@ -379,13 +383,13 @@ def _report_h(parsed, wb):
 def _inter_auth_h(parsed, wb):
     for i in range(len(parsed[INTERNATIONAL_AUTHORITIES])):
         ia = entities.translate_fields(
-            parsed[INTERNATIONAL_AUTHORITIES][i], entities.international_authorities)
+            parsed[INTERNATIONAL_AUTHORITIES][i], entities.international_authority)
         parsed[INTERNATIONAL_AUTHORITIES][i] = InternationalAuthority(**ia)
     return parsed
 
 def _state_auth_h(parsed, wb):
     for i in range(len(parsed[STATE_AUTHORITIES])):
-        sa = entities.translate_fields(parsed[STATE_AUTHORITIES][i], entities.STATE_AUTHORITIES)
+        sa = entities.translate_fields(parsed[STATE_AUTHORITIES][i], entities.state_authority)
         parsed[STATE_AUTHORITIES][i] = StateAuthority(**sa)
     return parsed
 
@@ -405,7 +409,7 @@ def _profession_h(parsed, wb):
 
 def _location_h(parsed, wb):
     for i in range(len(parsed[LOCATIONS])):
-        location = entities.translate_fields(parsed[LOCATIONS][i], entities.locations)
+        location = entities.translate_fields(parsed[LOCATIONS][i], entities.location)
         parsed[LOCATIONS][i] = Location(**location)
     return parsed
 
@@ -425,7 +429,7 @@ def _source_h(parsed, wb):
         parsed[SOURCES][i] = Source(**source)
     return parsed
 
-def _prison_type_h(parsed, wb):a
+def _prison_type_h(parsed, wb):
     for i in range(len(parsed[PRISON_TYPES])):
         pt = entities.translate_fields(parsed[PRISON_TYPES][i], entities.prison_type)
         parsed[PRISON_TYPES][i] = PrisonType(**pt)
@@ -470,7 +474,7 @@ _parsers = {
 
 # Public
 
-def parse(stream, filetype, excel_workbook=None):
+def parse(stream, filetype):
     '''Parse the contents of a report file with one of the accepted filetypes into a dict'''
     parse = _parsers.get(filetype, _parse_error)
-    return parse(stream, excel_workbook)
+    return parse(stream)
