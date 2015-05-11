@@ -11,9 +11,10 @@ def login():
 
     # form is submitted and has been validated
     if helpers.validate_form_on_submit(login_form):
-        login_user(login_form.user)
-
-    if current_user.is_authenticated():
+        try:
+            login_user(login_form.user)
+        except:
+            redirect('/')
         return redirect("/reports")
 
     return render_template('login.html', current_user=current_user, form=login_form)

@@ -1,6 +1,6 @@
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms_alchemy import ModelForm
-from rvd.forms import location_factory
+from rvd.forms import user_org_factory
 from rvd.models import Organisation
 
 
@@ -16,6 +16,6 @@ class OrganisationForm(ModelForm):
         get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
         return (get_field(field_id) for field_id in self.__order)
 
-    locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name', allow_blank=True)
+    organisation = QuerySelectField(query_factory=user_org_factory, get_label='name')
 
 

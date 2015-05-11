@@ -14,7 +14,7 @@
     <table class="table">
         {% for item in data['data'] %}
             <tr>
-                <td>{{item['name'] or item['title']}}</td>
+                <td>{{item['name'] or item['title'] or item['email'] }}</td>
                 <td>{{item['id']}}</td>
                 <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}">View</a></td>
                 <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/edit">Edit</a></td>
