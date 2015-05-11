@@ -345,14 +345,17 @@ class RightsViolation(Base):
 ## Source model ##
 ##################
 
+source_org = Table('source_organisation', Base.metadata,
+                   sa.Column('source_id', sa.BigInteger, ForeignKey('sources.id')),
+                   sa.Column('organisation_id', sa.BigInteger, ForeignKey('organisations.id')))
+
 class Source(Base):
     __tablename__ = 'sources'
 
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={
         'description': ___('Name'), 'label': ___('Name')})
-    organisation_id = sa.Column(sa.BigInteger, ForeignKey('organisations.id'))
-    organisation = relationship('Organisation', backref=backref('sources', order_by=id))
+    organisations = relationship('Organisation', secondary=source_org, backref='sources')
 
 
 ###########################
