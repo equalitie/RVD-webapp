@@ -343,36 +343,45 @@ def _actor_h(parsed, wb):
     return parsed
 
 def _event_h(parsed, wb):
-
+    return parsed
 
 def _report_h(parsed, wb):
-
+    return parsed
 
 def _inter_auth_h(parsed, wb):
+    return parsed
 
 
 def _state_auth_h(parsed, wb):
+    return parsed
 
 
 def _organisation_h(parsed, wb):
+    return parsed
 
 
 def _profession_h(parsed, wb):
+    return parsed
 
 
 def _location_h(parsed, wb):
-
+    return parsed
 
 def _rights_violation_h(parsed, wb):
+    return parsed
+
 
 
 def _source_h(parsed, wb):
+    return parsed
 
 
 def _prison_type_h(parsed, wb):
+    return parsed
 
 
 def _prison_h(parsed, wb):
+    return parsed
 
 
 # Mapping of entitiy names, as listed in the document template,

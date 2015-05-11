@@ -2,7 +2,7 @@
 document types to the names of attributes in each model.
 '''
 
-from flask_babel import ___
+from flask_babel import lazy_gettext as ___
 
 import datetime
 
@@ -73,7 +73,7 @@ release_types = {
 
 rights_violations = {
     ___('Name'): 'name',
-    ___('Description') 'description':
+    ___('Description'): 'description'
 }
 
 sources = {
