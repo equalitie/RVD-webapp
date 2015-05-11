@@ -248,6 +248,7 @@ def _parse_excel_template(filename):
         if entity_name not in entities['finished']:
             handler = _post_collection_handlers.get(entity_name, _id)
             entities = handler(entities, book)
+            entities['finished'].append(entity_name)
     return entities
 
 
