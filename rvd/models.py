@@ -79,10 +79,11 @@ class Actor(Base):
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
     address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
-    organisations = relationship('Organisation', secondary=actor_organisation, backref='members', info={'label': ___('Organisations')})
+    organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
     professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
     locations = relationship('Location', secondary=actor_location, backref='locals')
-    gender = sa.Column(sa.Text, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
+    # Not trying to be sexist, just efficient.
+    gender = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
     is_activist = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Is activist'), 'label': ___('Is activist')})
     activist_info = sa.Column(sa.Text, nullable=True, info={
