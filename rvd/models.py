@@ -3,10 +3,9 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
-#from instance import config
+from instance import config
 
-#engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
-engine = create_engine('mysql://root:s0ciusP()tens@localhost/rvd')
+engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
