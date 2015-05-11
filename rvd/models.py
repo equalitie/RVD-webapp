@@ -4,8 +4,9 @@ from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from instance import config
+from flask_login import UserMixin
 
-engine = create_engine('mysql://{}:{}@{}/{}'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
+engine = create_engine('mysql://{}:{}@{}/{}?charset=utf8'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
 Base = declarative_base(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -366,6 +367,29 @@ class StateAuthority(Base):
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
 
+
+#############################
+## User Organisation model ##
+#############################
+
+class UserOrganisation(Base):
+    __tablename__ = 'user_organisations'
+
+    id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
+    name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
+
+
+###########
+## Users ##
+###########
+class User(Base, UserMixin):
+    __tablename__ = 'users'
+    id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
+    email = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Email'), 'label': ___('Email')})
+    password = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Password'), 'label': ___('Password')})
+    organisation = relationship('UserOrganisation', backref=backref('members', order_by=id))
+    organisation_id = sa.Column(sa.BigInteger, ForeignKey('user_organisations.id'), nullable=True)
+    is_admin = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Is admin'), 'label': ___('Is admin')})
 
 ## Create the database tables ##
 

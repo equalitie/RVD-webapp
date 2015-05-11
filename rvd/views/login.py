@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect
 from flask_login import login_required, current_user, login_user, logout_user
 from flask_admin import helpers
 from rvd.forms.Login import LoginForm
+import logging
 login_bp = Blueprint('login', __name__)
 
 
@@ -11,9 +12,11 @@ def login():
 
     # form is submitted and has been validated
     if helpers.validate_form_on_submit(login_form):
-        login_user(login_form.user)
-
-    if current_user.is_authenticated():
+        try:
+            login_user(login_form.user)
+        except:
+            logging.error("Could not log in.")
+            redirect('/')
         return redirect("/reports")
 
     return render_template('login.html', current_user=current_user, form=login_form)

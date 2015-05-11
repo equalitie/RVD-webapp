@@ -1,7 +1,9 @@
 from wtforms import fields, validators
 from flask_babel import lazy_gettext as ___
 from flask_wtf import Form
-from lib.models.User import User
+from rvd.models import session, User
+from sqlalchemy import and_
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class LoginForm(Form):
@@ -19,9 +21,8 @@ class LoginForm(Form):
     )
 
     def validate_password(self, field):
-        user = User({'id': 0})
-
-        if self.login.data != "demo@demo.com" or field.data != "demo":
-            raise validators.ValidationError(___('Try demo@demo.com/demo'))
-
-        self.user = user
+        try:
+            result = session.query(User).filter(and_(User.email == self.login.data, User.password == field.data)).one()
+        except NoResultFound:
+            result = None
+        self.user = result

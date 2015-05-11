@@ -1,7 +1,7 @@
 from rvd.models import Location as LocationModel, Organisation as OrganisationModel, Profession as ProfessionModel
 from rvd.models import PrisonType as PrisonTypeModel, ReleaseType as ReleaseTypeModel
 from rvd.models import Prison as PrisonModel, Source as SourceModel, event_witness, event_victim, event_perp
-from rvd.models import Event as EventModel
+from rvd.models import Event as EventModel, UserOrganisation as UserOrganisationModel
 from rvd.models import session
 
 
@@ -47,3 +47,7 @@ def victims_factory():
 
 def perpetrators_factory():
     return session.query(event_perp).all()
+
+
+def user_org_factory():
+    return session.query(UserOrganisationModel).all()

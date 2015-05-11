@@ -5,7 +5,7 @@ import os
 from flask import Flask, redirect
 from flask_login import LoginManager
 from flask_babel import Babel
-from lib.models.User import User
+from rvd.models import session, User
 
 import config.check_config as check
 from views.login import login_bp
@@ -25,6 +25,7 @@ from views.sources import sources_bp
 from views.state_authority import state_authority_bp
 from views.events import events_bp
 from views.evidence_type import evidence_types_bp
+from views.users import users_bp
 
 # FLASK APP
 static_paths = [os.getcwd(), '/lib/static']
@@ -49,6 +50,7 @@ app.register_blueprint(sources_bp)
 app.register_blueprint(state_authority_bp)
 app.register_blueprint(events_bp)
 app.register_blueprint(evidence_types_bp)
+app.register_blueprint(users_bp)
 
 # LOCALIZED CONTENT
 babel = Babel(app)
@@ -64,7 +66,7 @@ def load_user(user_id):
     """
     Required for the login manager
     """
-    user = User({"id": 0})
+    user = session.query(User).get(user_id)
     return user
 
 

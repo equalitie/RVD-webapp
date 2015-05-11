@@ -127,3 +127,6 @@ ul li.normal:before{
 .actors_menu ul li i, .upload_menu ul li i .reports_menu ul li, .events_menu ul li i, .meta_menu ul li i{
     margin-right: 5px;
 }
+.only_admin{
+    margin-top: 40px;
+}
