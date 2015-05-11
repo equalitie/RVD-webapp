@@ -18,17 +18,17 @@ attributes.'''
 def excel_parse_date(datefloat):
     return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, excel_workbook.datemode))
 
-international_authorities = {
+international_authority = {
     ___('Name'): 'name',
     ___('Description'): 'description'
 }
 
-state_authorities = {
+state_authority = {
     ___('Name'): 'name',
     ___('Description'): 'description'
 }
 
-actions = {
+action = {
     ___('State authorities approached'): 'state_bodies_apprached',
     ___('Complaint to state authority'): 'complaint_to_state_authority',
     ___('Response from state authority'): 'response_from_state_authority',
@@ -38,23 +38,23 @@ actions = {
     ___('Events'): 'events'
 }
 
-organisations = {
+organisation = {
     ___('Name'): 'name',
     ___('Description'): 'description',
     ___('Locations'): 'locations'
 }
 
-professions = {
+profession = {
     ___('Name'): 'name'
 }
 
-locations = {
+location = {
     ___('Name'): 'name',
     ___('Latitude'): 'latitude',
     ___('Latitude'): 'longitude'
 }
 
-actors = {
+actor = {
     ___('Name'): 'name',
     ___('Birth date'): 'birth_date',
     ___('Telephone number'): 'telephone',
@@ -67,31 +67,31 @@ actors = {
     ___('Locations'): 'locations'
 }
 
-release_types = {
+release_type = {
     ___('Type code'): 'type_code'
 }
 
-rights_violations = {
+rights_violation = {
     ___('Name'): 'name',
     ___('Description'): 'description'
 }
 
-sources = {
+source = {
     ___('Name'): 'name',
     ___('Organisations'): 'organisations'
 }
 
-prisons_types = {
+prisons_type = {
     ___('Name'): 'name'
 }
 
-prisons = {
+prison = {
     ___('Name'): 'name',
     ___('Locations'): 'locations',
     ___('Prison types'): 'prison_types'
 }
 
-events = {
+event = {
     ___('Title'): 'title',
     ___('Description'): 'description',
     ___('Charges'): 'charges',
@@ -117,7 +117,7 @@ events = {
     ___('Rights violations'): 'rights_violations'
 }
 
-reports = {
+report = {
     ___('Text'): 'text',
     ___('Events'): 'events'
 }
