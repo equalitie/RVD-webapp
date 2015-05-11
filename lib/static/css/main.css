@@ -37,7 +37,7 @@ a{
 }
 .dashboard_left{
     position: absolute;
-    margin-top:60px;
+    margin-top:46px;
     width:300px;
     top: 0;
     left: 0;
@@ -82,7 +82,7 @@ ul li.normal:before{
 }
 .top_title{
     font-family: opensans_light, Helvetica, Arial, sans-serif;
-    font-size: 48px;
+    font-size: 36px;
     margin-top:25px;
     padding-bottom:15px;
     color: #85ACD6;
@@ -90,7 +90,7 @@ ul li.normal:before{
 }
 #settings{
     float:right;
-    margin-top: 60px;
+    margin-top: 50px;
 }
 .section_item_title{
     margin-top: 40px;
@@ -113,7 +113,7 @@ ul li.normal:before{
     margin:0;
     padding:0;
     display:inline;
-    margin-left: 12px;
+    margin-left: 10px;
 }
 #settings ul li i{
     margin-right: 2px;
