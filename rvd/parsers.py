@@ -244,11 +244,10 @@ def _parse_excel_template(filename):
     # Call on each entity's respective model instance builder.
     entity_names = entities.keys()
     for entity_name in entity_names:
-        handler = _post_collection_handlers.get(entity_name, _id)
-        print handler
-        entities = handler(entities, book)
-    print '#######################################'
-    print '#######################################'
+        print entities['finished'], entity_name
+        if entity_name not in entities['finished']:
+            handler = _post_collection_handlers.get(entity_name, _id)
+            entities = handler(entities, book)
     return entities
 
 
@@ -273,7 +272,7 @@ def _make_indices(indices, array_len):
         except ValueError:
             indices[i] = '{0} not a valid integer.'.format(indices[i])
             continue
-        if v < 0 or v >= array_len:
+        if v < 1 or v > array_len:
             indices[i] = 'Index ({0}) must be between 1 and {1} inclusive'.format(
                 v, array_len)
         else:
@@ -296,6 +295,10 @@ def _take(array, indices):
 # Extract elements from the provided array being indexed into and outputting
 # any errors that occur.
 def _from_indices(ind_list, other_entities):
+    # If a single index value is provided, it will be converted to a float.
+    # So it is necessary to convert it back to a string-int.
+    if isinstance(ind_list, float):
+        ind_list = str(int(ind_list))
     indices = _make_indices(ind_list.split(','), len(other_entities))
     values = _take(other_entities, indices)
     return values
@@ -313,15 +316,30 @@ def _from_indices(ind_list, other_entities):
 # !!! IMPORTANT !!!
 # All handlers are *required* to maintain the order of entities in value fields.
 
+def p_dict(d, level=0):
+    keys = sorted(d.keys())
+    for key in keys:
+        if isinstance(d[key], dict):
+            print ('\t' * level) + key + ' =>'
+            p_dict(d[key], level + 1)
+        else:
+            print ('\t' * level) + '{0} => {1}'.format(key, d[key])
+
 # Handles building entities upon which others depend.
 def _pre_handle(parsed, wb, *entity_names):
+    print 'Calling _pre_handle to handle ' + ' and '.join(entity_names)
+    print 'Parsed["finished"] = ' + str(parsed['finished'])
     for entity in entity_names:
         if entity not in parsed['finished']:
+            print 'Unfound ' + entity
             parsed = _post_collection_handlers[entity](parsed, wb)
             parsed['finished'].append(entity)
+    print '_-_-_ End of pre handle _-_-_'
+    #p_dict(parsed)
     return parsed
 
 def _action_h(parsed, wb):
+    print '### action_h'
     parsed = _pre_handle(parsed, wb, STATE_AUTHORITIES, INTERNATIONAL_AUTHORITIES, EVENTS)
     for i in range(len(parsed[ACTIONS])):
         action = entities.translate_fields(parsed[ACTIONS][i], entities.action)
@@ -334,6 +352,7 @@ def _action_h(parsed, wb):
     return parsed
 
 def _actor_h(parsed, wb):
+    print '### actor_h'
     parsed = _pre_handle(parsed, wb, ORGANISATIONS, PROFESSIONS, LOCATIONS)
     for i in range(len(parsed[ACTORS])):
         actor = entities.translate_fields(parsed[ACTORS][i], entities.actor)
@@ -347,6 +366,7 @@ def _actor_h(parsed, wb):
     return parsed
 
 def _event_h(parsed, wb):
+    print '### event_h'
     parsed = _pre_handle(parsed, wb,
         RELEASE_TYPES, LOCATIONS, PRISONS, SOURCES, ACTORS, RIGHTS_VIOLATIONS)
     for i in range(len(parsed[EVENTS])):
@@ -375,12 +395,16 @@ def _event_h(parsed, wb):
     return parsed
 
 def _report_h(parsed, wb):
+    print '### report_h'
+    parsed = _pre_handle(parsed, wb, EVENTS)
     for i in range(len(parsed[REPORTS])):
         report = entities.translate_fields(parsed[REPORTS][i], entities.report)
+        report['events'] = _from_indices(report['events'], parsed[EVENTS])
         parsed[REPORTS][i] = Report(**report)
     return parsed 
 
 def _inter_auth_h(parsed, wb):
+    print '### inter_auth_h'
     for i in range(len(parsed[INTERNATIONAL_AUTHORITIES])):
         ia = entities.translate_fields(
             parsed[INTERNATIONAL_AUTHORITIES][i], entities.international_authority)
@@ -388,12 +412,14 @@ def _inter_auth_h(parsed, wb):
     return parsed
 
 def _state_auth_h(parsed, wb):
+    print '### state_auth_h'
     for i in range(len(parsed[STATE_AUTHORITIES])):
         sa = entities.translate_fields(parsed[STATE_AUTHORITIES][i], entities.state_authority)
         parsed[STATE_AUTHORITIES][i] = StateAuthority(**sa)
     return parsed
 
 def _organisation_h(parsed, wb):
+    print '### organisation_h'
     parsed = _pre_handle(parsed, wb, LOCATIONS)
     for i in range(len(parsed[ORGANISATIONS])):
         organisation = entities.translate_fields(parsed[ORGANISATIONS][i], entities.organisation)
@@ -402,40 +428,51 @@ def _organisation_h(parsed, wb):
     return parsed
 
 def _profession_h(parsed, wb):
+    print '### profession_h'
     for i in range(len(parsed[PROFESSIONS])):
         profession = entities.translate_fields(parsed[PROFESSIONS][i], entities.profession)
         parsed[PROFESSIONS][i] = Profession(**profession)
     return parsed
 
 def _location_h(parsed, wb):
+    print '### location_h'
     for i in range(len(parsed[LOCATIONS])):
         location = entities.translate_fields(parsed[LOCATIONS][i], entities.location)
         parsed[LOCATIONS][i] = Location(**location)
     return parsed
 
 def _rights_violation_h(parsed, wb):
+    print '### rights_violation_h'
     for i in range(len(parsed[RIGHTS_VIOLATIONS])):
-        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.rights_violations)
+        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.rights_violation)
         parsed[RIGHTS_VIOLATIONS][i] = RightsViolation(**rv)
     return parsed
 
+def _release_type_h(parsed, wb):
+    print '### release_type_h'
+    for i in range(len(parsed[RELEASE_TYPES])):
+        rt = entities.translate_fields(parsed[RELEASE_TYPES][i], entities.release_type)
+        parsed[RELEASE_TYPES][i] = ReleaseType(**rt)
+    return parsed
+
 def _source_h(parsed, wb):
+    print '### source_h'
     parsed = _pre_handle(parsed, wb, ORGANISATIONS)
     for i in range(len(parsed[SOURCES])):
         source = entities.translate_fields(parsed[SOURCES][i], entities.source)
-        source['organisation'] = _from_indices(source['organisation'], parsed[ORGANISATIONS])
-        if len(source['organisation']) > 0:
-            source['organisation'] = source['organisation'][0]
+        source['organisations'] = _from_indices(source['organisations'], parsed[ORGANISATIONS])
         parsed[SOURCES][i] = Source(**source)
     return parsed
 
 def _prison_type_h(parsed, wb):
+    print '### prison_type_h'
     for i in range(len(parsed[PRISON_TYPES])):
         pt = entities.translate_fields(parsed[PRISON_TYPES][i], entities.prison_type)
         parsed[PRISON_TYPES][i] = PrisonType(**pt)
     return parsed
 
 def _prison_h(parsed, wb):
+    print '### prison_h'
     parsed = _pre_handle(parsed, wb, LOCATIONS, PRISON_TYPES)
     for i in range(len(parsed[PRISONS])):
         prison = entities.translate_fields(parsed[PRISONS][i], entities.prison)
@@ -457,7 +494,7 @@ _post_collection_handlers = {
     ORGANISATIONS: _organisation_h,
     PROFESSIONS: _profession_h,
     LOCATIONS: _location_h,
-    RELEASE_TYPES: _location_h,
+    RELEASE_TYPES: _release_type_h,
     RIGHTS_VIOLATIONS: _rights_violation_h,
     SOURCES: _source_h,
     PRISON_TYPES: _prison_type_h,

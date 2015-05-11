@@ -32,20 +32,13 @@
                 <li><a href="/rights_violations/all"><i class="fa fa-caret-right"></i> Rights Violations</a></li>
                 <li><a href="/sources/all"><i class="fa fa-caret-right"></i> Sources</a></li>
                 <li><a href="/state_authorities/all"><i class="fa fa-caret-right"></i> State Authorities</a></li>
-                <li><a href="/evidence_types/all"><i class="fa fa-caret-right"></i> Evidence Type</a></li>
+                <li><a href="/evidence_types    /all"><i class="fa fa-caret-right"></i> Evidence Type</a></li>
             </ul>
         </div>
         <div class="upload_menu">
             <h3 class="data_filters"><i class="fa fa-upload"></i> {{ _("Upload documents") }}</h3>
             <ul>
                 <li><a href="/document/add"><i class="fa fa-caret-right"></i> Upload documents</a></li>
-            </ul>
-        </div>
-
-        <div class="reports_menu">
-            <h3 class="data_filters"><i class="fa fa-file-o"></i> {{ _("Reports") }}</h3>
-            <ul>
-                <li><a href="/reports"><i class="fa fa-caret-right"></i> View reports</a></li>
             </ul>
         </div>
 
@@ -62,8 +55,10 @@
                 <h2 class="top_title">Rights Violation Documentation</h2>
                 <div id="settings">
                     <ul>
+                        <li><i class="fa fa-user"></i> <a href="/users">users</a></li>
+                        <li><i class="fa fa-database"></i> <a href="/actors/add">data</a></li>
+                        <li><i class="fa fa-file"></i> <a href="/reports">reports</a></li>
                         <li><i class="fa fa-sign-out"></i> <a href="/logout">logout</a></li>
-                        <li><i class="fa fa-cog"></i> <a href="/settings">settings</a></li>
                     </ul>
                 </div>
         {% endblock %}
