@@ -99,7 +99,7 @@ class Report(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     text = sa.Column(sa.Text, nullable=False, info={
         'description': ___('Content of report'), 'label': ___('Content of report')})
-    describes = relationship('Event')
+    events = relationship('Event')
 
 #################
 ## Event Model ##
@@ -149,10 +149,6 @@ class Event(Base):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     title = sa.Column(sa.Unicode(200), nullable=False, info={
         'description': ___('Title'), 'label': ___('Title')})
-    # The beginning of docx files have a report section that will contain a
-    # big blob of text, a sort of meta-analysis of the event
-    report = sa.Column(sa.Text, nullable=True, info={
-        'description': ___('Report'), 'label': ___('Report')})
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
     charges = sa.Column(sa.Text, nullable=True, info={
