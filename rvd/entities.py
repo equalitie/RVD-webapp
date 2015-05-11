@@ -27,7 +27,7 @@ state_authority = {
 }
 
 action = {
-    u'State authorities approached': 'state_bodies_apprached',
+    u'State authorities approached': 'state_bodies_approached',
     u'Complaint to state authority': 'complaint_to_state_authority',
     u'Response from state authority': 'response_from_state_authority',
     u'International authorities approached': 'international_bodies_approached',
