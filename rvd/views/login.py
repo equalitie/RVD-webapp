@@ -14,8 +14,8 @@ def login():
     if helpers.validate_form_on_submit(login_form):
         try:
             login_user(login_form.user)
-        except:
-            logging.error("Could not log in.")
+        except Exception as e:
+            logging.error("Could not log in: %s", e)
             redirect('/')
         return redirect("/reports")
 
