@@ -88,8 +88,11 @@ class Actor(Base):
         'description': ___('Is activist'), 'label': ___('Is activist')})
     activist_info = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Activist info'), 'label': ___('Activist info')})
-    owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False)
+    owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='actor_owner')
+    public = sa.Column(sa.Boolean, nullable=False, info={
+        'description': ___('Public'), 'label': ___('Public')
+    }, default=0)
 
 
 ##################
@@ -195,8 +198,11 @@ class Event(Base):
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
     rights_violations = relationship('RightsViolation', secondary=event_violations, backref='events')
-    owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False)
+    owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='event_owner')
+    public = sa.Column(sa.Boolean, nullable=False, info={
+        'description': ___('Public'), 'label': ___('Public')
+    }, default=0)
 
 
 ##################

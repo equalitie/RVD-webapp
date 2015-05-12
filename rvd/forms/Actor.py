@@ -13,7 +13,7 @@ class ActorForm(ModelForm):
 
     __order = (
         'name', 'birth_date', 'gender', 'telephone', 'address', 'is_activist',
-        'activist_info', 'organisations', 'professions', 'locations'
+        'activist_info', 'organisations', 'professions', 'locations', 'public'
     )
 
     def __iter__(self):
@@ -27,4 +27,6 @@ class ActorForm(ModelForm):
     gender = fields.SelectField(___('Gender'), validators=[validators.required()], choices=[
         ('M', ___('Male')), ('F', ___('Female'))])
     is_activist = fields.SelectField(___('Is activist'), validators=[validators.required()], choices=[
+        (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    public = fields.SelectField(___('Public'), validators=[validators.required()], choices=[
         (1, ___('Yes')), (0, ___('No'))], coerce=bool)

@@ -16,7 +16,7 @@ class EventForm(ModelForm):
         'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
         'victim_is_complainant', 'allow_storage', 'allow_publishing', 'allow_representation',
         'data_is_sensitive', 'locations', 'prisons', 'release_types', 'sources',
-        'witnesses', 'victims', 'perpetrators'
+        'witnesses', 'victims', 'perpetrators', 'public'
     )
 
     def __iter__(self):
@@ -65,3 +65,5 @@ class EventForm(ModelForm):
                                            validators=[validators.required()],
                                            choices=[
                                                (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    public = fields.SelectField(___('Public'), validators=[validators.required()], choices=[
+        (1, ___('Yes')), (0, ___('No'))], coerce=bool)
