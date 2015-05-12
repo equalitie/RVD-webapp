@@ -4,9 +4,12 @@ from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
 from rvd.models import session, Event
+from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
 from rvd.forms import perpetrators_factory, victims_factory
+from sqlalchemy import and_
 from copy import copy
+from sqlalchemy.orm.exc import NoResultFound
 names = {
     'name': 'event',
     'plural': 'events',
@@ -23,7 +26,7 @@ def get_name_from_id(needle, things):
 
 
 def gather_form_data():
-    event_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
+    event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
 
     location_ids = request.form.getlist('locations')
     event_dict['locations'] = [get_name_from_id(x, location_factory()) for x in location_ids]
@@ -45,6 +48,8 @@ def gather_form_data():
 
     perpetrators_ids = request.form.getlist('perpetrators')
     event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
+
+    event_dict['owner_id'] = current_user.id
 
     event_instance = Event(**event_dict)
     session.add(event_instance)
@@ -80,16 +85,25 @@ def flatten_instance(obj):
 
     for r in inspect(Event).relationships:
         associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
+        try:
+            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
+        except TypeError:
+            fields[r.key] = associated_data.email
     return fields
 
 
 @events_bp.route('/events/<int:event_id>')
 @login_required
 def view_event(event_id):
-    event = session.query(Event).get(event_id)
-    fields = flatten_instance(event)
     data = copy(names)
+    try:
+        if current_user.is_admin:
+            event = session.query(Event).get(event_id)
+        else:
+            event = session.query(Event).filter(and_(Event.id == event_id, Event.owner_id == current_user.id)).one()
+        fields = flatten_instance(event)
+    except NoResultFound:
+        return redirect('/events/all')
     data['data'] = fields
 
     return render_template("item_view_single.html", data=data)
@@ -98,7 +112,10 @@ def view_event(event_id):
 @events_bp.route('/events/all')
 @login_required
 def view_all_events():
-    all_events = session.query(Event).all()
+    if current_user.is_admin:
+        all_events = session.query(Event).all()
+    else:
+        all_events = session.query(Event).filter(Event.owner_id == current_user.id)
     all_events = [{k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_events]
     data = copy(names)
     data['data'] = all_events
@@ -109,7 +126,13 @@ def view_all_events():
 @events_bp.route('/events/<int:event_id>/delete')
 @login_required
 def delete_event(event_id):
-    event = session.query(Event).get(event_id)
+    try:
+        if current_user.is_admin:
+            event = session.query(Event).get(event_id)
+        else:
+            event = session.query(Event).filter(and_(Event.id == event_id, Event.owner_id == current_user.id)).one()
+    except NoResultFound:
+        return redirect('/events/all')
     session.delete(event)
     session.commit()
     return redirect('/events/all?success=1')
@@ -118,7 +141,14 @@ def delete_event(event_id):
 @events_bp.route('/events/<int:event_id>/edit', methods=('GET', 'POST'))
 @login_required
 def edit_event(event_id):
-    event = session.query(Event).get(event_id)
+    try:
+        if current_user.is_admin:
+            event = session.query(Event).get(event_id)
+        else:
+            event = session.query(Event).filter(and_(Event.id == event_id, Event.owner_id == current_user.id)).one()
+    except NoResultFound:
+        return redirect('/events/all')
+
     event_form = EventForm(request.form, obj=event)
 
     if helpers.validate_form_on_submit(event_form):
