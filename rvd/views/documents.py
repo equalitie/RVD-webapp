@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from flask_login import current_user
 import rvd.models
 from werkzeug.utils import secure_filename
 import os
@@ -46,15 +47,14 @@ def documents_uploads():
                     rvd.models.session.add_all(parsed['events'])
                     print '### Added all parsed events'
                 else:
-                    # !!!! TODO !!!!
-                    # Pull the owner id out of the flask session and find the actual user instance.
-                    admin = rvd.models.session.query(rvd.models.User).first()
+                    user_id = current_user.id
+                    user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
                     for i in range(len(parsed[parsers.ACTORS])):
-                        parsed[parsers.ACTORS][i].owner_id = 0
-                        parsed[parsers.ACTORS][i].owner = admin
+                        parsed[parsers.ACTORS][i].owner_id = user_id
+                        parsed[parsers.ACTORS][i].owner = user 
                     for i in range(len(parsed[parsers.EVENTS])):
-                        parsed[parsers.EVENTS][i].owner_id = 0
-                        parsed[parsers.EVENTS][i].owner = admin
+                        parsed[parsers.EVENTS][i].owner_id = user_id
+                        parsed[parsers.EVENTS][i].owner = user
                     for entity in parsed:
                         rvd.models.session.add_all(parsed[entity])
                         
