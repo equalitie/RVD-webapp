@@ -49,7 +49,7 @@ profession = {
 location = {
     u'Name': 'name',
     u'Latitude': 'latitude',
-    u'Latitude': 'longitude'
+    u'Longitude': 'longitude'
 }
 
 actor = {

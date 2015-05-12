@@ -8,7 +8,7 @@ from rvd import parsers
 documents_bp = Blueprint('documents', __name__)
 
 
-UPLOAD_FOLDER = '/path/to/uploads'
+UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['docx', 'doc', 'xlsx', 'xls'])
 
 # Document types that only provide information about events.
@@ -41,7 +41,7 @@ def documents_uploads():
                 print '### Succeeding in parsing document'
                 if 'error' in parsed:
                     print '### ' + parsed['error']
-                    return render_template('document_add.html', 'failure')
+                    return render_template('document_add.html')
                 elif only_supplies_event(file.filename):
                     rvd.models.session.add_all(parsed['events'])
                     print '### Added all parsed events'
@@ -51,7 +51,7 @@ def documents_uploads():
                     print '### Added all parsed entities'
                 rvd.models.session.commit()
                         
-    return render_template("document_add.html", 'success')
+    return render_template("document_add.html")
 
 
 def allowed_file(filename):
