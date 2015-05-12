@@ -3,7 +3,7 @@ from flask_login import login_required
 from rvd.forms.Actor import ActorForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Actor
+from rvd.models import session, Actor, Event
 import datetime
 from flask_login import current_user
 from rvd.forms import organisation_factory, location_factory, profession_factory
@@ -58,6 +58,15 @@ def actors():
     return render_template("item_edit.html", form=actor_form, action='add', data=data)
 
 
+def get_attr(a):
+    if hasattr(a, 'name'):
+        return a.name
+    if hasattr(a, 'type_code'):
+        return str(a.type_code)
+    if hasattr(a, 'id'):
+        return str(a.id)
+
+
 def flatten_instance(obj):
     fields = {'id': obj.id}
     for c in obj.__table__.columns:
@@ -67,7 +76,7 @@ def flatten_instance(obj):
     for r in inspect(Actor).relationships:
         associated_data = getattr(obj, r.key)
         try:
-            fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
+            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
         except TypeError:
             fields[r.key] = associated_data.email
     return fields

@@ -6,3 +6,4 @@ instance/config.py
 .idea
 .swp
 instance/keyfile.asc
+uploads

@@ -3,7 +3,7 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event
+from rvd.models import session, Event, Action
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
 from rvd.forms import perpetrators_factory, victims_factory
@@ -71,10 +71,15 @@ def events():
 
 
 def get_attr(a):
+    if isinstance(a, Action):
+        items = [u"{}: {}".format(k, v) for k, v in a.__dict__.iteritems() if k[0:4] != '_sa_']
+        return ", ".join(items)
     if hasattr(a, 'name'):
         return a.name
     if hasattr(a, 'type_code'):
         return str(a.type_code)
+    if hasattr(a, 'id'):
+        return str(a.id)
 
 
 def flatten_instance(obj):
