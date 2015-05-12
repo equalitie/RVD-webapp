@@ -46,8 +46,18 @@ def documents_uploads():
                     rvd.models.session.add_all(parsed['events'])
                     print '### Added all parsed events'
                 else:
+                    # !!!! TODO !!!!
+                    # Pull the owner id out of the flask session and find the actual user instance.
+                    admin = rvd.models.session.query(rvd.models.User).first()
+                    for i in range(len(parsed[parsers.ACTORS])):
+                        parsed[parsers.ACTORS][i].owner_id = 0
+                        parsed[parsers.ACTORS][i].owner = admin
+                    for i in range(len(parsed[parsers.EVENTS])):
+                        parsed[parsers.EVENTS][i].owner_id = 0
+                        parsed[parsers.EVENTS][i].owner = admin
                     for entity in parsed:
                         rvd.models.session.add_all(parsed[entity])
+                        
                     print '### Added all parsed entities'
                 rvd.models.session.commit()
                         
