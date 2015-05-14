@@ -48,20 +48,9 @@
     </div>
 
     <div class="dashboard_right">
-
-
         <div id="content_header">
         {% block content_header %}
-                <h2 class="top_title">Rights Violation Documentation</h2>
-                <div id="settings">
-                    <ul>
-                        <li><i class="fa fa-user"></i> <a href="/users/all">{{ _("users") }}</a></li>
-                        <li><i class="fa fa-database"></i> <a href="/actors/add">{{ _("data") }}</a></li>
-                        <li><i class="fa fa-file"></i> <a href="/reports">{{ _("reports") }}</a></li>
-                        <li><i class="fa fa-globe"></i> <a href="/lang">{{ _("language") }}</a></li>
-                        <li><i class="fa fa-sign-out"></i> <a href="/logout">{{ _("logout") }}</a></li>
-                    </ul>
-                </div>
+            {% include 'top_menu.html' %}
         {% endblock %}
         </div>
 
