@@ -67,3 +67,7 @@ class EventForm(ModelForm):
                                                (1, ___('Yes')), (0, ___('No'))], coerce=bool)
     public = fields.SelectField(___('Public'), validators=[validators.required()], choices=[
         (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+
+    def validate_release_date(self, field):
+        if field.data <= self.detention_date.data:
+            raise validators.ValidationError(___('Release date has to be greater than detention date.'))
