@@ -2,7 +2,7 @@
 Everything we want available to the 'rvd' app module
 """
 import os
-from flask import Flask, redirect
+from flask import Flask, redirect, request
 from flask_login import LoginManager
 from flask_babel import Babel
 from rvd.models import session, User
@@ -76,3 +76,9 @@ def custom_401(error):
     User trying to access protected resources
     """
     return redirect("/")
+
+
+@babel.localeselector
+def get_locale():
+    cookie_lang = request.cookies.get('lang')
+    return cookie_lang if cookie_lang is not None else 'en'

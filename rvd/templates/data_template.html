@@ -8,37 +8,37 @@
         <div class="actors_menu">
             <h3 class="data_filters"><i class="fa fa-user"></i> {{ _("Actors") }}</h3>
             <ul>
-                <li><a href="/actors/add"><i class="fa fa-caret-right"></i> Add actor</a></li>
-                <li><a href="/actors/all"><i class="fa fa-caret-right"></i> View all actors</a></li>
+                <li><a href="/actors/add"><i class="fa fa-caret-right"></i> {{ _("Add actor") }}</a></li>
+                <li><a href="/actors/all"><i class="fa fa-caret-right"></i> {{ _("View all actors") }}</a></li>
             </ul>
         </div>
         <div class="events_menu">
             <h3 class="data_filters"><i class="fa fa-bolt"></i> {{ _("Events") }}</h3>
             <ul>
-                <li><a href="/events/add"><i class="fa fa-caret-right"></i> Add event</a></li>
-                <li><a href="/events/all"><i class="fa fa-caret-right"></i> View all events</a></li>
+                <li><a href="/events/add"><i class="fa fa-caret-right"></i> {{ _("Add event") }}</a></li>
+                <li><a href="/events/all"><i class="fa fa-caret-right"></i> {{ _("View all events") }}</a></li>
             </ul>
         </div>
         <div class="meta_menu">
             <h3 class="data_filters"><i class="fa fa-file"></i> {{ _("Meta") }}</h3>
             <ul>
-                <li><a href="/organisations/all"><i class="fa fa-caret-right"></i> Organisations</a></li>
-                <li><a href="/locations/all"><i class="fa fa-caret-right"></i> Locations</a></li>
-                <li><a href="/professions/all"><i class="fa fa-caret-right"></i> Professions</a></li>
-                <li><a href="/international_authorities/all"><i class="fa fa-caret-right"></i> International Authorities</a></li>
-                <li><a href="/prison_types/all"><i class="fa fa-caret-right"></i> Prison Types</a></li>
-                <li><a href="/prisons/all"><i class="fa fa-caret-right"></i> Prisons</a></li>
-                <li><a href="/release_types/all"><i class="fa fa-caret-right"></i> Release Types</a></li>
-                <li><a href="/rights_violations/all"><i class="fa fa-caret-right"></i> Rights Violations</a></li>
-                <li><a href="/sources/all"><i class="fa fa-caret-right"></i> Sources</a></li>
-                <li><a href="/state_authorities/all"><i class="fa fa-caret-right"></i> State Authorities</a></li>
-                <li><a href="/evidence_types/all"><i class="fa fa-caret-right"></i> Evidence Type</a></li>
+                <li><a href="/organisations/all"><i class="fa fa-caret-right"></i> {{ _("Organisations") }}</a></li>
+                <li><a href="/locations/all"><i class="fa fa-caret-right"></i> {{ _("Locations") }}</a></li>
+                <li><a href="/professions/all"><i class="fa fa-caret-right"></i> {{ _("Professions") }}</a></li>
+                <li><a href="/international_authorities/all"><i class="fa fa-caret-right"></i> {{ _("International Authorities") }}</a></li>
+                <li><a href="/prison_types/all"><i class="fa fa-caret-right"></i> {{ _("Prison Types") }}</a></li>
+                <li><a href="/prisons/all"><i class="fa fa-caret-right"></i> {{ _("Prisons") }}</a></li>
+                <li><a href="/release_types/all"><i class="fa fa-caret-right"></i> {{ _("Release Types") }}</a></li>
+                <li><a href="/rights_violations/all"><i class="fa fa-caret-right"></i> {{ _("Rights Violations") }}</a></li>
+                <li><a href="/sources/all"><i class="fa fa-caret-right"></i> {{ _("Sources") }}</a></li>
+                <li><a href="/state_authorities/all"><i class="fa fa-caret-right"></i> {{ _("State Authorities") }}</a></li>
+                <li><a href="/evidence_types/all"><i class="fa fa-caret-right"></i> {{ _("Evidence Type") }}</a></li>
             </ul>
         </div>
         <div class="upload_menu">
             <h3 class="data_filters"><i class="fa fa-upload"></i> {{ _("Upload documents") }}</h3>
             <ul>
-                <li><a href="/document/add"><i class="fa fa-caret-right"></i> Upload documents</a></li>
+                <li><a href="/document/add"><i class="fa fa-caret-right"></i> {{ _("Upload documents") }}</a></li>
             </ul>
         </div>
 
@@ -55,10 +55,11 @@
                 <h2 class="top_title">Rights Violation Documentation</h2>
                 <div id="settings">
                     <ul>
-                        <li><i class="fa fa-user"></i> <a href="/users/all">users</a></li>
-                        <li><i class="fa fa-database"></i> <a href="/actors/add">data</a></li>
-                        <li><i class="fa fa-file"></i> <a href="/reports">reports</a></li>
-                        <li><i class="fa fa-sign-out"></i> <a href="/logout">logout</a></li>
+                        <li><i class="fa fa-user"></i> <a href="/users/all">{{ _("users") }}</a></li>
+                        <li><i class="fa fa-database"></i> <a href="/actors/add">{{ _("data") }}</a></li>
+                        <li><i class="fa fa-file"></i> <a href="/reports">{{ _("reports") }}</a></li>
+                        <li><i class="fa fa-globe"></i> <a href="/lang">{{ _("language") }}</a></li>
+                        <li><i class="fa fa-sign-out"></i> <a href="/logout">{{ _("logout") }}</a></li>
                     </ul>
                 </div>
         {% endblock %}

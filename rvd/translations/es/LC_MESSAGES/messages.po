@@ -1,0 +1,349 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-05-13 22:31-0400\n"
+"PO-Revision-Date: 2015-05-13 21:57-0400\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+
+#: ../../rvd/models.py:40
+msgid "Complaint to state authority"
+msgstr ""
+
+#: ../../rvd/models.py:42
+msgid "Response from state authority"
+msgstr ""
+
+#: ../../rvd/models.py:44 ../../rvd/models.py:45
+msgid "Complaint to international authority"
+msgstr ""
+
+#: ../../rvd/models.py:47
+msgid "Response from international authority"
+msgstr ""
+
+#: ../../rvd/models.py:77 ../../rvd/models.py:217 ../../rvd/models.py:233
+#: ../../rvd/models.py:247 ../../rvd/models.py:269 ../../rvd/models.py:295
+#: ../../rvd/models.py:309 ../../rvd/models.py:320 ../../rvd/models.py:344
+#: ../../rvd/models.py:362 ../../rvd/models.py:375 ../../rvd/models.py:388
+msgid "Name"
+msgstr ""
+
+#: ../../rvd/models.py:78
+msgid "Date of birth"
+msgstr ""
+
+#: ../../rvd/models.py:81
+msgid "+1 819 987-6543"
+msgstr ""
+
+#: ../../rvd/models.py:81
+msgid "Phone number"
+msgstr ""
+
+#: ../../rvd/models.py:82
+msgid "Address"
+msgstr ""
+
+#: ../../rvd/models.py:86 ../../rvd/forms/Actor.py:27
+msgid "Gender"
+msgstr ""
+
+#: ../../rvd/models.py:88 ../../rvd/forms/Actor.py:29
+msgid "Is activist"
+msgstr ""
+
+#: ../../rvd/models.py:90
+msgid "Activist info"
+msgstr ""
+
+#: ../../rvd/models.py:94 ../../rvd/models.py:204 ../../rvd/forms/Actor.py:31
+#: ../../rvd/forms/Event.py:68
+msgid "Public"
+msgstr ""
+
+#: ../../rvd/models.py:107
+msgid "Content of report"
+msgstr ""
+
+#: ../../rvd/models.py:157
+msgid "Title"
+msgstr ""
+
+#: ../../rvd/models.py:159 ../../rvd/models.py:219 ../../rvd/models.py:235
+#: ../../rvd/models.py:271 ../../rvd/models.py:346 ../../rvd/models.py:377
+msgid "Description"
+msgstr ""
+
+#: ../../rvd/models.py:161
+msgid "Charges"
+msgstr ""
+
+#: ../../rvd/models.py:163
+msgid "Date of detention"
+msgstr ""
+
+#: ../../rvd/models.py:165
+msgid "Date of release"
+msgstr ""
+
+#: ../../rvd/models.py:167
+msgid "Date of report"
+msgstr ""
+
+#: ../../rvd/models.py:169 ../../rvd/models.py:170 ../../rvd/forms/Event.py:36
+msgid "Psychological assistance provided"
+msgstr ""
+
+#: ../../rvd/models.py:172 ../../rvd/models.py:173 ../../rvd/forms/Event.py:40
+msgid "Material assistance provided"
+msgstr ""
+
+#: ../../rvd/models.py:175
+msgid "Consequences"
+msgstr ""
+
+#: ../../rvd/models.py:177 ../../rvd/forms/Event.py:44
+msgid "Was an activist"
+msgstr ""
+
+#: ../../rvd/models.py:179 ../../rvd/forms/Event.py:48
+msgid "Victim is complainant"
+msgstr ""
+
+#: ../../rvd/models.py:181 ../../rvd/models.py:182 ../../rvd/forms/Event.py:52
+msgid "Allows storage of information"
+msgstr ""
+
+#: ../../rvd/models.py:184 ../../rvd/models.py:185 ../../rvd/forms/Event.py:56
+msgid "Allows publishing of information"
+msgstr ""
+
+#: ../../rvd/models.py:187 ../../rvd/models.py:188 ../../rvd/forms/Event.py:60
+msgid "Allows legal representation"
+msgstr ""
+
+#: ../../rvd/models.py:190 ../../rvd/models.py:191 ../../rvd/forms/Event.py:64
+msgid "Data is hyper sensitive"
+msgstr ""
+
+#: ../../rvd/models.py:249
+msgid "Longitude"
+msgstr ""
+
+#: ../../rvd/models.py:251
+msgid "Latitude"
+msgstr ""
+
+#: ../../rvd/models.py:332
+msgid "Type code"
+msgstr ""
+
+#: ../../rvd/models.py:397
+msgid "Email"
+msgstr ""
+
+#: ../../rvd/models.py:398
+msgid "Password"
+msgstr ""
+
+#: ../../rvd/models.py:401 ../../rvd/forms/User.py:27
+msgid "Is admin"
+msgstr ""
+
+#: ../../rvd/parsers.py:26
+msgid "yes"
+msgstr ""
+
+#: ../../rvd/parsers.py:27
+msgid "no"
+msgstr ""
+
+#: ../../rvd/parsers.py:28
+msgid "male"
+msgstr ""
+
+#: ../../rvd/parsers.py:29
+msgid "female"
+msgstr ""
+
+#: ../../rvd/forms/Actor.py:28
+msgid "Male"
+msgstr ""
+
+#: ../../rvd/forms/Actor.py:28
+msgid "Female"
+msgstr ""
+
+#: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
+#: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
+#: ../../rvd/forms/Event.py:47 ../../rvd/forms/Event.py:51
+#: ../../rvd/forms/Event.py:55 ../../rvd/forms/Event.py:59
+#: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
+#: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
+msgid "Yes"
+msgstr ""
+
+#: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
+#: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
+#: ../../rvd/forms/Event.py:47 ../../rvd/forms/Event.py:51
+#: ../../rvd/forms/Event.py:55 ../../rvd/forms/Event.py:59
+#: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
+#: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
+msgid "No"
+msgstr ""
+
+#: ../../rvd/forms/DocumentUpload.py:5
+msgid "Organisation Name"
+msgstr ""
+
+#: ../../rvd/forms/Login.py:14
+msgid "email"
+msgstr ""
+
+#: ../../rvd/forms/Login.py:19
+msgid "password"
+msgstr ""
+
+#: ../../rvd/templates/base.html:12
+msgid "Rights Violation Documentation"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:9
+msgid "Actors"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:11
+msgid "Add actor"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:12
+msgid "View all actors"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:16
+msgid "Events"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:18
+msgid "Add event"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:19
+msgid "View all events"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:23
+msgid "Meta"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:25
+msgid "Organisations"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:26
+msgid "Locations"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:27
+msgid "Professions"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:28
+msgid "International Authorities"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:29
+msgid "Prison Types"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:30
+msgid "Prisons"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:31
+msgid "Release Types"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:32
+msgid "Rights Violations"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:33
+msgid "Sources"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:34
+msgid "State Authorities"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:35
+msgid "Evidence Type"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:39
+#: ../../rvd/templates/data_template.html:41
+msgid "Upload documents"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:58
+#: ../../rvd/templates/report_template.html:19
+msgid "users"
+msgstr "usuarios"
+
+#: ../../rvd/templates/data_template.html:59
+#: ../../rvd/templates/report_template.html:20
+msgid "data"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:60
+#: ../../rvd/templates/report_template.html:21
+msgid "reports"
+msgstr ""
+
+#: ../../rvd/templates/data_template.html:61
+#: ../../rvd/templates/report_template.html:22
+msgid "language"
+msgstr "Idioma"
+
+#: ../../rvd/templates/data_template.html:62
+#: ../../rvd/templates/report_template.html:23
+msgid "logout"
+msgstr ""
+
+#: ../../rvd/templates/lang.html:6
+msgid "Current language"
+msgstr "Idioma actual"
+
+#: ../../rvd/templates/login.html:29
+msgid "Log in"
+msgstr ""
+
+#: ../../rvd/templates/reports.html:15
+msgid "Data filters"
+msgstr ""
+
+#~ msgid "Actors"
+#~ msgstr ""
+
+#~ msgid "Events"
+#~ msgstr ""
+
+#~ msgid "Meta"
+#~ msgstr ""
+
+#~ msgid "Upload documents"
+#~ msgstr ""
+
