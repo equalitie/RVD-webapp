@@ -1,191 +1,189 @@
-# Spanish translations for PROJECT.
-# Copyright (C) 2015 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
-#
-#, fuzzy
+# 
+# Translators:
+# Erik Jennische <Erik.Jennische@civilrightsdefenders.org>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: RVD\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-05-13 22:31-0400\n"
-"PO-Revision-Date: 2015-05-13 21:57-0400\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"PO-Revision-Date: 2015-05-15 13:42+0000\n"
+"Last-Translator: Erik Jennische <Erik.Jennische@civilrightsdefenders.org>\n"
+"Language-Team: Spanish (http://www.transifex.com/projects/p/rvd/language/es/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../../rvd/models.py:40
 msgid "Complaint to state authority"
-msgstr ""
+msgstr "Solicitud a autoridad estatal "
 
 #: ../../rvd/models.py:42
 msgid "Response from state authority"
-msgstr ""
+msgstr "Respuesta de la autoridad estatal "
 
 #: ../../rvd/models.py:44 ../../rvd/models.py:45
 msgid "Complaint to international authority"
-msgstr ""
+msgstr "Solicitud a autoridad internacional "
 
 #: ../../rvd/models.py:47
 msgid "Response from international authority"
-msgstr ""
+msgstr "Respuesta de la autoridad internacional "
 
 #: ../../rvd/models.py:77 ../../rvd/models.py:217 ../../rvd/models.py:233
 #: ../../rvd/models.py:247 ../../rvd/models.py:269 ../../rvd/models.py:295
 #: ../../rvd/models.py:309 ../../rvd/models.py:320 ../../rvd/models.py:344
 #: ../../rvd/models.py:362 ../../rvd/models.py:375 ../../rvd/models.py:388
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #: ../../rvd/models.py:78
 msgid "Date of birth"
-msgstr ""
+msgstr "Fecha de nacimiento"
 
 #: ../../rvd/models.py:81
 msgid "+1 819 987-6543"
-msgstr ""
+msgstr "+1 819 987-6543"
 
 #: ../../rvd/models.py:81
 msgid "Phone number"
-msgstr ""
+msgstr "Número telefónico"
 
 #: ../../rvd/models.py:82
 msgid "Address"
-msgstr ""
+msgstr "Dirección"
 
 #: ../../rvd/models.py:86 ../../rvd/forms/Actor.py:27
 msgid "Gender"
-msgstr ""
+msgstr "Género "
 
 #: ../../rvd/models.py:88 ../../rvd/forms/Actor.py:29
 msgid "Is activist"
-msgstr ""
+msgstr "Es activista"
 
 #: ../../rvd/models.py:90
 msgid "Activist info"
-msgstr ""
+msgstr "Información del activista"
 
 #: ../../rvd/models.py:94 ../../rvd/models.py:204 ../../rvd/forms/Actor.py:31
 #: ../../rvd/forms/Event.py:68
 msgid "Public"
-msgstr ""
+msgstr "Público"
 
 #: ../../rvd/models.py:107
 msgid "Content of report"
-msgstr ""
+msgstr "Contenido del reporte "
 
 #: ../../rvd/models.py:157
 msgid "Title"
-msgstr ""
+msgstr "Titulo"
 
 #: ../../rvd/models.py:159 ../../rvd/models.py:219 ../../rvd/models.py:235
 #: ../../rvd/models.py:271 ../../rvd/models.py:346 ../../rvd/models.py:377
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: ../../rvd/models.py:161
 msgid "Charges"
-msgstr ""
+msgstr "Cargos"
 
 #: ../../rvd/models.py:163
 msgid "Date of detention"
-msgstr ""
+msgstr "Fecha de la detención"
 
 #: ../../rvd/models.py:165
 msgid "Date of release"
-msgstr ""
+msgstr "Fecha de liberación"
 
 #: ../../rvd/models.py:167
 msgid "Date of report"
-msgstr ""
+msgstr "Fecha del reporte"
 
 #: ../../rvd/models.py:169 ../../rvd/models.py:170 ../../rvd/forms/Event.py:36
 msgid "Psychological assistance provided"
-msgstr ""
+msgstr "Asistencia psicológica provista "
 
 #: ../../rvd/models.py:172 ../../rvd/models.py:173 ../../rvd/forms/Event.py:40
 msgid "Material assistance provided"
-msgstr ""
+msgstr "Asistencia médica provista"
 
 #: ../../rvd/models.py:175
 msgid "Consequences"
-msgstr ""
+msgstr "Consecuencias "
 
 #: ../../rvd/models.py:177 ../../rvd/forms/Event.py:44
 msgid "Was an activist"
-msgstr ""
+msgstr "Era activista"
 
 #: ../../rvd/models.py:179 ../../rvd/forms/Event.py:48
 msgid "Victim is complainant"
-msgstr ""
+msgstr "Víctima es solicitante "
 
 #: ../../rvd/models.py:181 ../../rvd/models.py:182 ../../rvd/forms/Event.py:52
 msgid "Allows storage of information"
-msgstr ""
+msgstr "Autoriza el almacenamiento de la información "
 
 #: ../../rvd/models.py:184 ../../rvd/models.py:185 ../../rvd/forms/Event.py:56
 msgid "Allows publishing of information"
-msgstr ""
+msgstr "Autoriza la publicación de la información"
 
 #: ../../rvd/models.py:187 ../../rvd/models.py:188 ../../rvd/forms/Event.py:60
 msgid "Allows legal representation"
-msgstr ""
+msgstr "Autoriza representación legal "
 
 #: ../../rvd/models.py:190 ../../rvd/models.py:191 ../../rvd/forms/Event.py:64
 msgid "Data is hyper sensitive"
-msgstr ""
+msgstr "Información hiper sensible "
 
 #: ../../rvd/models.py:249
 msgid "Longitude"
-msgstr ""
+msgstr "Longitud"
 
 #: ../../rvd/models.py:251
 msgid "Latitude"
-msgstr ""
+msgstr "Latitud"
 
 #: ../../rvd/models.py:332
 msgid "Type code"
-msgstr ""
+msgstr "Ingresar código "
 
 #: ../../rvd/models.py:397
 msgid "Email"
-msgstr ""
+msgstr "Correo electrónico"
 
 #: ../../rvd/models.py:398
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 #: ../../rvd/models.py:401 ../../rvd/forms/User.py:27
 msgid "Is admin"
-msgstr ""
+msgstr "Es administrador"
 
 #: ../../rvd/parsers.py:26
 msgid "yes"
-msgstr ""
+msgstr "Si"
 
 #: ../../rvd/parsers.py:27
 msgid "no"
-msgstr ""
+msgstr "No"
 
 #: ../../rvd/parsers.py:28
 msgid "male"
-msgstr ""
+msgstr "masculino "
 
 #: ../../rvd/parsers.py:29
 msgid "female"
-msgstr ""
+msgstr "femenino "
 
 #: ../../rvd/forms/Actor.py:28
 msgid "Male"
-msgstr ""
+msgstr "Masculino "
 
 #: ../../rvd/forms/Actor.py:28
 msgid "Female"
-msgstr ""
+msgstr "Femenino"
 
 #: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
 #: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
@@ -194,7 +192,7 @@ msgstr ""
 #: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
 #: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
 msgid "Yes"
-msgstr ""
+msgstr "Si"
 
 #: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
 #: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
@@ -203,147 +201,134 @@ msgstr ""
 #: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
 #: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: ../../rvd/forms/DocumentUpload.py:5
 msgid "Organisation Name"
-msgstr ""
+msgstr "Nombre de la Organización"
 
 #: ../../rvd/forms/Login.py:14
 msgid "email"
-msgstr ""
+msgstr "Correo electrónico"
 
 #: ../../rvd/forms/Login.py:19
 msgid "password"
-msgstr ""
+msgstr "Contraseña"
 
 #: ../../rvd/templates/base.html:12
 msgid "Rights Violation Documentation"
-msgstr ""
+msgstr "Documentación de violación de derechos "
 
 #: ../../rvd/templates/data_template.html:9
 msgid "Actors"
-msgstr ""
+msgstr "Actores"
 
 #: ../../rvd/templates/data_template.html:11
 msgid "Add actor"
-msgstr ""
+msgstr "Añadir actor"
 
 #: ../../rvd/templates/data_template.html:12
 msgid "View all actors"
-msgstr ""
+msgstr "Ver todos los actores"
 
 #: ../../rvd/templates/data_template.html:16
 msgid "Events"
-msgstr ""
+msgstr "Eventos"
 
 #: ../../rvd/templates/data_template.html:18
 msgid "Add event"
-msgstr ""
+msgstr "Añadir evento"
 
 #: ../../rvd/templates/data_template.html:19
 msgid "View all events"
-msgstr ""
+msgstr "Ver todos los eventos"
 
 #: ../../rvd/templates/data_template.html:23
 msgid "Meta"
-msgstr ""
+msgstr "Meta"
 
 #: ../../rvd/templates/data_template.html:25
 msgid "Organisations"
-msgstr ""
+msgstr "Organizaciones "
 
 #: ../../rvd/templates/data_template.html:26
 msgid "Locations"
-msgstr ""
+msgstr "Ubicación"
 
 #: ../../rvd/templates/data_template.html:27
 msgid "Professions"
-msgstr ""
+msgstr "Profesiones "
 
 #: ../../rvd/templates/data_template.html:28
 msgid "International Authorities"
-msgstr ""
+msgstr "Autoridades internacionales"
 
 #: ../../rvd/templates/data_template.html:29
 msgid "Prison Types"
-msgstr ""
+msgstr "Tipos de prisión "
 
 #: ../../rvd/templates/data_template.html:30
 msgid "Prisons"
-msgstr ""
+msgstr "Prisiones"
 
 #: ../../rvd/templates/data_template.html:31
 msgid "Release Types"
-msgstr ""
+msgstr "Tipos de liberaciones "
 
 #: ../../rvd/templates/data_template.html:32
 msgid "Rights Violations"
-msgstr ""
+msgstr "Violaciones de derechos"
 
 #: ../../rvd/templates/data_template.html:33
 msgid "Sources"
-msgstr ""
+msgstr "Fuentes"
 
 #: ../../rvd/templates/data_template.html:34
 msgid "State Authorities"
-msgstr ""
+msgstr "Autoridades estatales"
 
 #: ../../rvd/templates/data_template.html:35
 msgid "Evidence Type"
-msgstr ""
+msgstr "Tipo de evidencia "
 
 #: ../../rvd/templates/data_template.html:39
 #: ../../rvd/templates/data_template.html:41
 msgid "Upload documents"
-msgstr ""
+msgstr "Añadir documentos"
 
 #: ../../rvd/templates/data_template.html:58
 #: ../../rvd/templates/report_template.html:19
 msgid "users"
-msgstr "usuarios"
+msgstr "usuarios "
 
 #: ../../rvd/templates/data_template.html:59
 #: ../../rvd/templates/report_template.html:20
 msgid "data"
-msgstr ""
+msgstr "datos"
 
 #: ../../rvd/templates/data_template.html:60
 #: ../../rvd/templates/report_template.html:21
 msgid "reports"
-msgstr ""
+msgstr "reportes"
 
 #: ../../rvd/templates/data_template.html:61
 #: ../../rvd/templates/report_template.html:22
 msgid "language"
-msgstr "Idioma"
+msgstr "idioma"
 
 #: ../../rvd/templates/data_template.html:62
 #: ../../rvd/templates/report_template.html:23
 msgid "logout"
-msgstr ""
+msgstr "salir"
 
 #: ../../rvd/templates/lang.html:6
 msgid "Current language"
-msgstr "Idioma actual"
+msgstr "Idioma actual "
 
 #: ../../rvd/templates/login.html:29
 msgid "Log in"
-msgstr ""
+msgstr "Ingresar"
 
 #: ../../rvd/templates/reports.html:15
 msgid "Data filters"
-msgstr ""
-
-#~ msgid "Actors"
-#~ msgstr ""
-
-#~ msgid "Events"
-#~ msgstr ""
-
-#~ msgid "Meta"
-#~ msgstr ""
-
-#~ msgid "Upload documents"
-#~ msgstr ""
-
+msgstr "Filtros de datos"
