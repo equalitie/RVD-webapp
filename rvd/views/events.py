@@ -6,7 +6,7 @@ from collections import defaultdict
 from rvd.models import session, Event, Action
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
-from rvd.forms import perpetrators_factory, victims_factory
+from rvd.forms import perpetrators_factory, victims_factory, rights_violations_factory
 from sqlalchemy import and_
 from copy import copy
 from sqlalchemy.orm.exc import NoResultFound
@@ -48,6 +48,9 @@ def gather_form_data():
 
     perpetrators_ids = request.form.getlist('perpetrators')
     event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
+
+    rights_violations = request.form.getlist('rights_violations')
+    event_dict['rights_violations'] = [get_name_from_id(x, rights_violations_factory()) for x in rights_violations]
 
     event_dict['owner_id'] = current_user.id
 
