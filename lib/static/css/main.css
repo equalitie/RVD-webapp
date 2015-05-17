@@ -82,15 +82,15 @@ ul li.normal:before{
 }
 .top_title{
     font-family: opensans_light, Helvetica, Arial, sans-serif;
-    font-size: 36px;
-    margin-top:25px;
+    font-size: 30px;
+    margin-top:30px;
     padding-bottom:15px;
     color: #85ACD6;
     float:left;
 }
 #settings{
     float:right;
-    margin-top: 50px;
+    margin-top: 44px;
 }
 .section_item_title{
     margin-top: 40px;
