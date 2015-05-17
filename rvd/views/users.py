@@ -51,6 +51,13 @@ def users():
     return render_template("item_edit.html", form=user_form, action='add', data=data, needs_admin=1, user=current_user)
 
 
+def get_attr(a):
+    if hasattr(a, 'name'):
+        return a.name
+    if hasattr(a, 'title'):
+        return str(a.title)
+
+
 def flatten_instance(obj):
     fields = {'id': obj.id}
     for c in obj.__table__.columns:
@@ -60,9 +67,9 @@ def flatten_instance(obj):
     for r in inspect(User).relationships:
         associated_data = getattr(obj, r.key)
         try:
-            fields[r.key] = ", ".join([a.title for a in associated_data]) if associated_data else None
+            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
         except TypeError:
-            fields[r.key] = associated_data.name
+            fields[r.key] = get_attr(associated_data)
     return fields
 
 

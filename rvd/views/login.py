@@ -29,12 +29,6 @@ def logout():
     return redirect("/")
 
 
-@login_bp.route('/reports')
-@login_required
-def reports():
-    return render_template("reports.html")
-
-
 @login_bp.route('/lang')
 @login_required
 def language():
