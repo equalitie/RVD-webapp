@@ -396,6 +396,7 @@ class User(Base, UserMixin):
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     email = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Email'), 'label': ___('Email')})
     password = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Password'), 'label': ___('Password')})
+    password_salt = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Password salt'), 'label': ___('Password salt')})
     organisation = relationship('UserOrganisation', backref=backref('members', order_by=id))
     organisation_id = sa.Column(sa.BigInteger, ForeignKey('user_organisations.id'), nullable=True)
     is_admin = sa.Column(sa.Boolean, nullable=False, info={'description': ___('Is admin'), 'label': ___('Is admin')})

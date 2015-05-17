@@ -18,7 +18,7 @@
     <div class="filter_title">Violation type</div>
     <ul class="filter_types">
         {% for violation in rights_violation_types %}
-        <li><input value="{{ violation.id }}" checked="checked" type="checkbox" id="option{{violation.id}}" class="filter_option_type" name=""><label for="option{{violation.id}}">{{ violation.name }}</label></li>
+        <li><input value="{{ violation.id }}" checked="checked" type="checkbox" id="violation_option{{violation.id}}" class="filter_option_type" name=""><label for="violation_option{{violation.id}}">{{ violation.name }}</label></li>
         {% endfor %}
     </ul>
 
@@ -26,7 +26,7 @@
     <div class="filter_title">Locations</div>
     <ul class="filter_organisations">
         {% for locations in locations %}
-        <li><input value="{{ locations.id }}" checked="checked" type="checkbox" id="option{{locations.id}}" class="filter_option_type" name=""><label for="option{{locations.id}}">{{ locations.name }}</label></li>
+        <li><input value="{{ locations.id }}" checked="checked" type="checkbox" id="location_option{{locations.id}}" class="filter_option_type" name=""><label for="location_option{{locations.id}}">{{ locations.name }}</label></li>
         {% endfor %}
     </ul>
 

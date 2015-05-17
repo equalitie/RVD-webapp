@@ -7,6 +7,7 @@ from collections import defaultdict
 from rvd.models import session, User
 from rvd.forms import user_org_factory
 from copy import copy
+import bcrypt
 names = {
     'name': 'user',
     'plural': 'users',
@@ -24,6 +25,9 @@ def get_name_from_id(needle, things):
 
 def gather_form_data():
     user_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
+
+    user_dict['password_salt'] = bcrypt.gensalt()
+    user_dict['password'] = bcrypt.hashpw(str(request.form.get('password')), str(user_dict['password_salt']))
 
     organisation = request.form.getlist('organisation')
     if organisation:
@@ -43,6 +47,7 @@ def gather_form_data():
 @login_required
 def users():
     user_form = UserForm(request.form)
+
     if helpers.validate_form_on_submit(user_form):
         user_instance = gather_form_data()
         return redirect('/users/{}?success=1'.format(user_instance.id))
