@@ -1,15 +1,18 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, jsonify
 from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, Action
+from rvd.models import session, Event, Action, RightsViolation, Location
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
-from rvd.forms import perpetrators_factory, victims_factory
+from rvd.forms import perpetrators_factory, victims_factory, rights_violations_factory
 from sqlalchemy import and_
 from copy import copy
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.inspection import inspect
+from itertools import groupby
+import datetime
 names = {
     'name': 'event',
     'plural': 'events',
@@ -49,6 +52,9 @@ def gather_form_data():
     perpetrators_ids = request.form.getlist('perpetrators')
     event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
 
+    rights_violations = request.form.getlist('rights_violations')
+    event_dict['rights_violations'] = [get_name_from_id(x, rights_violations_factory()) for x in rights_violations]
+
     event_dict['owner_id'] = current_user.id
 
     event_instance = Event(**event_dict)
@@ -86,7 +92,6 @@ def flatten_instance(obj):
     fields = {'id': obj.id}
     for c in obj.__table__.columns:
         fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
 
     for r in inspect(Event).relationships:
         associated_data = getattr(obj, r.key)
@@ -94,6 +99,15 @@ def flatten_instance(obj):
             fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
         except TypeError:
             fields[r.key] = associated_data.email
+    return fields
+
+
+def get_event_violations_type(obj):
+    fields = {'id': obj.id}
+    for r in inspect(Event).relationships:
+        if r.key == "rights_violations":
+            associated_data = getattr(obj, r.key)
+            fields['rights_violations'] = [a.id for a in associated_data]
     return fields
 
 
@@ -112,6 +126,60 @@ def view_event(event_id):
     data['data'] = fields
 
     return render_template("item_view_single.html", data=data)
+
+
+@events_bp.route('/events/grouped')
+@login_required
+def events_by_type():
+    violation_types = request.args.get("violation_types", None)
+    violation_types_list = violation_types.split(",")
+
+    locations = request.args.get("locations", None)
+    locations_list = locations.split(",")
+
+    violations_start_date = request.args.get("start_date", None)
+    violations_end_date = request.args.get("end_date", None)
+
+    violations_start_date = datetime.datetime.fromtimestamp(float(violations_start_date)).strftime('%Y-%m-%d')
+    violations_end_date = datetime.datetime.fromtimestamp(float(violations_end_date)).strftime('%Y-%m-%d')
+
+    rights_violations_types = [x for x in rights_violations_factory()]
+    rights_violations_names = [{"id": x.id, "name": x.name} for x in rights_violations_types]
+
+    ands = [RightsViolation.id.in_(violation_types_list), Event.report_date >= violations_start_date,
+            Event.report_date <= violations_end_date, Location.id.in_(locations_list)]
+
+    # add extra restriction about user/owner if logged in user is not an admin
+    if not current_user.is_admin:
+        ands.append(Event.owner_id == current_user.id)
+
+    all_events = session.query(Event).join(
+        Event.rights_violations
+    ).join(Event.locations).filter(and_(x for x in ands))
+
+    grouped_events = []
+    locations = []
+
+    for event in all_events:
+        event_locations = event.locations
+        for location in event_locations:
+            locations.append([getattr(location, 'latitude'), getattr(location, 'longitude')])
+
+    # group by date first
+    all_events = sorted(all_events, key=lambda z: z.report_date)
+    for date, group in groupby(all_events, key=lambda y: y.report_date):
+        # group by type, make sure we have a default of 0
+        date_types = {"{}".format(x.id): 0 for x in rights_violations_types}
+        date_types["date"] = date.strftime("%Y%m%d")
+        event_objs = [get_event_violations_type(e) for e in list(group)]
+        for violation in event_objs:
+            if violation['rights_violations']:
+                for v in violation['rights_violations']:
+                    label = "{}".format(v)
+                    date_types[label] += 1
+        grouped_events.append(date_types)
+
+    return jsonify({"events": grouped_events, "locations": locations, "names": rights_violations_names})
 
 
 @events_bp.route('/events/all')

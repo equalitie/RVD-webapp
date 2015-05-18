@@ -7,6 +7,7 @@ from collections import defaultdict
 from rvd.models import session, User
 from rvd.forms import user_org_factory
 from copy import copy
+import bcrypt
 names = {
     'name': 'user',
     'plural': 'users',
@@ -24,6 +25,9 @@ def get_name_from_id(needle, things):
 
 def gather_form_data():
     user_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
+
+    user_dict['password_salt'] = bcrypt.gensalt()
+    user_dict['password'] = bcrypt.hashpw(str(request.form.get('password')), str(user_dict['password_salt']))
 
     organisation = request.form.getlist('organisation')
     if organisation:
@@ -43,12 +47,20 @@ def gather_form_data():
 @login_required
 def users():
     user_form = UserForm(request.form)
+
     if helpers.validate_form_on_submit(user_form):
         user_instance = gather_form_data()
         return redirect('/users/{}?success=1'.format(user_instance.id))
 
     data = copy(names)
     return render_template("item_edit.html", form=user_form, action='add', data=data, needs_admin=1, user=current_user)
+
+
+def get_attr(a):
+    if hasattr(a, 'name'):
+        return a.name
+    if hasattr(a, 'title'):
+        return str(a.title)
 
 
 def flatten_instance(obj):
@@ -60,9 +72,9 @@ def flatten_instance(obj):
     for r in inspect(User).relationships:
         associated_data = getattr(obj, r.key)
         try:
-            fields[r.key] = ", ".join([a.title for a in associated_data]) if associated_data else None
+            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
         except TypeError:
-            fields[r.key] = associated_data.name
+            fields[r.key] = get_attr(associated_data)
     return fields
 
 

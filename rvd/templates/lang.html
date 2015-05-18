@@ -1,0 +1,16 @@
+{% extends "data_template.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
+
+    <h3>{{ _("Current language") }}: {{ locale }}</h3>
+
+    <div class="lang_chooser">
+
+        <ul>
+            <li><a href="/lang/en">English</a></li>
+            <li><a href="/lang/es">Español</a></li>
+        </ul>
+    </div>
+
+{% endblock %}

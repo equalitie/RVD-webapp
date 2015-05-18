@@ -12,13 +12,7 @@ class UserForm(ModelForm):
 
     class Meta:
         model = User
-
-    __order = ('email', 'password', 'organisation', 'is_admin')
-
-    def __iter__(self):
-        f = list(super(ModelForm, self).__iter__())
-        get_field = lambda field_id: next((fld for fld in f if fld.id == field_id))
-        return (get_field(field_id) for field_id in self.__order)
+        exclude = ['password_salt']
 
     email = EmailField(validators=[validators.required()])
     password = PasswordField(validators=[validators.required()])
@@ -26,5 +20,3 @@ class UserForm(ModelForm):
     is_admin = SelectField(
         ___('Is admin'), validators=[validators.required()], choices=[(1, ___('Yes')), (0, ___('No'))], coerce=bool
     )
-
-

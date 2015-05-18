@@ -42,6 +42,13 @@ def rights_violations():
     return render_template("item_edit.html", form=rights_violation_form, action='add', data=data)
 
 
+def get_attr(a):
+    if hasattr(a, 'name'):
+        return a.name
+    if hasattr(a, 'title'):
+        return str(a.title)
+
+
 def flatten_instance(obj):
     fields = {'id': obj.id}
     for c in obj.__table__.columns:
@@ -50,7 +57,7 @@ def flatten_instance(obj):
 
     for r in inspect(RightsViolation).relationships:
         associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
+        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
     return fields
 
 

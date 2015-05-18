@@ -3,7 +3,7 @@ from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
 from rvd.models import Event
 from rvd.forms import location_factory, release_type_factory, prison_factory, source_factory, witnesses_factory
-from rvd.forms import victims_factory, perpetrators_factory
+from rvd.forms import victims_factory, perpetrators_factory, rights_violations_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
 
@@ -16,7 +16,7 @@ class EventForm(ModelForm):
         'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
         'victim_is_complainant', 'allow_storage', 'allow_publishing', 'allow_representation',
         'data_is_sensitive', 'locations', 'prisons', 'release_types', 'sources',
-        'witnesses', 'victims', 'perpetrators', 'public'
+        'witnesses', 'victims', 'perpetrators', 'rights_violations', 'public'
     )
 
     def __iter__(self):
@@ -32,6 +32,7 @@ class EventForm(ModelForm):
     witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label='name')
     victims = QuerySelectMultipleField(query_factory=victims_factory, get_label='name')
     perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label='name')
+    rights_violations = QuerySelectMultipleField(query_factory=rights_violations_factory, get_label='name')
 
     psych_assist = fields.SelectField(___('Psychological assistance provided'),
                                       validators=[validators.required()],
@@ -67,3 +68,7 @@ class EventForm(ModelForm):
                                                (1, ___('Yes')), (0, ___('No'))], coerce=bool)
     public = fields.SelectField(___('Public'), validators=[validators.required()], choices=[
         (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+
+    def validate_release_date(self, field):
+        if field.data <= self.detention_date.data:
+            raise validators.ValidationError(___('Release date has to be greater than detention date.'))
