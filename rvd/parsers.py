@@ -97,7 +97,7 @@ def _org1_events_to_model(events):
         del event['source']
         geocoded = utils.geocodes(event['location']['name'], include_importance=True)
         del event['location']
-        if len(geocoded) > 0:
+        if geocoded is not None and len(geocoded) > 0:
           geocoded = utils.max_by(geocoded, lambda gc: gc['importance'])
           location = Location(name=geocoded['name'],
               latitude=geocoded['latitude'], longitude=geocoded['latitude'])
