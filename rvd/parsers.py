@@ -61,7 +61,7 @@ def _parse_org1_docx_report(doc):
 
 # Parse organisation 1's docx documents.
 # Does not accept the excel_workbook argument (None, here)
-def _parse_org1_docx_events(doc, _):
+def _parse_org1_docx_events(doc):
     events = []
     table = doc.tables[0]
     # First row contains table headers
