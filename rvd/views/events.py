@@ -3,7 +3,7 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, Action, RightsViolation, Location
+from rvd.models import session, Event, Action, RightsViolation, Location, User
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
 from rvd.forms import perpetrators_factory, victims_factory, rights_violations_factory
@@ -151,11 +151,19 @@ def events_by_type():
 
     # add extra restriction about user/owner if logged in user is not an admin
     if not current_user.is_admin:
-        ands.append(Event.owner_id == current_user.id)
+        ands.append(User.organisation_id == current_user.organisation_id)
 
-    all_events = session.query(Event).join(
+    all_events = session.query(
+        Event
+    ).join(
         Event.rights_violations
-    ).join(Event.locations).filter(and_(x for x in ands))
+    ).join(
+        Event.locations
+    ).join(
+        Event.owner
+    ).filter(
+        and_(x for x in ands)
+    )
 
     grouped_events = []
     locations = []
