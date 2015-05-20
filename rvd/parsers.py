@@ -51,6 +51,9 @@ def log_error(msg):
     print msg
     # Log to a file later?
 
+def _excel_parse_date(datefloat, workbook):
+    return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
+
 def _parse_org1_docx_report(doc):
     report = ''
     for p in doc.paragraphs:
@@ -223,6 +226,8 @@ def _parse_excel_template(filename):
         reading_event = False
         row = sheet.row(cur_row)
         print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+        cur_row += 1
+        '''
         if 'Event' in row[0].value and not reading_event:
             reading_event = True
             event = Event(**{
@@ -230,9 +235,9 @@ def _parse_excel_template(filename):
                 'description': row[2].value,
                 'charges': row[3].value,
                 'consequences': row[4].value,
-                'detention_date': _excel_parse_date(row[5].value, book),
-                'release_date': _excel_parse_date(row[6].value, book),
-                'report_date': _excel_parse_date(row[7].value, book),
+                'detention_date': _excel_parse_date(float(row[5].value), book),
+                'release_date': _excel_parse_date(float(row[6].value), book),
+                'report_date': _excel_parse_date(float(row[7].value), book),
                 'psych_assist': row[8].value.lower() == YES,
                 'material_assist': row[9].value.lower() == YES,
                 'was_activist': row[10].value.lower() == YES,
@@ -261,7 +266,7 @@ def _parse_excel_template(filename):
                 _type = row[2].value
                 actor = Actor(**{
                     'name': row[3].value,
-                    'birth_date': _excel_parse_date(row[4].value, book),
+                    'birth_date': _excel_parse_date(float(row[4].value), book),
                     'telephone': row[5].value,
                     'address': row[6].value,
                     'gender': row[7].value,
@@ -312,7 +317,8 @@ def _parse_excel_template(filename):
             session.add_all(cur_event.sources)
             session.add(cur_event)
         cur_row += 1
-    session.commit()
+        '''
+    #session.commit()
 
 '''
 # This function will do generic parsing of the content in an excel workbook
@@ -352,7 +358,6 @@ def _parse_excel_template(filename):
             entities['finished'].append(entity_name)
     del entities['finished']
     return entities
-'''
 
 def _parse_error(stream):
     return {'error': 'No parser exists for the provided filetype.'}
@@ -362,9 +367,8 @@ def _id(x, *args, **kwargs):
     return x
 
 
-def _excel_parse_date(datefloat, workbook):
-    return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
 
+'''
 # Given a list of strings of integers that should be indices into an array,
 # produce a list of converted integers. A string error message will be left
 # in the place of a value that could not be parsed. Indeces are 1-indexed.
