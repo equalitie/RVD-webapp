@@ -214,38 +214,39 @@ def _parse_org2_docx(_file):
         'events': events
     }
 
-# Based on Bill's pseudocode
-# https://gist.github.com/billdoran/8acb07dedc0e18775e38#file-example-algorithm
 def _parse_excel_template(filename):
     book = xlrd.open_workbook(filename)
     sheet = book.sheet_by_index(0)
+    import ipdb
+    ipdb.set_trace()
+    cur_row = 0
     for row_num in range(sheet.nrows):
+        
         cur_event = None
         reading_event = False
         row = sheet.row(row_num)
-        if row[0].value() == 'Event' and not reading_event:
+        if 'Event' in row[0].value and not reading_event:
             reading_event = True
-            #row_num += 1 # Jump to the actual event data
             event = Event(**{
-                'title': row[0].value(),
-                'description': row[1].value(),
-                'charges': row[2].value(),
-                'consequences': row[3].value(),
-                'detention_date': _excel_parse_date(row[4].value(), book),
-                'release_date': _excel_parse_date(row[5].value(), book),
-                'report_date': _excel_parse_date(row[6].value(), book),
-                'psych_assist': row[7].value().lower() == YES,
-                'material_assist': row[8].value().lower() == YES,
-                'was_activist': row[9].value().lower() == YES,
-                'victim_is_complainant': row[10].value().lower() == YES,
-                'allow_storage': row[11].value().lower() == YES,
-                'allow_publishing': row[12].value().lower() == YES,
-                'allow_representation': row[13].value().lower() == YES,
-                'data_is_sensitive': row[14].value().lower() == YES,
-                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[15].value())).first()],
-                'locations': [session.query(Location).filter_by(name=row[16].value()).first()],
-                'prisons': [session.query(Prison).filter_by(name=row[17].value()).first()],
-                'rights_violations': [session.query(RightsViolation).filter_by(name=row[18].value()).first()]
+                'title': row[1].value(),
+                'description': row[2].value(),
+                'charges': row[3].value(),
+                'consequences': row[4].value(),
+                'detention_date': _excel_parse_date(row[5].value(), book),
+                'release_date': _excel_parse_date(row[6].value(), book),
+                'report_date': _excel_parse_date(row[7].value(), book),
+                'psych_assist': row[8].value().lower() == YES,
+                'material_assist': row[9].value().lower() == YES,
+                'was_activist': row[10].value().lower() == YES,
+                'victim_is_complainant': row[11].value().lower() == YES,
+                'allow_storage': row[12].value().lower() == YES,
+                'allow_publishing': row[13].value().lower() == YES,
+                'allow_representation': row[14].value().lower() == YES,
+                'data_is_sensitive': row[15].value().lower() == YES,
+                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[16].value())).first()],
+                'locations': [session.query(Location).filter_by(name=row[17].value()).first()],
+                'prisons': [session.query(Prison).filter_by(name=row[18].value()).first()],
+                'rights_violations': [session.query(RightsViolation).filter_by(name=row[19].value()).first()]
             })
             cur_event = event
             cur_event.victims = []
@@ -253,7 +254,8 @@ def _parse_excel_template(filename):
             cur_event.perpetrators = []
             cur_event.actions = []
             cur_event.sources = []
-        elif row[1].value() == 'Actors' and reading_event:
+        elif row[1].value == 'Actors' and reading_event:
+            
             _type = row[2].value()
             actor = Actor(**{
                 'name': row[3].value(),
@@ -271,7 +273,7 @@ def _parse_excel_template(filename):
                 cur_event.victims.append(actor)
             elif _type == 'Perpetrator':
                 cur_event.perpetrators.append(actor)
-        elif row[1].value() == 'Actions' and reading_event:
+        elif row[1].value == 'Actions' and reading_event:
             action = Action(**{
                 'state_bodies_approached': [
                     session.query(StateAuthority).filter_by(name=row[2].value()).first()],
@@ -283,18 +285,20 @@ def _parse_excel_template(filename):
                 'response_from_international_authority': row[7].value()
             })
             cur_event.actions.append(action)
-        elif row[1].value() == 'Sources' and reading_event:
+        elif row[1].value == 'Sources' and reading_event:
             source = Source(**{
                 'name': row[2].value(),
                 'organisations': [session.query(Organisation).filter_by(name=row[3].value()).first()]
             })
             cur_event.sources.append(source)
-        session.add_all(cur_event.witnesses)
-        session.add_all(cur_event.victims)
-        session.add_all(cur_event.perpetrators)
-        session.add_all(cur_event.actions)
-        session.add_all(cur_event.sources)
-        session.add(cur_event)
+        if reading_event:
+            session.add_all(cur_event.witnesses)
+            session.add_all(cur_event.victims)
+            session.add_all(cur_event.perpetrators)
+            session.add_all(cur_event.actions)
+            session.add_all(cur_event.sources)
+            session.add(cur_event)
+        cur_row += 1
     session.commit()
 
 '''
