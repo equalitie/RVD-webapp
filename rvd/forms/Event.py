@@ -16,7 +16,7 @@ class EventForm(ModelForm):
         'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
         'victim_is_complainant', 'allow_storage', 'allow_publishing', 'allow_representation',
         'data_is_sensitive', 'locations', 'prisons', 'release_types', 'sources',
-        'witnesses', 'victims', 'perpetrators', 'rights_violations', 'public'
+        'witnesses', 'victims', 'perpetrators', 'rights_violations', 'public','documents'
     )
 
     def __iter__(self):
@@ -33,6 +33,8 @@ class EventForm(ModelForm):
     victims = QuerySelectMultipleField(query_factory=victims_factory, get_label='name')
     perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label='name')
     rights_violations = QuerySelectMultipleField(query_factory=rights_violations_factory, get_label='name')
+
+    documents = fields.FileField()
 
     psych_assist = fields.SelectField(___('Psychological assistance provided'),
                                       validators=[validators.required()],

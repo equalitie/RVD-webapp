@@ -145,6 +145,11 @@ event_violations = Table('event_rights-violation', Base.metadata,
                          sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
                          sa.Column('rights_violation_id', sa.BigInteger, ForeignKey('rightsviolations.id')))
 
+event_documents = Table('event_document', Base.metadata,
+                         sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
+                         sa.Column('document_id', sa.BigInteger, ForeignKey('documents.id')))
+
+
 # event_event = Table('event_event', Base.metadata,
 #    sa.Column('event1_id', sa.BigInteger, ForeignKey('events.id')),
 #    sa.Column('event2_id', sa.BigInteger, ForeignKey('events.id')))
@@ -198,6 +203,7 @@ class Event(Base):
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
     rights_violations = relationship('RightsViolation', secondary=event_violations, backref='events')
+    documents = relationship('Document', secondary=event_documents, backref='events')
     owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='event_owner')
     public = sa.Column(sa.Boolean, nullable=False, info={
@@ -344,6 +350,17 @@ class RightsViolation(Base):
         'description': ___('Name'), 'label': ___('Name')})
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
+
+############################
+## Rights Violation model ##
+############################
+
+class Document(Base):
+    __tablename__ = 'documents'
+
+    id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
+    filename = sa.Column(sa.Unicode(200), nullable=False, info={
+        'description': ___('filename'), 'label': ___('Filename')})
 
 
 ##################

@@ -24,7 +24,12 @@
                 {% for field in form %}
 
                 <div class="form-group">
-                    {% if field.type == "RadioField" %}
+                    {% if field.type == "FileField" %}
+                         <div class="form_actor_label">{{ field.label }}</div>
+                         <div class="form_actor_field {% if field.errors %}has-error{% endif %}">
+                           {{form.documents(multiple="") }}
+                        </div>
+                    {% elif field.type == "RadioField" %}
                         <div class="form_actor_label">{{ field.label }}</div>
                         <label class="gender_label {% if form.errors %}has-error{% endif %}">{{ field }}</label>
                     {% else %}
