@@ -51,6 +51,9 @@ def log_error(msg):
     print msg
     # Log to a file later?
 
+def _excel_parse_date(datefloat, workbook):
+    return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
+
 def _parse_org1_docx_report(doc):
     report = ''
     for p in doc.paragraphs:
@@ -214,7 +217,121 @@ def _parse_org2_docx(_file):
         'events': events
     }
 
+def _get_location(loc_name):
+    location = session.query(Location).filter_by(name=loc_name).first()
+    if location is not None:
+        return location
+    # Create a new Location based on the data pulled from OSM if the location
+    # isn't already in the database
+    locations = utils.geocodes(loc_name, include_importance=True)
+    location = utils.max_by(locations, lambda l: l['importance'])
+    location = Location(name=location['name'],
+        longitude=location['longitude'], latitude=location['latitude'])
+    return location
 
+def _parse_excel_template(filename):
+    book = xlrd.open_workbook(filename)
+    sheet = book.sheet_by_index(0)
+    cur_row = 0
+    while cur_row < sheet.nrows:
+        cur_event = None
+        reading_event = False
+        row = sheet.row(cur_row)
+        print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+        if 'Event' in row[0].value and not reading_event:
+            reading_event = True
+            event = Event(**{
+                'title': row[0].value,
+                'description': row[1].value,
+                'charges': row[2].value,
+                'consequences': row[3].value,
+                'detention_date': _excel_parse_date(float(row[4].value), book),
+                'release_date': _excel_parse_date(float(row[5].value), book),
+                'report_date': _excel_parse_date(float(row[6].value), book),
+                'psych_assist': row[7].value.lower() == YES,
+                'material_assist': row[8].value.lower() == YES,
+                'was_activist': row[9].value.lower() == YES,
+                'victim_is_complainant': row[10].value.lower() == YES,
+                'allow_storage': row[11].value.lower() == YES,
+                'allow_publishing': row[12].value.lower() == YES,
+                'allow_representation': row[13].value.lower() == YES,
+                'data_is_sensitive': row[14].value.lower() == YES,
+                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[15].value)).first()],
+                'locations': [_get_location(row[16].value)],
+                'prisons': [session.query(Prison).filter_by(name=row[17].value).first()],
+                'rights_violations': [session.query(RightsViolation).filter_by(name=row[18].value).first()],
+                'owner': session.query(User).filter_by(is_admin=1).first()
+            })
+            cur_event = event
+            cur_event.victims = []
+            cur_event.witnesses = []
+            cur_event.perpetrators = []
+            cur_event.actions = []
+            cur_event.sources = []
+        elif row[1].value == 'Actors' and reading_event:
+            cur_row += 1
+            row = sheet.row(cur_row)
+            # Rely on the columns under an entity name and before the next being blank
+            while row[1].value == '' and cur_row < sheet.nrows:
+                row = sheet.row(cur_row)
+                _type = row[2].value
+                actor = Actor(**{
+                    'name': row[3].value,
+                    'birth_date': _excel_parse_date(float(row[4].value), book),
+                    'telephone': row[5].value,
+                    'address': row[6].value,
+                    'gender': row[7].value,
+                    'is_activist': row[8].value.lower() == YES,
+                    'organisations': [session.query(Organisation).filter_by(name=row[9].value).first()],
+                    'professions': [session.query(Profession).filter_by(name=row[10].value).first()],
+                    'owner': session.query(User).filter_by(is_admin=1).first()
+                })
+                if _type == 'Witness':
+                    cur_event.witnesses.append(actor)
+                elif _type == 'Victim':
+                    cur_event.victims.append(actor)
+                elif _type == 'Perpetrator':
+                    cur_event.perpetrators.append(actor)
+                cur_row += 1
+        elif row[1].value == 'Actions' and reading_event:
+            cur_row += 1
+            row = sheet.row(cur_row)
+            while row[1].value == '' and cur_row < sheet.nrows:
+                row = sheet.row(cur_row)
+                action = Action(**{
+                    'state_bodies_approached': [
+                        session.query(StateAuthority).filter_by(name=row[2].value).first()],
+                    'complaint_to_state_authority': row[3].value,
+                    'response_from_state_authority': row[4].value,
+                    'international_bodies_approached': [
+                        session.query(InternationalAuthority).filter_by(name=row[5].value).first()],
+                    'complaint_to_international_authority': row[6].value,
+                    'response_from_international_authority': row[7].value
+                })
+                cur_event.actions.append(action)
+                cur_row += 1
+        elif row[1].value == 'Sources' and reading_event:
+            cur_row += 1
+            row = sheet.row(cur_row)
+            while row[1].value == '' and cur_row < sheet.nrows:
+                row = sheet.row(cur_row)
+                source = Source(**{
+                    'name': row[2].value,
+                    'organisations': [session.query(Organisation).filter_by(name=row[3].value).first()]
+                })
+                cur_event.sources.append(source)
+                cur_row += 1
+        if reading_event:
+            session.add_all(cur_event.witnesses)
+            session.add_all(cur_event.victims)
+            session.add_all(cur_event.perpetrators)
+            session.add_all(cur_event.actions)
+            session.add_all(cur_event.sources)
+            session.add(cur_event)
+        cur_row += 1
+    session.commit()
+
+'''
 # This function will do generic parsing of the content in an excel workbook
 # but we will leave it to other handler functions to do entity-specific manipulation
 def _parse_excel_template(filename):
@@ -253,7 +370,6 @@ def _parse_excel_template(filename):
     del entities['finished']
     return entities
 
-
 def _parse_error(stream):
     return {'error': 'No parser exists for the provided filetype.'}
 
@@ -262,9 +378,8 @@ def _id(x, *args, **kwargs):
     return x
 
 
-def _excel_parse_date(datefloat, workbook):
-    return datetime.datetime(*xlrd.xldate_as_tuple(datefloat, workbook.datemode))
 
+'''
 # Given a list of strings of integers that should be indices into an array,
 # produce a list of converted integers. A string error message will be left
 # in the place of a value that could not be parsed. Indeces are 1-indexed.
