@@ -14,7 +14,9 @@
             <p class="bg-success new_actor_success">Operation successful.</p>
         {% endif %}
 
-        <h3>{{ data['name'] }}</h3>
+        <h3>{{ data['name'] }}
+        {% if event and event['report_date'] %}: report date: {{ event['report_date'] }} {% endif%}
+        </h3>
 
         <table class="table">
             {% for key, value in data['data'].iteritems() %}

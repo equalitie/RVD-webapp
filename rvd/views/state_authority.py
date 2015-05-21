@@ -4,6 +4,7 @@ from rvd.forms.StateAuthority import StateAuthorityForm
 from flask_admin import helpers
 from collections import defaultdict
 from rvd.models import session, StateAuthority
+from rvd.views import flatten_instance
 from copy import copy
 names = {
     'name': 'state authority',
@@ -12,12 +13,6 @@ names = {
     'plural_slug': 'state_authorities'
 }
 state_authority_bp = Blueprint('state_authority', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -41,23 +36,11 @@ def state_authority():
     return render_template("item_edit.html", form=state_authority_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(StateAuthority).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @state_authority_bp.route('/state_authorities/<int:state_authority_id>')
 @login_required
 def view_state_authority(state_authority_id):
     state_authorities = session.query(StateAuthority).get(state_authority_id)
-    fields = flatten_instance(state_authorities)
+    fields = flatten_instance(state_authorities, StateAuthority)
     data = copy(names)
     data['data'] = fields
 
@@ -68,7 +51,9 @@ def view_state_authority(state_authority_id):
 @login_required
 def view_all_state_authority():
     all_state_authority = session.query(StateAuthority).all()
-    all_state_authority = [{k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_state_authority]
+    all_state_authority = [
+        {k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_state_authority
+    ]
     data = copy(names)
     data['data'] = all_state_authority
 
@@ -80,7 +65,7 @@ def view_all_state_authority():
 def delete_state_authority(state_authority_id):
     state_authorities = session.query(StateAuthority).get(state_authority_id)
     session.delete(state_authorities)
-    session.commit()
+    session.flush()
     return redirect('/state_authorities/all?success=1')
 
 

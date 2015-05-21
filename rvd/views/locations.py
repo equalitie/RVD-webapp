@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session
 from rvd.models import Location
 from copy import copy
+from rvd.views import flatten_instance
 names = {
     'name': 'location',
     'plural': 'locations',
@@ -36,23 +37,11 @@ def locations():
     return render_template("item_edit.html", form=location_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Location).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @locations_bp.route('/locations/<int:location_id>')
 @login_required
 def view_location(location_id):
     location = session.query(Location).get(location_id)
-    fields = flatten_instance(location)
+    fields = flatten_instance(location, Location)
     data = copy(names)
     data['data'] = fields
 
@@ -75,7 +64,7 @@ def view_all_locations():
 def delete_location(location_id):
     location = session.query(Location).get(location_id)
     session.delete(location)
-    session.commit()
+    session.flush()
     return redirect('/locations/all?success=1')
 
 

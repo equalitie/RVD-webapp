@@ -3,10 +3,11 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, Action, RightsViolation, Location, User
+from rvd.models import session, Event, EventType, Location, User
+from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
-from rvd.forms import perpetrators_factory, victims_factory, rights_violations_factory
+from rvd.forms import perpetrators_factory, victims_factory, event_type_factory
 from sqlalchemy import and_
 from copy import copy
 from sqlalchemy.orm.exc import NoResultFound
@@ -20,12 +21,6 @@ names = {
     'plural_slug': 'events'
 }
 events_bp = Blueprint('events', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -52,14 +47,14 @@ def gather_form_data():
     perpetrators_ids = request.form.getlist('perpetrators')
     event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
 
-    rights_violations = request.form.getlist('rights_violations')
-    event_dict['rights_violations'] = [get_name_from_id(x, rights_violations_factory()) for x in rights_violations]
+    event_types = request.form.getlist('event_types')
+    event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
 
     event_dict['owner_id'] = current_user.id
 
     event_instance = Event(**event_dict)
     session.add(event_instance)
-    session.commit()
+    session.flush()
 
     return event_instance
 
@@ -76,38 +71,12 @@ def events():
     return render_template("item_edit.html", form=event_form, action='add', data=data)
 
 
-def get_attr(a):
-    if isinstance(a, Action):
-        items = [u"{}: {}".format(k, v) for k, v in a.__dict__.iteritems() if k[0:4] != '_sa_']
-        return ", ".join(items)
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'type_code'):
-        return str(a.type_code)
-    if hasattr(a, 'id'):
-        return str(a.id)
-
-
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-
-    for r in inspect(Event).relationships:
-        associated_data = getattr(obj, r.key)
-        try:
-            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-        except TypeError:
-            fields[r.key] = associated_data.email
-    return fields
-
-
 def get_event_violations_type(obj):
     fields = {'id': obj.id}
     for r in inspect(Event).relationships:
-        if r.key == "rights_violations":
+        if r.key == "event_types":
             associated_data = getattr(obj, r.key)
-            fields['rights_violations'] = [a.id for a in associated_data]
+            fields['event_types'] = [a.id for a in associated_data]
     return fields
 
 
@@ -120,19 +89,19 @@ def view_event(event_id):
             event = session.query(Event).get(event_id)
         else:
             event = session.query(Event).filter(and_(Event.id == event_id, Event.owner_id == current_user.id)).one()
-        fields = flatten_instance(event)
+        fields = flatten_instance(event, Event)
     except NoResultFound:
         return redirect('/events/all')
     data['data'] = fields
 
-    return render_template("item_view_single.html", data=data)
+    return render_template("item_view_single.html", data=data, event=event.__dict__)
 
 
 @events_bp.route('/events/grouped')
 @login_required
 def events_by_type():
-    violation_types = request.args.get("violation_types", None)
-    violation_types_list = violation_types.split(",")
+    event_types = request.args.get("event_types", None)
+    event_types_list = event_types.split(",")
 
     locations = request.args.get("locations", None)
     locations_list = locations.split(",")
@@ -143,10 +112,10 @@ def events_by_type():
     violations_start_date = datetime.datetime.fromtimestamp(float(violations_start_date)).strftime('%Y-%m-%d')
     violations_end_date = datetime.datetime.fromtimestamp(float(violations_end_date)).strftime('%Y-%m-%d')
 
-    rights_violations_types = [x for x in rights_violations_factory()]
-    rights_violations_names = [{"id": x.id, "name": x.name} for x in rights_violations_types]
+    event_types = [x for x in event_type_factory()]
+    event_type_names = [{"id": x.id, "name": x.name} for x in event_types]
 
-    ands = [RightsViolation.id.in_(violation_types_list), Event.report_date >= violations_start_date,
+    ands = [EventType.id.in_(event_types_list), Event.report_date >= violations_start_date,
             Event.report_date <= violations_end_date, Location.id.in_(locations_list)]
 
     # add extra restriction about user/owner if logged in user is not an admin
@@ -156,7 +125,7 @@ def events_by_type():
     all_events = session.query(
         Event
     ).join(
-        Event.rights_violations
+        Event.event_type
     ).join(
         Event.locations
     ).join(
@@ -177,17 +146,17 @@ def events_by_type():
     all_events = sorted(all_events, key=lambda z: z.report_date)
     for date, group in groupby(all_events, key=lambda y: y.report_date):
         # group by type, make sure we have a default of 0
-        date_types = {"{}".format(x.id): 0 for x in rights_violations_types}
+        date_types = {"{}".format(x.id): 0 for x in event_types}
         date_types["date"] = date.strftime("%Y%m%d")
         event_objs = [get_event_violations_type(e) for e in list(group)]
         for violation in event_objs:
-            if violation['rights_violations']:
-                for v in violation['rights_violations']:
+            if violation['event_types']:
+                for v in violation['event_types']:
                     label = "{}".format(v)
                     date_types[label] += 1
         grouped_events.append(date_types)
 
-    return jsonify({"events": grouped_events, "locations": locations, "names": rights_violations_names})
+    return jsonify({"events": grouped_events, "locations": locations, "names": event_type_names})
 
 
 @events_bp.route('/events/all')
@@ -215,7 +184,7 @@ def delete_event(event_id):
     except NoResultFound:
         return redirect('/events/all')
     session.delete(event)
-    session.commit()
+    session.flush()
     return redirect('/events/all?success=1')
 
 

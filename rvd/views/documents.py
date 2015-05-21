@@ -8,17 +8,18 @@ from rvd import parsers
 
 documents_bp = Blueprint('documents', __name__)
 
-
 UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = set(['docx', 'doc', 'xlsx', 'xls'])
+ALLOWED_EXTENSIONS = {'docx', 'doc', 'xlsx', 'xls'}
 
 # Document types that only provide information about events.
-EVENT_ONLY = set(['docx', 'doc'])
+EVENT_ONLY = {'docx', 'doc'}
+
 
 @documents_bp.route('/document/add', methods=('GET', 'POST'))
 @login_required
 def documents_add():
     return render_template("document_add.html")
+
 
 @documents_bp.route('/document/upload', methods=('POST',))
 @login_required
@@ -36,9 +37,9 @@ def documents_uploads():
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
                 print '### Saved'
                 f = os.path.join(UPLOAD_FOLDER, filename)
-                #org_name = request.form['organisation_name']
-                #print '### Got organisation name ' + org_name
-                parsed = parsers.parse(f, parsers.EXCEL_DOC) #org_name)
+                # org_name = request.form['organisation_name']
+                # print '### Got organisation name ' + org_name
+                parsed = parsers.parse(f, parsers.EXCEL_DOC)  # org_name)
                 print '### Succeeding in parsing document'
                 if 'error' in parsed:
                     print '### ' + parsed['error']
@@ -51,16 +52,16 @@ def documents_uploads():
                     user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
                     for i in range(len(parsed[parsers.ACTORS])):
                         parsed[parsers.ACTORS][i].owner_id = user_id
-                        parsed[parsers.ACTORS][i].owner = user 
+                        parsed[parsers.ACTORS][i].owner = user
                     for i in range(len(parsed[parsers.EVENTS])):
                         parsed[parsers.EVENTS][i].owner_id = user_id
                         parsed[parsers.EVENTS][i].owner = user
                     for entity in parsed:
                         rvd.models.session.add_all(parsed[entity])
-                        
+
                     print '### Added all parsed entities'
-                rvd.models.session.commit()
-                        
+                rvd.models.session.flush()
+
     return render_template("document_add.html")
 
 

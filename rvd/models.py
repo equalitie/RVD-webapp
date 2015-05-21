@@ -2,14 +2,15 @@ from flask_babel import lazy_gettext as ___
 import sqlalchemy as sa
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 from instance import config
 from flask_login import UserMixin
 
-engine = create_engine('mysql://{}:{}@{}/{}?charset=utf8'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME))
+engine = create_engine(
+    'mysql://{}:{}@{}/{}?charset=utf8'.format(config.DB_USER, config.DB_PASS, config.DB_HOST, config.DB_NAME)
+)
 Base = declarative_base(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
+session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
 ##################
@@ -141,9 +142,9 @@ event_perp = Table('event_perpetrator', Base.metadata,
                    sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
                    sa.Column('perpetrator_id', sa.BigInteger, ForeignKey('actors.id')))
 
-event_violations = Table('event_rights-violation', Base.metadata,
+event_type = Table('event_type', Base.metadata,
                          sa.Column('event_id', sa.BigInteger, ForeignKey('events.id')),
-                         sa.Column('rights_violation_id', sa.BigInteger, ForeignKey('rightsviolations.id')))
+                         sa.Column('event_type_id', sa.BigInteger, ForeignKey('eventtypes.id')))
 
 # event_event = Table('event_event', Base.metadata,
 #    sa.Column('event1_id', sa.BigInteger, ForeignKey('events.id')),
@@ -158,11 +159,11 @@ class Event(Base):
     description = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Description'), 'label': ___('Description')})
     charges = sa.Column(sa.Text, nullable=True, info={
-        'description': ___('Charges'), 'label': ___('Charges')})
-    detention_date = sa.Column(sa.Date, nullable=False, info={
-        'description': ___('Date of detention'), 'label': ___('Date of detention')})
-    release_date = sa.Column(sa.Date, nullable=True, info={
-        'description': ___('Date of release'), 'label': ___('Date of release')})
+        'description': ___('Charges'), 'label': ___('Charges against victim')})
+    event_start = sa.Column(sa.DateTime, nullable=False, info={
+        'description': ___('YYYY-MM-DD 00:00:00'), 'label': ___('Event start')})
+    event_end = sa.Column(sa.DateTime, nullable=True, info={
+        'description': ___('YYYY-MM-DD 00:00:00'), 'label': ___('Event end')})
     report_date = sa.Column(sa.Date, nullable=False, info={
         'description': ___('Date of report'), 'label': ___('Date of report')})
     psych_assist = sa.Column(sa.Boolean, nullable=False, info={
@@ -197,7 +198,7 @@ class Event(Base):
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
-    rights_violations = relationship('RightsViolation', secondary=event_violations, backref='events')
+    event_types = relationship('EventType', secondary=event_type, backref='events')
     owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='event_owner')
     public = sa.Column(sa.Boolean, nullable=False, info={
@@ -336,8 +337,8 @@ class ReleaseType(Base):
 ## Rights Violation model ##
 ############################
 
-class RightsViolation(Base):
-    __tablename__ = 'rightsviolations'
+class EventType(Base):
+    __tablename__ = 'eventtypes'
 
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={

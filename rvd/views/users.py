@@ -8,6 +8,7 @@ from rvd.models import session, User
 from rvd.forms import user_org_factory
 from copy import copy
 import bcrypt
+from rvd.views import flatten_instance, get_name_from_id
 names = {
     'name': 'user',
     'plural': 'users',
@@ -15,12 +16,6 @@ names = {
     'plural_slug': 'users'
 }
 users_bp = Blueprint('users', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -38,7 +33,7 @@ def gather_form_data():
 
     user_instance = User(**user_dict)
     session.add(user_instance)
-    session.commit()
+    session.flush()
 
     return user_instance
 
@@ -56,33 +51,11 @@ def users():
     return render_template("item_edit.html", form=user_form, action='add', data=data, needs_admin=1, user=current_user)
 
 
-def get_attr(a):
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'title'):
-        return str(a.title)
-
-
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(User).relationships:
-        associated_data = getattr(obj, r.key)
-        try:
-            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-        except TypeError:
-            fields[r.key] = get_attr(associated_data)
-    return fields
-
-
 @users_bp.route('/users/<int:user_id>')
 @login_required
 def view_user(user_id):
     user = session.query(User).get(user_id)
-    fields = flatten_instance(user)
+    fields = flatten_instance(user, User)
     data = copy(names)
     data['data'] = fields
 
@@ -105,7 +78,7 @@ def view_all_users():
 def delete_user(user_id):
     user = session.query(User).get(user_id)
     session.delete(user)
-    session.commit()
+    session.flush()
     return redirect('/users/all?success=1')
 
 

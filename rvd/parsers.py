@@ -151,15 +151,15 @@ def _parse_org2_docx_events(doc):
             # the schema description
             # parsed['notes'] = ' '.join(doc.paragraphs[i + 3].text.split(':')[1:]).strip()
             parsed['source']['name'] = ' '.join(doc.paragraphs[i + 4].text.split(':')[1:]).strip()
-            parsed['detention_date'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
+            parsed['event_start'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
             parsed['report_date'] = ' '.join(doc.paragraphs[i + 6].text.split(':')[1:]).strip()
-            if parsed['detention_date']:
-                parsed['detention_date'] = parsed['detention_date'].replace(' ', '').replace('.', '')
+            if parsed['event_start']:
+                parsed['event_start'] = parsed['event_start'].replace(' ', '').replace('.', '')
                 try:
-                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%Y')
+                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%Y')
                 except:
-                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%y')
-                parsed['detention_date'] = utils.to_datetime(parsed['detention_date'])
+                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%y')
+                parsed['event_start'] = utils.to_datetime(parsed['event_start'])
             if parsed['report_date']:
                 parsed['report_date'] = parsed['report_date'].replace(' ', '').replace('.', '')
                 try:
@@ -381,10 +381,10 @@ def _event_h(parsed, wb):
         event['witnesses'] = _from_indices(event['witnesses'], parsed[ACTORS])
         event['victims'] = _from_indices(event['victims'], parsed[ACTORS])
         event['perpetrators'] = _from_indices(event['perpetrators'], parsed[ACTORS])
-        event['rights_violations'] = _from_indices(
-            event['rights_violations'], parsed[RIGHTS_VIOLATIONS])
-        event['detention_date'] = _excel_parse_date(event['detention_date'], wb)
-        event['release_date'] = _excel_parse_date(event['release_date'], wb)
+        event['event_types'] = _from_indices(
+            event['event_types'], parsed[RIGHTS_VIOLATIONS])
+        event['event_start'] = _excel_parse_date(event['event_start'], wb)
+        event['event_end'] = _excel_parse_date(event['event_end'], wb)
         event['report_date'] = _excel_parse_date(event['report_date'], wb)
         event['psych_assist'] = event['psych_assist'].lower() == YES
         event['material_assist'] = event['material_assist'].lower() == YES
@@ -444,11 +444,11 @@ def _location_h(parsed, wb):
         parsed[LOCATIONS][i] = Location(**location)
     return parsed
 
-def _rights_violation_h(parsed, wb):
-    print '### rights_violation_h'
+def _event_type_h(parsed, wb):
+    print '### event_type_h'
     for i in range(len(parsed[RIGHTS_VIOLATIONS])):
-        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.rights_violation)
-        parsed[RIGHTS_VIOLATIONS][i] = RightsViolation(**rv)
+        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.event_type)
+        parsed[RIGHTS_VIOLATIONS][i] = EventType(**rv)
     return parsed
 
 def _release_type_h(parsed, wb):
@@ -498,7 +498,7 @@ _post_collection_handlers = {
     PROFESSIONS: _profession_h,
     LOCATIONS: _location_h,
     RELEASE_TYPES: _release_type_h,
-    RIGHTS_VIOLATIONS: _rights_violation_h,
+    RIGHTS_VIOLATIONS: _event_type_h,
     SOURCES: _source_h,
     PRISON_TYPES: _prison_type_h,
     PRISONS: _prison_h

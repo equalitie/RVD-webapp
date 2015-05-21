@@ -3,13 +3,14 @@ from flask_login import login_required
 from rvd.forms.Actor import ActorForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Actor, Event
+from rvd.models import session, Actor
 import datetime
 from flask_login import current_user
 from rvd.forms import organisation_factory, location_factory, profession_factory
 from copy import copy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import and_
+from rvd.views import flatten_instance, get_name_from_id
 
 names = {
     'name': 'actor',
@@ -18,12 +19,6 @@ names = {
     'plural_slug': 'actors'
 }
 actors_bp = Blueprint('actors', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -41,7 +36,7 @@ def gather_form_data():
 
     actor_instance = Actor(**actor_dict)
     session.add(actor_instance)
-    session.commit()
+    session.flush()
 
     return actor_instance
 
@@ -58,30 +53,6 @@ def actors():
     return render_template("item_edit.html", form=actor_form, action='add', data=data)
 
 
-def get_attr(a):
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'type_code'):
-        return str(a.type_code)
-    if hasattr(a, 'id'):
-        return str(a.id)
-
-
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Actor).relationships:
-        associated_data = getattr(obj, r.key)
-        try:
-            fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-        except TypeError:
-            fields[r.key] = associated_data.email
-    return fields
-
-
 @actors_bp.route('/actors/<int:actor_id>')
 @login_required
 def view_actor(actor_id):
@@ -91,7 +62,7 @@ def view_actor(actor_id):
             actor = session.query(Actor).get(actor_id)
         else:
             actor = session.query(Actor).filter(and_(Actor.id == actor_id, Actor.owner_id == current_user.id)).one()
-        fields = flatten_instance(actor)
+        fields = flatten_instance(actor, Actor)
     except NoResultFound:
         return redirect('/actors/all')
     data['data'] = fields
@@ -124,7 +95,6 @@ def delete_actor(actor_id):
     except NoResultFound:
         return redirect('/actors/all')
     session.delete(actor)
-    session.commit()
     return redirect('/actors/all?success=1')
 
 
