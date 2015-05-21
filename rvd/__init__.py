@@ -2,7 +2,7 @@
 Everything we want available to the 'rvd' app module
 """
 import os
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request, g
 from flask_login import LoginManager
 from flask_babel import Babel
 from rvd.models import session, User
@@ -20,12 +20,16 @@ from views.intl_authority import international_authority_bp
 from views.prison_type import prison_types_bp
 from views.prisons import prisons_bp
 from views.release_types import release_types_bp
-from views.rights_violations import rights_violations_bp
+from views.event_types import event_types_bp
 from views.sources import sources_bp
 from views.state_authority import state_authority_bp
 from views.events import events_bp
 from views.evidence_type import evidence_types_bp
 from views.users import users_bp
+from models import session
+
+import logging
+import time
 
 # FLASK APP
 static_paths = [os.getcwd(), '/lib/static']
@@ -45,7 +49,7 @@ app.register_blueprint(international_authority_bp)
 app.register_blueprint(prison_types_bp)
 app.register_blueprint(prisons_bp)
 app.register_blueprint(release_types_bp)
-app.register_blueprint(rights_violations_bp)
+app.register_blueprint(event_types_bp)
 app.register_blueprint(sources_bp)
 app.register_blueprint(state_authority_bp)
 app.register_blueprint(events_bp)
@@ -61,6 +65,26 @@ login_manager.init_app(app)
 
 
 # flask overrides
+@app.before_request
+def before_request():
+    g.start = time.time()
+
+
+@app.teardown_request
+def teardown_request(exception=None):
+    logging.info("Request took {} ms".format((time.time() - g.start)*1000))
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        logging.error(e.message)
+    session.remove()
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """

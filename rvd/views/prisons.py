@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session, Prison
 from rvd.forms import location_factory, prison_type_factory
 from copy import copy
+from rvd.views import flatten_instance, get_name_from_id
 names = {
     'name': 'prison',
     'plural': 'prisons',
@@ -13,12 +14,6 @@ names = {
     'plural_slug': 'prisons'
 }
 prisons_bp = Blueprint('prisons', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -34,7 +29,7 @@ def gather_form_data():
 
     prison_instance = Prison(**prison_dict)
     session.add(prison_instance)
-    session.commit()
+    session.flush()
 
     return prison_instance
 
@@ -51,30 +46,11 @@ def prisons():
     return render_template("item_edit.html", form=prison_form, action='add', data=data)
 
 
-def get_attr(a):
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'title'):
-        return str(a.title)
-
-
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Prison).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-    return fields
-
-
 @prisons_bp.route('/prisons/<int:prison_id>')
 @login_required
 def view_prison(prison_id):
     prison = session.query(Prison).get(prison_id)
-    fields = flatten_instance(prison)
+    fields = flatten_instance(prison, Prison)
     data = copy(names)
     data['data'] = fields
 
@@ -97,7 +73,7 @@ def view_all_prisons():
 def delete_prison(prison_id):
     prison = session.query(Prison).get(prison_id)
     session.delete(prison)
-    session.commit()
+    session.flush()
     return redirect('/prisons/all?success=1')
 
 

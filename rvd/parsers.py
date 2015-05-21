@@ -154,15 +154,15 @@ def _parse_org2_docx_events(doc):
             # the schema description
             # parsed['notes'] = ' '.join(doc.paragraphs[i + 3].text.split(':')[1:]).strip()
             parsed['source']['name'] = ' '.join(doc.paragraphs[i + 4].text.split(':')[1:]).strip()
-            parsed['detention_date'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
+            parsed['event_start'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
             parsed['report_date'] = ' '.join(doc.paragraphs[i + 6].text.split(':')[1:]).strip()
-            if parsed['detention_date']:
-                parsed['detention_date'] = parsed['detention_date'].replace(' ', '').replace('.', '')
+            if parsed['event_start']:
+                parsed['event_start'] = parsed['event_start'].replace(' ', '').replace('.', '')
                 try:
-                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%Y')
+                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%Y')
                 except:
-                    parsed['detention_date'] = time.strptime(parsed['detention_date'], '%d-%m-%y')
-                parsed['detention_date'] = utils.to_datetime(parsed['detention_date'])
+                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%y')
+                parsed['event_start'] = utils.to_datetime(parsed['event_start'])
             if parsed['report_date']:
                 parsed['report_date'] = parsed['report_date'].replace(' ', '').replace('.', '')
                 try:
@@ -217,6 +217,18 @@ def _parse_org2_docx(_file):
         'events': events
     }
 
+def _get_location(loc_name):
+    location = session.query(Location).filter_by(name=loc_name).first()
+    if location is not None:
+        return location
+    # Create a new Location based on the data pulled from OSM if the location
+    # isn't already in the database
+    locations = utils.geocodes(loc_name, include_importance=True)
+    location = utils.max_by(locations, lambda l: l['importance'])
+    location = Location(name=location['name'],
+        longitude=location['longitude'], latitude=location['latitude'])
+    return location
+
 def _parse_excel_template(filename):
     book = xlrd.open_workbook(filename)
     sheet = book.sheet_by_index(0)
@@ -226,30 +238,29 @@ def _parse_excel_template(filename):
         reading_event = False
         row = sheet.row(cur_row)
         print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
-        cur_row += 1
-        '''
         if 'Event' in row[0].value and not reading_event:
             reading_event = True
             event = Event(**{
-                'title': row[1].value,
-                'description': row[2].value,
-                'charges': row[3].value,
-                'consequences': row[4].value,
-                'detention_date': _excel_parse_date(float(row[5].value), book),
-                'release_date': _excel_parse_date(float(row[6].value), book),
-                'report_date': _excel_parse_date(float(row[7].value), book),
-                'psych_assist': row[8].value.lower() == YES,
-                'material_assist': row[9].value.lower() == YES,
-                'was_activist': row[10].value.lower() == YES,
-                'victim_is_complainant': row[11].value.lower() == YES,
-                'allow_storage': row[12].value.lower() == YES,
-                'allow_publishing': row[13].value.lower() == YES,
-                'allow_representation': row[14].value.lower() == YES,
-                'data_is_sensitive': row[15].value.lower() == YES,
-                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[16].value)).first()],
-                'locations': [session.query(Location).filter_by(name=row[17].value).first()],
-                'prisons': [session.query(Prison).filter_by(name=row[18].value).first()],
-                'rights_violations': [session.query(RightsViolation).filter_by(name=row[19].value).first()]
+                'title': row[0].value,
+                'description': row[1].value,
+                'charges': row[2].value,
+                'consequences': row[3].value,
+                'event_start': _excel_parse_date(float(row[4].value), book),
+                'event_end': _excel_parse_date(float(row[5].value), book),
+                'report_date': _excel_parse_date(float(row[6].value), book),
+                'psych_assist': row[7].value.lower() == YES,
+                'material_assist': row[8].value.lower() == YES,
+                'was_activist': row[9].value.lower() == YES,
+                'victim_is_complainant': row[10].value.lower() == YES,
+                'allow_storage': row[11].value.lower() == YES,
+                'allow_publishing': row[12].value.lower() == YES,
+                'allow_representation': row[13].value.lower() == YES,
+                'data_is_sensitive': row[14].value.lower() == YES,
+                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[15].value)).first()],
+                'locations': [_get_location(row[16].value)],
+                'prisons': [session.query(Prison).filter_by(name=row[17].value).first()],
+                'event_types': [session.query(EventType).filter_by(name=row[18].value).first()],
+                'owner': session.query(User).filter_by(is_admin=1).first()
             })
             cur_event = event
             cur_event.victims = []
@@ -272,7 +283,8 @@ def _parse_excel_template(filename):
                     'gender': row[7].value,
                     'is_activist': row[8].value.lower() == YES,
                     'organisations': [session.query(Organisation).filter_by(name=row[9].value).first()],
-                    'professions': [session.query(Profession).filter_by(name=row[10].value).first()]
+                    'professions': [session.query(Profession).filter_by(name=row[10].value).first()],
+                    'owner': session.query(User).filter_by(is_admin=1).first()
                 })
                 if _type == 'Witness':
                     cur_event.witnesses.append(actor)
@@ -317,8 +329,7 @@ def _parse_excel_template(filename):
             session.add_all(cur_event.sources)
             session.add(cur_event)
         cur_row += 1
-        '''
-    #session.commit()
+    session.commit()
 
 '''
 # This function will do generic parsing of the content in an excel workbook
@@ -359,8 +370,6 @@ def _parse_excel_template(filename):
     del entities['finished']
     return entities
 
-def _parse_error(stream):
-    return {'error': 'No parser exists for the provided filetype.'}
 
 
 def _id(x, *args, **kwargs):
@@ -485,10 +494,10 @@ def _event_h(parsed, wb):
         event['witnesses'] = _from_indices(event['witnesses'], parsed[ACTORS])
         event['victims'] = _from_indices(event['victims'], parsed[ACTORS])
         event['perpetrators'] = _from_indices(event['perpetrators'], parsed[ACTORS])
-        event['rights_violations'] = _from_indices(
-            event['rights_violations'], parsed[RIGHTS_VIOLATIONS])
-        event['detention_date'] = _excel_parse_date(event['detention_date'], wb)
-        event['release_date'] = _excel_parse_date(event['release_date'], wb)
+        event['event_types'] = _from_indices(
+            event['event_types'], parsed[RIGHTS_VIOLATIONS])
+        event['event_start'] = _excel_parse_date(event['event_start'], wb)
+        event['event_end'] = _excel_parse_date(event['event_end'], wb)
         event['report_date'] = _excel_parse_date(event['report_date'], wb)
         event['psych_assist'] = event['psych_assist'].lower() == YES
         event['material_assist'] = event['material_assist'].lower() == YES
@@ -548,11 +557,11 @@ def _location_h(parsed, wb):
         parsed[LOCATIONS][i] = Location(**location)
     return parsed
 
-def _rights_violation_h(parsed, wb):
-    print '### rights_violation_h'
+def _event_type_h(parsed, wb):
+    print '### event_type_h'
     for i in range(len(parsed[RIGHTS_VIOLATIONS])):
-        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.rights_violation)
-        parsed[RIGHTS_VIOLATIONS][i] = RightsViolation(**rv)
+        rv = entities.translate_fields(parsed[RIGHTS_VIOLATIONS][i], entities.event_type)
+        parsed[RIGHTS_VIOLATIONS][i] = EventType(**rv)
     return parsed
 
 def _release_type_h(parsed, wb):
@@ -602,7 +611,7 @@ _post_collection_handlers = {
     PROFESSIONS: _profession_h,
     LOCATIONS: _location_h,
     RELEASE_TYPES: _release_type_h,
-    RIGHTS_VIOLATIONS: _rights_violation_h,
+    RIGHTS_VIOLATIONS: _event_type_h,
     SOURCES: _source_h,
     PRISON_TYPES: _prison_type_h,
     PRISONS: _prison_h
@@ -615,6 +624,8 @@ _parsers = {
     EXCEL_DOC: _parse_excel_template
 }
 
+def _parse_error(stream):
+    return {'error': 'No parser exists for the provided filetype.'}
 
 # Public
 

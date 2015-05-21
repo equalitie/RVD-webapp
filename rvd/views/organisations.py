@@ -7,6 +7,7 @@ from rvd.models import session
 from rvd.models import Organisation
 from rvd.forms import location_factory
 from copy import copy
+from rvd.views import get_name_from_id, flatten_instance
 names = {
     'name': 'organisation',
     'plural': 'organisations',
@@ -14,12 +15,6 @@ names = {
     'plural_slug': 'organisations'
 }
 organisations_bp = Blueprint('organisations', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -31,7 +26,7 @@ def gather_form_data():
 
     organisation_instance = Organisation(**organisation_dict)
     session.add(organisation_instance)
-    session.commit()
+    session.flush()
 
     return organisation_instance
 
@@ -48,23 +43,11 @@ def organisations():
     return render_template("item_edit.html", form=organisation_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Organisation).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @organisations_bp.route('/organisations/<int:organisation_id>')
 @login_required
 def view_organisation(organisation_id):
     organisation = session.query(Organisation).get(organisation_id)
-    fields = flatten_instance(organisation)
+    fields = flatten_instance(organisation, Organisation)
     data = copy(names)
     data['data'] = fields
 
@@ -88,7 +71,7 @@ def view_all_organisations():
 def delete_organisation(organisation_id):
     organisation = session.query(Organisation).get(organisation_id)
     session.delete(organisation)
-    session.commit()
+    session.flush()
     return redirect('/organisations/all?success=1')
 
 

@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session
 from rvd.models import PrisonType
 from copy import copy
+from rvd.views import flatten_instance
 names = {
     'name': 'prison type',
     'plural': 'prison types',
@@ -36,23 +37,11 @@ def prison_types():
     return render_template("item_edit.html", form=prison_type_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(PrisonType).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @prison_types_bp.route('/prison_types/<int:prison_type_id>')
 @login_required
 def view_prison_type(prison_type_id):
     prison_type = session.query(PrisonType).get(prison_type_id)
-    fields = flatten_instance(prison_type)
+    fields = flatten_instance(prison_type, PrisonType)
     data = copy(names)
     data['data'] = fields
 
@@ -75,7 +64,7 @@ def view_all_prison_types():
 def delete_prison_type(prison_type_id):
     prison_type = session.query(PrisonType).get(prison_type_id)
     session.delete(prison_type)
-    session.commit()
+    session.flush()
     return redirect('/prison_types/all?success=1')
 
 

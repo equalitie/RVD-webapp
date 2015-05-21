@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session, Source
 from rvd.forms import organisation_factory
 from copy import copy
+from rvd.views import flatten_instance, get_name_from_id
 names = {
     'name': 'source',
     'plural': 'sources',
@@ -15,22 +16,15 @@ names = {
 sources_bp = Blueprint('sources', __name__)
 
 
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
-
-
 def gather_form_data():
     source_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
 
-    organisation = request.form.getlist('organisation')
-    orgs = organisation_factory()
-    source_dict['organisation'] = get_name_from_id(organisation[0], orgs)
+    organisation_ids = request.form.getlist('organisations')
+    source_dict['organisations'] = [get_name_from_id(x, organisation_factory()) for x in organisation_ids]
 
     source_instance = Source(**source_dict)
     session.add(source_instance)
-    session.commit()
+    session.flush()
 
     return source_instance
 
@@ -47,30 +41,11 @@ def sources():
     return render_template("item_edit.html", form=source_form, action='add', data=data)
 
 
-def get_attr(a):
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'title'):
-        return str(a.title)
-
-
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Source).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-    return fields
-
-
 @sources_bp.route('/sources/<int:source_id>')
 @login_required
 def view_source(source_id):
     source = session.query(Source).get(source_id)
-    fields = flatten_instance(source)
+    fields = flatten_instance(source, Source)
     data = copy(names)
     data['data'] = fields
 
@@ -93,7 +68,7 @@ def view_all_sources():
 def delete_source(source_id):
     source = session.query(Source).get(source_id)
     session.delete(source)
-    session.commit()
+    session.flush()
     return redirect('/sources/all?success=1')
 
 

@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session
 from rvd.models import Profession
 from copy import copy
+from rvd.views import flatten_instance
 names = {
     'name': 'profession',
     'plural': 'professions',
@@ -19,7 +20,7 @@ def gather_form_data():
     profession_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
     profession_instance = Profession(**profession_dict)
     session.add(profession_instance)
-    session.commit()
+    session.flush()
 
     return profession_instance
 
@@ -35,23 +36,11 @@ def professions():
     return render_template("item_edit.html", form=profession_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(Profession).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @professions_bp.route('/professions/<int:profession_id>')
 @login_required
 def view_profession(profession_id):
     profession = session.query(Profession).get(profession_id)
-    fields = flatten_instance(profession)
+    fields = flatten_instance(profession, Profession)
     data = copy(names)
     data['data'] = fields
 
@@ -74,7 +63,7 @@ def view_all_professions():
 def delete_profession(profession_id):
     profession = session.query(Profession).get(profession_id)
     session.delete(profession)
-    session.commit()
+    session.flush()
     return redirect('/professions/all?success=1')
 
 

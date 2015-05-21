@@ -69,7 +69,7 @@ release_type = {
     u'Type code': 'type_code'
 }
 
-rights_violation = {
+event_type = {
     u'Name': 'name',
     u'Description': 'description'
 }
@@ -94,8 +94,8 @@ event = {
     u'Description': 'description',
     u'Charges': 'charges',
     u'Consequencess': 'consequences',
-    u'Detention date': 'detention_date',
-    u'Release date': 'release_date',
+    u'Detention date': 'event_start',
+    u'Release date': 'event_end',
     u'Report date': 'report_date',
     u'Psychological assistance provided': 'psych_assist',
     u'Material assistance provided': 'material_assist',
@@ -112,7 +112,7 @@ event = {
     u'Witnesses': 'witnesses',
     u'Victims': 'victims',
     u'Perpetrators': 'perpetrators',
-    u'Rights violations': 'rights_violations'
+    u'Rights violations': 'event_types'
 }
 
 report = {

@@ -5,6 +5,7 @@ from flask_admin import helpers
 from collections import defaultdict
 from rvd.models import session, ReleaseType
 from copy import copy
+from rvd.views import flatten_instance
 names = {
     'name': 'release type',
     'plural': 'release types',
@@ -14,24 +15,11 @@ names = {
 release_types_bp = Blueprint('release_types', __name__)
 
 
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
-
-
-def get_attr(a):
-    if hasattr(a, 'name'):
-        return a.name
-    if hasattr(a, 'title'):
-        return str(a.title)
-
-
 def gather_form_data():
     release_type_dict = defaultdict(lambda: None, {value: field for value, field in request.form.iteritems()})
     release_type_instance = ReleaseType(**release_type_dict)
     session.add(release_type_instance)
-    session.commit()
+    session.flush()
 
     return release_type_instance
 
@@ -48,23 +36,11 @@ def release_types():
     return render_template("item_edit.html", form=release_type_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(ReleaseType).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([get_attr(a) for a in associated_data]) if associated_data else None
-    return fields
-
-
 @release_types_bp.route('/release_types/<int:release_type_id>')
 @login_required
 def view_release_type(release_type_id):
     release_type = session.query(ReleaseType).get(release_type_id)
-    fields = flatten_instance(release_type)
+    fields = flatten_instance(release_type, ReleaseType)
     data = copy(names)
     data['data'] = fields
 
@@ -87,7 +63,7 @@ def view_all_release_types():
 def delete_release_type(release_type_id):
     release_type = session.query(ReleaseType).get(release_type_id)
     session.delete(release_type)
-    session.commit()
+    session.flush()
     return redirect('/release_types/all?success=1')
 
 
