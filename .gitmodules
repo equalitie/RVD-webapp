@@ -1,0 +1,3 @@
+[submodule "xlrd"]
+	path = lib/xlrd
+	url = git@github.com:redwire/xlrd.git

@@ -58,14 +58,8 @@ def geocodes(location_name, include_importance=False):
     '''Obtain the geographical coordinates of a place based on the name.
 Returns an array of dictionaries containing latitude, longitude, and name of the location.'''
 
-    location_name = ' '.join([s.strip() for s in location_name.split() if len(s) > 0])
-    print 'Geocoding ' + location_name
     nominatim_url = 'https://nominatim.openstreetmap.org/search?format=json&q='
-    try:
-      req = urllib2.urlopen(nominatim_url + location_name.replace(' ', '+')).read()
-    except:
-      print 'Could not fetch geocodes'
-      return []
+    req = urllib2.urlopen(nominatim_url + location_name.replace(' ', '+')).read()
     data = json.loads(req)
     # Build array of dictionaries in a way that is compatible with older Python versions
     geocodings = []
