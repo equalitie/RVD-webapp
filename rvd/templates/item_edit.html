@@ -19,7 +19,7 @@
 
         <div class="new_event_form">
 
-            <form method="POST" action="{% if action=='add' %}/{{ data['plural_slug'] }}/add?{% else %}/{{ data['plural_slug'] }}/{{ data['data'].id }}/edit{% endif %}" class="" role="form">
+            <form method="POST" action="{% if action=='add' %}/{{ data['plural_slug'] }}/add?{% else %}/{{ data['plural_slug'] }}/{{ data['data'].id }}/edit{% endif %}" class="" role="form" enctype=multipart/form-data>
 
                 {% for field in form %}
 

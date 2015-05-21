@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, jsonify
+from werkzeug.utils import secure_filename 
 from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, EventType, Location, User
+from rvd.models import session, Event, EventType, Location, User, Document
 from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
@@ -14,6 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.inspection import inspect
 from itertools import groupby
 import datetime
+import os
 names = {
     'name': 'event',
     'plural': 'events',
@@ -21,11 +23,27 @@ names = {
     'plural_slug': 'events'
 }
 events_bp = Blueprint('events', __name__)
-
+DOC_FOLDER = 'documents'
 
 def gather_form_data():
-    event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
+    import ipdb
 
+    event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
+    
+    uploaded_docs = request.files.getlist("documents")
+    documents_to_save = []
+    event_dict['documents'] = []
+    if uploaded_docs:
+        for file in uploaded_docs:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(DOC_FOLDER, filename))
+            doc = Document()
+            doc.filename = filename
+            session.add(doc)
+            session.commit()
+            event_dict['documents'].append(doc)
+
+    ipdb.set_trace()
     location_ids = request.form.getlist('locations')
     event_dict['locations'] = [get_name_from_id(x, location_factory()) for x in location_ids]
 
@@ -50,8 +68,9 @@ def gather_form_data():
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
 
-    event_dict['owner_id'] = current_user.id
+    ipdb.set_trace()
 
+    event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
     session.add(event_instance)
     session.flush()
@@ -63,6 +82,7 @@ def gather_form_data():
 @login_required
 def events():
     event_form = EventForm(request.form)
+
     if helpers.validate_form_on_submit(event_form):
         event_instance = gather_form_data()
         return redirect('/events/{}?success=1'.format(event_instance.id))
