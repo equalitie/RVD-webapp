@@ -78,8 +78,9 @@ def teardown_request(exception=None):
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     try:
-        return session.commit()
+        session.commit()
     except Exception as e:
+        session.rollback()
         logging.error(e.message)
     session.remove()
 
