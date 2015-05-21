@@ -261,12 +261,11 @@ def _parse_excel_template(filename):
                 'event_types': [session.query(EventType).filter_by(name=row[18].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()
             })
-            #cur_event = event
-            '''cur_event.victims = []
+            cur_event.victims = []
             cur_event.witnesses = []
             cur_event.perpetrators = []
             cur_event.actions = []
-            cur_event.sources = []'''
+            cur_event.sources = []
         elif row[1].value == 'Actors':
             print 'Found Actors row; current event.title = ' + cur_event.title
             cur_row += 1
@@ -326,15 +325,17 @@ def _parse_excel_template(filename):
                 'text': row[2].value,
                 'events': [cur_event]
             })
+            session.add(report)
             print 'Parsed report: ' + report.text
-        '''session.add_all(cur_event.witnesses)
-        session.add_all(cur_event.victims)
-        session.add_all(cur_event.perpetrators)
-        session.add_all(cur_event.actions)
-        session.add_all(cur_event.sources)
-        session.add(cur_event)'''
+        if cur_event is not None:
+            session.add_all(cur_event.witnesses)
+            session.add_all(cur_event.victims)
+            session.add_all(cur_event.perpetrators)
+            session.add_all(cur_event.actions)
+            session.add_all(cur_event.sources)
+            session.add(cur_event)
         cur_row += 1
-    #session.commit()
+    session.commit()
 
 '''
 # This function will do generic parsing of the content in an excel workbook
