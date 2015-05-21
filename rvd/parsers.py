@@ -233,14 +233,13 @@ def _parse_excel_template(filename):
     book = xlrd.open_workbook(filename)
     sheet = book.sheet_by_index(0)
     cur_row = 0
+    cur_event = None
     while cur_row < sheet.nrows:
-        cur_event = None
-        reading_event = False
         row = sheet.row(cur_row)
         print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
-        if 'Event' in row[0].value and not reading_event:
-            reading_event = True
-            event = Event(**{
+        if 'Event' in row[0].value:
+            print 'EVENT [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+            cur_event = Event(**{
                 'title': row[0].value,
                 'description': row[1].value,
                 'charges': row[2].value,
@@ -262,18 +261,19 @@ def _parse_excel_template(filename):
                 'event_types': [session.query(EventType).filter_by(name=row[18].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()
             })
-            cur_event = event
-            cur_event.victims = []
+            #cur_event = event
+            '''cur_event.victims = []
             cur_event.witnesses = []
             cur_event.perpetrators = []
             cur_event.actions = []
-            cur_event.sources = []
-        elif row[1].value == 'Actors' and reading_event:
+            cur_event.sources = []'''
+        elif row[1].value == 'Actors':
+            print 'Found Actors row; current event.title = ' + cur_event.title
             cur_row += 1
             row = sheet.row(cur_row)
             # Rely on the columns under an entity name and before the next being blank
             while row[1].value == '' and cur_row < sheet.nrows:
-                row = sheet.row(cur_row)
+                print 'ACTOR [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
                 _type = row[2].value
                 actor = Actor(**{
                     'name': row[3].value,
@@ -282,54 +282,59 @@ def _parse_excel_template(filename):
                     'address': row[6].value,
                     'gender': row[7].value,
                     'is_activist': row[8].value.lower() == YES,
-                    'organisations': [session.query(Organisation).filter_by(name=row[9].value).first()],
-                    'professions': [session.query(Profession).filter_by(name=row[10].value).first()],
+                    'activist_info': row[9].value,
+                    'organisations': [session.query(Organisation).filter_by(name=row[10].value).first()],
+                    'professions': [session.query(Profession).filter_by(name=row[11].value).first()],
                     'owner': session.query(User).filter_by(is_admin=1).first()
                 })
+                print 'Parsed actor<' + ', '.join(map(str, [
+                    actor.name, actor.birth_date, actor.telephone, actor.gender,
+                    actor.is_activist, actor.organisations[0].name, actor.professions[0].name])) + '>'
                 if _type == 'Witness':
                     cur_event.witnesses.append(actor)
                 elif _type == 'Victim':
                     cur_event.victims.append(actor)
                 elif _type == 'Perpetrator':
                     cur_event.perpetrators.append(actor)
-                cur_row += 1
-        elif row[1].value == 'Actions' and reading_event:
+                if (cur_row + 1) < sheet.nrows and sheet.row(cur_row + 1)[1].value == '':
+                    cur_row += 1
+                    row = sheet.row(cur_row)
+                else:
+                    break
+        elif row[1].value == 'Sources':
+            print 'Found sources row'
             cur_row += 1
             row = sheet.row(cur_row)
             while row[1].value == '' and cur_row < sheet.nrows:
-                row = sheet.row(cur_row)
-                action = Action(**{
-                    'state_bodies_approached': [
-                        session.query(StateAuthority).filter_by(name=row[2].value).first()],
-                    'complaint_to_state_authority': row[3].value,
-                    'response_from_state_authority': row[4].value,
-                    'international_bodies_approached': [
-                        session.query(InternationalAuthority).filter_by(name=row[5].value).first()],
-                    'complaint_to_international_authority': row[6].value,
-                    'response_from_international_authority': row[7].value
-                })
-                cur_event.actions.append(action)
-                cur_row += 1
-        elif row[1].value == 'Sources' and reading_event:
-            cur_row += 1
-            row = sheet.row(cur_row)
-            while row[1].value == '' and cur_row < sheet.nrows:
+                print 'SOURCE [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
                 row = sheet.row(cur_row)
                 source = Source(**{
                     'name': row[2].value,
                     'organisations': [session.query(Organisation).filter_by(name=row[3].value).first()]
                 })
+                print 'Parsed source<' + ', '.join(map(str, [
+                    source.name, source.organisations[0].name])) + '>'
                 cur_event.sources.append(source)
-                cur_row += 1
-        if reading_event:
-            session.add_all(cur_event.witnesses)
-            session.add_all(cur_event.victims)
-            session.add_all(cur_event.perpetrators)
-            session.add_all(cur_event.actions)
-            session.add_all(cur_event.sources)
-            session.add(cur_event)
+                if (cur_row + 1) < sheet.nrows and sheet.row(cur_row + 1)[1].value == '':
+                    cur_row += 1
+                    row = sheet.row(cur_row)
+                else:
+                    break
+        elif row[1].value == 'Report':
+            print 'Found report row'
+            report = Report(**{
+                'text': row[2].value,
+                'events': [cur_event]
+            })
+            print 'Parsed report: ' + report.text
+        '''session.add_all(cur_event.witnesses)
+        session.add_all(cur_event.victims)
+        session.add_all(cur_event.perpetrators)
+        session.add_all(cur_event.actions)
+        session.add_all(cur_event.sources)
+        session.add(cur_event)'''
         cur_row += 1
-    session.commit()
+    #session.commit()
 
 '''
 # This function will do generic parsing of the content in an excel workbook
