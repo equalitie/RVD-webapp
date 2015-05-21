@@ -38,29 +38,10 @@ def documents_uploads():
                 f = os.path.join(UPLOAD_FOLDER, filename)
                 #org_name = request.form['organisation_name']
                 #print '### Got organisation name ' + org_name
-                parsed = parsers.parse(f, parsers.EXCEL_DOC) #org_name)
-                print '### Succeeding in parsing document'
-                if 'error' in parsed:
-                    print '### ' + parsed['error']
-                    return render_template('document_add.html')
-                elif only_supplies_event(file.filename):
-                    rvd.models.session.add_all(parsed['events'])
-                    print '### Added all parsed events'
-                else:
-                    user_id = current_user.id
-                    user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
-                    for i in range(len(parsed[parsers.ACTORS])):
-                        parsed[parsers.ACTORS][i].owner_id = user_id
-                        parsed[parsers.ACTORS][i].owner = user 
-                    for i in range(len(parsed[parsers.EVENTS])):
-                        parsed[parsers.EVENTS][i].owner_id = user_id
-                        parsed[parsers.EVENTS][i].owner = user
-                    for entity in parsed:
-                        rvd.models.session.add_all(parsed[entity])
-                        
-                    print '### Added all parsed entities'
-                rvd.models.session.commit()
-                        
+                parsers.parse(f, parsers.EXCEL_DOC) #org_name)
+                print '### Succeeded in parsing document'
+                #user_id = current_user.id
+                #user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
     return render_template("document_add.html")
 
 
