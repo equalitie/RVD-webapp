@@ -245,8 +245,8 @@ def _parse_excel_template(filename):
                 'description': row[1].value,
                 'charges': row[2].value,
                 'consequences': row[3].value,
-                'detention_date': _excel_parse_date(float(row[4].value), book),
-                'release_date': _excel_parse_date(float(row[5].value), book),
+                'event_start': _excel_parse_date(float(row[4].value), book),
+                'event_end': _excel_parse_date(float(row[5].value), book),
                 'report_date': _excel_parse_date(float(row[6].value), book),
                 'psych_assist': row[7].value.lower() == YES,
                 'material_assist': row[8].value.lower() == YES,
@@ -259,7 +259,7 @@ def _parse_excel_template(filename):
                 'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[15].value)).first()],
                 'locations': [_get_location(row[16].value)],
                 'prisons': [session.query(Prison).filter_by(name=row[17].value).first()],
-                'rights_violations': [session.query(RightsViolation).filter_by(name=row[18].value).first()],
+                'event_types': [session.query(EventType).filter_by(name=row[18].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()
             })
             cur_event = event
@@ -370,8 +370,6 @@ def _parse_excel_template(filename):
     del entities['finished']
     return entities
 
-def _parse_error(stream):
-    return {'error': 'No parser exists for the provided filetype.'}
 
 
 def _id(x, *args, **kwargs):
@@ -626,6 +624,8 @@ _parsers = {
     EXCEL_DOC: _parse_excel_template
 }
 
+def _parse_error(stream):
+    return {'error': 'No parser exists for the provided filetype.'}
 
 # Public
 
