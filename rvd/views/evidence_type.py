@@ -6,6 +6,7 @@ from collections import defaultdict
 from rvd.models import session, EvidenceType
 from rvd.forms import event_factory
 from copy import copy
+from rvd.views import get_name_from_id, flatten_instance
 names = {
     'name': 'evidence_type',
     'plural': 'evidence_types',
@@ -13,12 +14,6 @@ names = {
     'plural_slug': 'evidence_types'
 }
 evidence_types_bp = Blueprint('evidence_types', __name__)
-
-
-def get_name_from_id(needle, things):
-    for thing in things:
-        if int(thing.id) == int(needle):
-            return thing
 
 
 def gather_form_data():
@@ -47,26 +42,11 @@ def evidence_types():
     return render_template("item_edit.html", form=evidence_type_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(EvidenceType).relationships:
-        associated_data = getattr(obj, r.key)
-        try:
-            fields[r.key] = ", ".join([a.title for a in associated_data]) if associated_data else None
-        except TypeError:
-            fields[r.key] = associated_data.title
-    return fields
-
-
 @evidence_types_bp.route('/evidence_types/<int:evidence_type_id>')
 @login_required
 def view_evidence_type(evidence_type_id):
     evidence_type = session.query(EvidenceType).get(evidence_type_id)
-    fields = flatten_instance(evidence_type)
+    fields = flatten_instance(evidence_type, EvidenceType)
     data = copy(names)
     data['data'] = fields
 
@@ -89,7 +69,7 @@ def view_all_evidence_types():
 def delete_evidence_type(evidence_type_id):
     evidence_type = session.query(EvidenceType).get(evidence_type_id)
     session.delete(evidence_type)
-    session.commit()
+    session.flush()
     return redirect('/evidence_types/all?success=1')
 
 

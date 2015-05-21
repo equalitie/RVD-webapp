@@ -4,6 +4,7 @@ from rvd.forms.InternationalAuthority import InternationalAuthorityForm
 from flask_admin import helpers
 from collections import defaultdict
 from rvd.models import session, InternationalAuthority
+from rvd.views import flatten_instance
 from copy import copy
 names = {
     'name': 'international authority',
@@ -20,7 +21,7 @@ def gather_form_data():
     )
     international_authority_instance = InternationalAuthority(**international_authority_dict)
     session.add(international_authority_instance)
-    session.commit()
+    session.flush()
 
     return international_authority_instance
 
@@ -37,23 +38,11 @@ def international_authority():
     return render_template("item_edit.html", form=international_authority_form, action='add', data=data)
 
 
-def flatten_instance(obj):
-    fields = {'id': obj.id}
-    for c in obj.__table__.columns:
-        fields[c.info.get('label')] = getattr(obj, c.key)
-    from sqlalchemy.inspection import inspect
-
-    for r in inspect(InternationalAuthority).relationships:
-        associated_data = getattr(obj, r.key)
-        fields[r.key] = ", ".join([a.name for a in associated_data]) if associated_data else None
-    return fields
-
-
 @international_authority_bp.route('/international_authorities/<int:international_authority_id>')
 @login_required
 def view_international_authority(international_authority_id):
     intl_auth = session.query(InternationalAuthority).get(international_authority_id)
-    fields = flatten_instance(intl_auth)
+    fields = flatten_instance(intl_auth, InternationalAuthority)
     data = copy(names)
     data['data'] = fields
 
@@ -79,7 +68,7 @@ def view_all_international_authority():
 def delete_international_authority(international_authority_id):
     intl_auth = session.query(InternationalAuthority).get(international_authority_id)
     session.delete(intl_auth)
-    session.commit()
+    session.flush()
     return redirect('/international_authorities/all?success=1')
 
 

@@ -3,8 +3,12 @@ from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
 from rvd.models import Event
 from rvd.forms import location_factory, release_type_factory, prison_factory, source_factory, witnesses_factory
-from rvd.forms import victims_factory, perpetrators_factory, rights_violations_factory
+from rvd.forms import victims_factory, perpetrators_factory, event_type_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+
+display_func = lambda model: "{} ({}), {}".format(
+    model.name, model.birth_date, ", ".join([x.name for x in model.organisations])
+)
 
 
 class EventForm(ModelForm):
@@ -12,11 +16,11 @@ class EventForm(ModelForm):
         model = Event
 
     __order = (
-        'title', 'description', 'detention_date', 'release_date', 'report_date',
+        'event_types', 'title', 'description', 'event_start', 'event_end', 'report_date',
         'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
         'victim_is_complainant', 'allow_storage', 'allow_publishing', 'allow_representation',
         'data_is_sensitive', 'locations', 'prisons', 'release_types', 'sources',
-        'witnesses', 'victims', 'perpetrators', 'rights_violations', 'public','documents'
+        'witnesses', 'victims', 'perpetrators', 'public', 'documents'
     )
 
     def __iter__(self):
@@ -29,10 +33,10 @@ class EventForm(ModelForm):
     locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name')
     prisons = QuerySelectMultipleField(query_factory=prison_factory, get_label='name')
     sources = QuerySelectMultipleField(query_factory=source_factory, get_label='name')
-    witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label='name')
-    victims = QuerySelectMultipleField(query_factory=victims_factory, get_label='name')
-    perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label='name')
-    rights_violations = QuerySelectMultipleField(query_factory=rights_violations_factory, get_label='name')
+    witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label=display_func)
+    victims = QuerySelectMultipleField(query_factory=victims_factory, get_label=display_func)
+    perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label=display_func)
+    event_types = QuerySelectMultipleField(query_factory=event_type_factory, get_label='name')
 
     documents = fields.FileField()
 
@@ -71,6 +75,6 @@ class EventForm(ModelForm):
     public = fields.SelectField(___('Public'), validators=[validators.required()], choices=[
         (1, ___('Yes')), (0, ___('No'))], coerce=bool)
 
-    def validate_release_date(self, field):
-        if field.data <= self.detention_date.data:
-            raise validators.ValidationError(___('Release date has to be greater than detention date.'))
+    def validate_event_end(self, field):
+        if field.data <= self.event_start.data:
+            raise validators.ValidationError(___('End date has to be greater than start date.'))
