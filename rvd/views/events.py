@@ -26,7 +26,6 @@ events_bp = Blueprint('events', __name__)
 DOC_FOLDER = 'documents'
 
 def gather_form_data():
-    import ipdb
 
     event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
     
@@ -43,7 +42,6 @@ def gather_form_data():
             session.commit()
             event_dict['documents'].append(doc)
 
-    ipdb.set_trace()
     location_ids = request.form.getlist('locations')
     event_dict['locations'] = [get_name_from_id(x, location_factory()) for x in location_ids]
 
@@ -68,7 +66,6 @@ def gather_form_data():
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
 
-    ipdb.set_trace()
 
     event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
