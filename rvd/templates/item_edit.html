@@ -83,7 +83,7 @@
                         {% if field.name == "sources" %}
                             <div class="form_actor_label">{{ field.label }}</div>
                             <div class="form_actor_field">
-                                <input class="form-control" placeholder="Type to search..." name="sources" id="sources" value="{% for x in field.object_data %}{{x.name}},{% endfor %}">
+                                <input class="form-control" placeholder="Type to search..." name="sources" id="sources" value="{% if field.object_data != None %}{% for x in field.object_data %}{{x.name}},{% endfor %}{% endif %}">
                             </div>
                         {% else %}
                         <div class="form_actor_label">{{ field.label }}</div>
