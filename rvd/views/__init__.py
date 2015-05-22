@@ -1,4 +1,4 @@
-from rvd.models import Action, Actor
+from rvd.models import Action, Document
 from sqlalchemy.inspection import inspect
 
 
@@ -6,6 +6,8 @@ def get_attr(a):
     if isinstance(a, Action):
         items = [u"{}: {}".format(k, v) for k, v in a.__dict__.iteritems() if k[0:4] != '_sa_']
         return ", ".join(items)
+    if isinstance(a, Document):
+        return "<a href='/static/documents/{0}'>{0}</a>".format(a.filename)
     if hasattr(a, 'name'):
         return a.name
     if hasattr(a, 'type_code'):

@@ -23,7 +23,7 @@
                 {% if value != None and key!= None %}
                 <tr>
                     <td width="300">{{key}}</td>
-                    <td>{{value}}</td>
+                    <td>{{value|safe}}</td>
                 </tr>
                 {% endif %}
             {% endfor %}

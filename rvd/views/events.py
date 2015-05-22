@@ -23,7 +23,7 @@ names = {
     'plural_slug': 'events'
 }
 events_bp = Blueprint('events', __name__)
-DOC_FOLDER = 'documents'
+DOC_FOLDER = 'lib/static/documents'
 
 def gather_form_data():
 
