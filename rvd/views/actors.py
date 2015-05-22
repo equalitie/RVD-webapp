@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect
+import json
 from flask_login import login_required
 from rvd.forms.Actor import ActorForm
 from flask_admin import helpers
@@ -119,3 +120,13 @@ def edit_actor(actor_id):
     data['data'] = actor
 
     return render_template("item_edit.html", data=data, form=actor_form, action='edit')
+
+
+@actors_bp.route('/search_actor')
+@login_required
+def search_actor():
+    return json.dumps([
+        { "label": 'C++', "value": 'C++' },
+        { "label": 'Java', "value": 'Java' },
+        { "label": 'COBOL', "value": 'COBOL' }
+    ])
