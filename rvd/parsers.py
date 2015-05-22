@@ -223,6 +223,7 @@ def _parse_org2_docx(_file):
     }
 
 def _get_location(loc_name):
+    import ipdb
     location = session.query(Location).filter_by(name=loc_name).first()
     if location is not None:
         return location
@@ -240,7 +241,6 @@ def _parse_excel_template(filename):
     cur_row = 0
     cur_event = None
     while cur_row < sheet.nrows:
-        import ipdb
         row = sheet.row(cur_row)
         #print u'ROW [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
         if u'Titulo' in row[1].value:
@@ -309,7 +309,6 @@ def _parse_excel_template(filename):
             #print u'Found sources row'
             cur_row += 1
             row = sheet.row(cur_row)
-            ipdb.set_trace()
             while row[1].value == '' and cur_row < sheet.nrows:
                 #print u'SOURCE [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
                 row = sheet.row(cur_row)
@@ -336,7 +335,6 @@ def _parse_excel_template(filename):
         cur_row += 1
 
 
-    ipdb.set_trace()
     if cur_event is not None:
         session.add_all(cur_event.witnesses)
         session.add_all(cur_event.victims)
