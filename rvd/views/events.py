@@ -188,12 +188,19 @@ def events_by_type():
 @login_required
 def view_all_events():
     if current_user.is_admin:
-        all_events = session.query(Event).all()
+        all_events = session.query(Event).join(Event.owner).all()
     else:
-        all_events = session.query(Event).filter(Event.owner_id == current_user.id)
-    all_events = [{k: v for k, v in x.__dict__.iteritems() if not k.startswith('_sa_')} for x in all_events]
+        all_events = session.query(Event).join(Event.owner).filter(Event.owner_id == current_user.id)
+    evs = []
+    for e in all_events:
+        evs.append({
+            "owner": "{}: {}".format(e.owner.email, e.owner.organisation),
+            "report_date": e.report_date,
+            "title": e.title,
+            "id": e.id
+        })
     data = copy(names)
-    data['data'] = all_events
+    data['data'] = evs
 
     return render_template("item_view_all.html", data=data)
 
