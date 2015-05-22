@@ -20,8 +20,7 @@
           return split( term ).pop();
         }
 
-        $( "#source_display" )
-          // don't navigate away from the field on tab when selecting an item
+        $( "#sources" )
           .bind( "keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB &&
                 $( this ).autocomplete( "instance" ).menu.active ) {
@@ -35,23 +34,18 @@
               }, response );
             },
             search: function() {
-              // custom minLength
               var term = extractLast( this.value );
               if ( term.length < 2 ) {
                 return false;
               }
             },
             focus: function() {
-              // prevent value inserted on focus
               return false;
             },
             select: function( event, ui ) {
               var terms = split( this.value );
-              // remove the current input
               terms.pop();
-              // add the selected item
-              terms.push( ui.item.value );
-              // add placeholder to get the comma-and-space at the end
+              terms.push( ui.item.label );
               terms.push( "" );
               this.value = terms.join( ", " );
               return false;
@@ -86,18 +80,10 @@
                         <div class="form_actor_label">{{ field.label }}</div>
                         <label class="gender_label {% if form.errors %}has-error{% endif %}">{{ field }}</label>
                     {% else %}
-                        {% if field.name == "sources" %}
-                            <div class="form_actor_label">{{ field.label }}</div>
-                            <div class="form_actor_field"><input class="form-control" id="source_display" name="source_display" /></div>
-                            <div class="form_actor_field {% if field.errors %}has-error{% endif %}">
-                                {{ field(class_="form-control", placeholder=field.description, rows=0)}}
-                            </div>
-                        {% else %}
                         <div class="form_actor_label">{{ field.label }}</div>
                         <div class="form_actor_field {% if field.errors %}has-error{% endif %}">
                           {{ field(class_="form-control", placeholder=field.description, rows=0)}}
                         </div>
-                        {% endif %}
                     {% endif %}
                     {% if field.errors %}<div class="validation_error">{{ field.errors[0] }}</div>{% endif %}
 

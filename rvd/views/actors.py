@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, abort
 import json
 from flask_login import login_required
 from rvd.forms.Actor import ActorForm
@@ -125,8 +125,8 @@ def edit_actor(actor_id):
 @actors_bp.route('/search_actor')
 @login_required
 def search_actor():
-    return json.dumps([
-        { "label": 'C++', "value": 'C++' },
-        { "label": 'Java', "value": 'Java' },
-        { "label": 'COBOL', "value": 'COBOL' }
-    ])
+    term = request.args.get('term', None)
+    if term is None:
+        abort(401, "Missing term parameter")
+    result = session.query(Actor).filter(Actor.name.like(("%{}%".format(term)))).all()
+    return json.dumps([{"label": x.name, "value": x.id} for x in result])

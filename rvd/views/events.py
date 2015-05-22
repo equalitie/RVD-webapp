@@ -4,7 +4,7 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, EventType, Location, User, Document
+from rvd.models import session, Event, EventType, Location, User, Document, Actor
 from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
@@ -24,10 +24,13 @@ names = {
 }
 events_bp = Blueprint('events', __name__)
 DOC_FOLDER = 'lib/static/documents'
+find_things_by_name = lambda x, thing: session.query(thing).filter(thing.name.in_(x)).all()
 
 
-def gather_form_data():
+def gather_form_data(event_id=None):
     event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
+    event_dict['id'] = event_id if event_id is not None else None
+
     uploaded_docs = request.files.getlist("documents")
     documents_to_save = []
     event_dict['documents'] = []
@@ -51,8 +54,11 @@ def gather_form_data():
     release_types_ids = request.form.getlist('release_types')
     event_dict['release_types'] = [get_name_from_id(x, release_type_factory()) for x in release_types_ids]
 
-    sources_ids = request.form.getlist('sources')
-    event_dict['sources'] = [get_name_from_id(x, source_factory()) for x in sources_ids]
+    sources = request.form.get('sources')
+    sources_list = list(set(sources.split(",")))
+    sources_instances = find_things_by_name(sources_list, Actor)
+    event_dict['sources'] = sources_instances
+    print sources_instances
 
     witnesses_ids = request.form.getlist('witnesses')
     event_dict['witnesses'] = [get_name_from_id(x, witnesses_factory()) for x in witnesses_ids]
@@ -68,7 +74,10 @@ def gather_form_data():
 
     event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
-    session.add(event_instance)
+    if event_id is not None:
+        session.merge(event_instance)
+    else:
+        session.add(event_instance)
     session.flush()
 
     return event_instance
@@ -218,8 +227,8 @@ def edit_event(event_id):
     event_form = EventForm(request.form, obj=event)
 
     if helpers.validate_form_on_submit(event_form):
-        event_form.populate_obj(event)
-        return redirect('/events/{}?success=1'.format(event_id))
+        event_instance = gather_form_data(event_id)
+        return redirect('/events/{}?success=1'.format(event_instance.id))
 
     data = copy(names)
     data['data'] = event

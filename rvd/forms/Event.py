@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as ___
 from wtforms_alchemy import ModelForm
 from wtforms import fields, validators
 from rvd.models import Event
-from rvd.forms import location_factory, release_type_factory, prison_factory, source_factory, witnesses_factory
+from rvd.forms import location_factory, release_type_factory, prison_factory, witnesses_factory
 from rvd.forms import victims_factory, perpetrators_factory, event_type_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
@@ -32,7 +32,7 @@ class EventForm(ModelForm):
     release_types = QuerySelectMultipleField(query_factory=release_type_factory, get_label='type_code')
     locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name')
     prisons = QuerySelectMultipleField(query_factory=prison_factory, get_label='name')
-    sources = fields.HiddenField()
+    sources = fields.StringField()
     witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label=display_func)
     victims = QuerySelectMultipleField(query_factory=victims_factory, get_label=display_func)
     perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label=display_func)
