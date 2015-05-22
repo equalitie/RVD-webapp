@@ -7,3 +7,4 @@ instance/config.py
 .swp
 instance/keyfile.asc
 uploads
+documents
