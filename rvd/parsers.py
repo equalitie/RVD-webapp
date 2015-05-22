@@ -143,40 +143,38 @@ def _parse_org2_docx_report(doc):
 # Parse organisation 2's docx documents.
 # Does not accept the excel_workbook argument (None, here)
 def _parse_org2_docx_events(doc):
+    def clean_text(pg):
+        return ' '.join(pg.text.split(':')[1:]).strip()
     events = []
     for i, p in enumerate(doc.paragraphs):
         if re.match('\d+\)\s+(n|N)ombre', p.text) is not None:
-            parsed = {'actor': {}, 'location': {}, 'source': {}}
-            parsed['actor']['name'] = ' '.join(doc.paragraphs[i].text.split(':')[1:]).strip()
-            parsed['actor']['organisation'] = ' '.join(doc.paragraphs[i + 1].text.split(':')[1:]).strip()
-            parsed['location']['name'] = ' '.join(doc.paragraphs[i + 2].text.split(':')[1:]).strip()
-            # TODO
-            # Decide if we want to include this extra field that does not follow
-            # the schema description
-            # parsed['notes'] = ' '.join(doc.paragraphs[i + 3].text.split(':')[1:]).strip()
-            parsed['source']['name'] = ' '.join(doc.paragraphs[i + 4].text.split(':')[1:]).strip()
-            parsed['event_start'] = ' '.join(doc.paragraphs[i + 5].text.split(':')[1:]).strip()
-            parsed['report_date'] = ' '.join(doc.paragraphs[i + 6].text.split(':')[1:]).strip()
-            if parsed['event_start']:
-                parsed['event_start'] = parsed['event_start'].replace(' ', '').replace('.', '')
-                try:
-                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%Y')
-                except:
-                    parsed['event_start'] = time.strptime(parsed['event_start'], '%d-%m-%y')
-                parsed['event_start'] = utils.to_datetime(parsed['event_start'])
-            if parsed['report_date']:
-                parsed['report_date'] = parsed['report_date'].replace(' ', '').replace('.', '')
+            parsed = {'actor': {}, 'location': {}, 'prison': {}, 'source': {}}
+            parsed['actor']['name'] = clean_text(doc.paragraphs[i])
+            parsed['actor']['organisation'] = clean_text(doc.paragraphs[i + 1])
+            parsed['location']['name'] = clean_text(doc.paragraphs[i + 2])
+            parsed['consequences'] = clean_text(doc.paragraphs[i + 3])
+            parsed['charges'] = clean_text(doc.paragraphs[i + 4])
+            parsed['prison']['name'] = clean_text(doc.paragraphs[i + 5])
+            parsed['actor']['telephone'] = clean_text(doc.paragraphs[i + 6])
+            parsed['source']['name'] = clean_text(doc.paragraphs[i + 8])
+            parsed['report_date'] = clean_text(doc.paragraphs[i + 9])
+            # If a report date was supplied, parse it out and convert it to a datetime object.
+            if len(parsed['report_date']) > 0:
+                parsed['report_date'] = parsed['report_date'].replace('.', '')
                 try:
                     parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%Y')
                 except:
                     parsed['report_date'] = time.strptime(parsed['report_date'], '%d-%m-%y')
                 parsed['report_date'] = utils.to_datetime(parsed['report_date'])
+            else:
+                del parsed['report_date']
             events.append(parsed)
     return events
 
 def _org2_events_to_model(events):
     '''Convert parsed event data to model instances'''
     for i in range(len(events)):
+        print events[i]
         event = events[i]
         actor = event['actor']
         organisation = actor['organisation']
@@ -184,17 +182,24 @@ def _org2_events_to_model(events):
         organisation = Organisation(name=organisation)
         actor.organisations = [organisation]
         location = event['location']['name']
+        if location.endswith('.'):
+            location = location[:-1]
         geocodes = utils.geocodes(location, include_importance=True)
         location = utils.max_by(geocodes, lambda gc: gc['importance'])
-        location = Location(name=location['name'],
-            latitude=location['latitude'], longitude=location['longitude'])
+        if len(geocodes) > 0 and location is not None:
+            location = Location(name=location['name'],
+                latitude=location['latitude'], longitude=location['longitude'])
+            event['locations'] = [location]
+        prison = event['prison']
+        prison = Prison(name=prison['name'])
         source = event['source']
         source = Source(name=source['name'])
         del event['actor']
         del event['location']
+        del event['prison']
         del event['source']
         event['victims'] = [actor]
-        event['locations'] = [location]
+        event['prisons'] = [prison]
         event['sources']  = [source]
         events[i] = Event(**event)
     return events
