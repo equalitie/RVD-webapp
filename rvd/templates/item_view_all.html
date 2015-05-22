@@ -17,15 +17,15 @@
         <h3>all {{ data['plural'] }}</h3>
 
         <table class="table">
+            <tr>
+                <th>{% if data['data'][0]['name']%}Name{% endif %}{% if data['data'][0]['title']%}Title{% endif %}{% if data['data'][0]['email']%}Email{% endif %}</th>
+                <th>ID</th>
+                {% if data['data'][0]['report_date'] %} <th>Report date</th> {% endif %}
+                <th>View</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
             {% for item in data['data'] %}
-                <tr>
-                    <th>{% if item['name']%}Name{% endif %}{% if item['title']%}Title{% endif %}{% if item['email']%}Email{% endif %}</th>
-                    <th>ID</th>
-                    {% if item['report_date'] %} <th>Report date</th> {% endif %}
-                    <th>View</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
                 <tr>
                     <td>{{item['name'] or item['title'] or item['email'] }}</td>
                     <td>{{item['id']}}</td>
