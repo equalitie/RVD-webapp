@@ -21,6 +21,7 @@
                 <tr>
                     <td>{{item['name'] or item['title'] or item['email'] }}</td>
                     <td>{{item['id']}}</td>
+                    {% if item['report_date'] %} <td>{{item['report_date']}}</td> {% endif %}
                     <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}">View</a></td>
                     <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/edit">Edit</a></td>
                     <td><a href="/{{ data['plural_slug'] }}/{{item['id']}}/delete">Delete</a></td>
