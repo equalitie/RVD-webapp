@@ -25,15 +25,12 @@ names = {
 events_bp = Blueprint('events', __name__)
 DOC_FOLDER = 'lib/static/documents'
 
-def gather_form_data():
 
+def gather_form_data():
     event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
-    
     uploaded_docs = request.files.getlist("documents")
     documents_to_save = []
     event_dict['documents'] = []
-    import ipdb
-    ipdb.set_trace()
     if uploaded_docs:
         for file in uploaded_docs:
             filename = secure_filename(file.filename)
@@ -68,7 +65,6 @@ def gather_form_data():
 
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
-
 
     event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
