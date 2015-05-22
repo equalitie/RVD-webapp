@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, abort
+import json
 from flask_login import login_required
 from rvd.forms.Source import SourceForm
 from flask_admin import helpers
@@ -86,3 +87,13 @@ def edit_source(source_id):
     data['data'] = source
 
     return render_template("item_edit.html", data=data, form=source_form, action='edit')
+
+
+@sources_bp.route('/search_source')
+@login_required
+def search_actor():
+    term = request.args.get('term', None)
+    if term is None:
+        abort(401, "Missing term parameter")
+    result = session.query(Source).filter(Source.name.like(("%{}%".format(term)))).all()
+    return json.dumps([{"label": x.name, "value": x.id} for x in result])

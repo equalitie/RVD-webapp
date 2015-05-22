@@ -4,10 +4,10 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, EventType, Location, User, Document, Actor
+from rvd.models import session, Event, EventType, Location, User, Document, Source
 from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
-from rvd.forms import location_factory, prison_factory, release_type_factory, source_factory, witnesses_factory
+from rvd.forms import location_factory, prison_factory, release_type_factory, witnesses_factory
 from rvd.forms import perpetrators_factory, victims_factory, event_type_factory
 from sqlalchemy import and_
 from copy import copy
@@ -29,10 +29,8 @@ find_things_by_name = lambda x, thing: session.query(thing).filter(thing.name.in
 
 def gather_form_data(event_id=None):
     event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
-    event_dict['id'] = event_id if event_id is not None else None
 
     uploaded_docs = request.files.getlist("documents")
-    documents_to_save = []
     event_dict['documents'] = []
     if uploaded_docs:
         for file in uploaded_docs:
@@ -56,9 +54,9 @@ def gather_form_data(event_id=None):
 
     sources = request.form.get('sources')
     sources_list = list(set(sources.split(",")))
-    sources_instances = find_things_by_name(sources_list, Actor)
-    event_dict['sources'] = sources_instances
-    print sources_instances
+    source_instances = find_things_by_name(sources_list, Source)
+
+    event_dict['sources'] = source_instances
 
     witnesses_ids = request.form.getlist('witnesses')
     event_dict['witnesses'] = [get_name_from_id(x, witnesses_factory()) for x in witnesses_ids]
@@ -74,6 +72,8 @@ def gather_form_data(event_id=None):
 
     event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
+    event_instance.id = event_id
+
     if event_id is not None:
         session.merge(event_instance)
     else:

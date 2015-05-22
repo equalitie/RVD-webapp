@@ -199,7 +199,7 @@ class Event(Base):
     release_types = relationship('ReleaseType', secondary=event_releasetype, backref='events')
     locations = relationship('Location', secondary=event_location, backref='events')
     prisons = relationship('Prison', secondary=event_prison, backref='events')
-    sources = relationship('Source', secondary=event_source, backref='events')
+    sources = relationship('Source', secondary=event_source)
     witnesses = relationship('Actor', secondary=event_witness, backref='witnessed')
     victims = relationship('Actor', secondary=event_victim, backref='victimized_during')
     perpetrators = relationship('Actor', secondary=event_perp, backref='perpetrated')
