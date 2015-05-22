@@ -243,28 +243,27 @@ def _parse_excel_template(filename):
     while cur_row < sheet.nrows:
         row = sheet.row(cur_row)
         print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
-        if 'Event' in row[0].value:
+        if 'Titulo' in row[1].value:
+            cur_row += 1
+            row = sheet.row(cur_row)
             print 'EVENT [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
             cur_event = Event(**{
-                'title': row[0].value,
-                'description': row[1].value,
-                'charges': row[2].value,
-                'consequences': row[3].value,
-                'event_start': _excel_parse_date(float(row[4].value), book),
-                'event_end': _excel_parse_date(float(row[5].value), book),
-                'report_date': _excel_parse_date(float(row[6].value), book),
-                'psych_assist': row[7].value.lower() == YES,
-                'material_assist': row[8].value.lower() == YES,
-                'was_activist': row[9].value.lower() == YES,
-                'victim_is_complainant': row[10].value.lower() == YES,
-                'allow_storage': row[11].value.lower() == YES,
-                'allow_publishing': row[12].value.lower() == YES,
-                'allow_representation': row[13].value.lower() == YES,
-                'data_is_sensitive': row[14].value.lower() == YES,
-                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[15].value)).first()],
-                'locations': [_get_location(row[16].value)],
-                'prisons': [session.query(Prison).filter_by(name=row[17].value).first()],
-                'event_types': [session.query(EventType).filter_by(name=row[18].value).first()],
+                'title': row[1].value,
+                'description': row[2].value,
+                'charges': row[3].value,
+                'consequences': row[4].value,
+                'event_start': _excel_parse_date(float(row[5].value), book),
+                'event_end': _excel_parse_date(float(row[6].value), book),
+                'report_date': _excel_parse_date(float(row[7].value), book),
+                'victim_is_complainant': row[8].value.lower() == YES,
+                'allow_storage': row[9].value.lower() == YES,
+                'allow_publishing': row[10].value.lower() == YES,
+                'allow_representation': row[11].value.lower() == YES,
+                'data_is_sensitive': row[12].value.lower() == YES,
+                'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[13].value)).first()],
+                'locations': [_get_location(row[14].value)],
+                'prisons': [session.query(Prison).filter_by(name=row[15].value).first()],
+                'event_types': [session.query(EventType).filter_by(name=row[16].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()
             })
             cur_event.victims = []
@@ -282,13 +281,13 @@ def _parse_excel_template(filename):
                 _type = row[2].value
                 actor = Actor(**{
                     'name': row[3].value,
-                    'birth_date': _excel_parse_date(float(row[4].value), book),
-                    'telephone': row[5].value,
-                    'address': row[6].value,
-                    'gender': row[7].value,
-                    'is_activist': row[8].value.lower() == YES,
-                    'activist_info': row[9].value,
-                    'organisations': [session.query(Organisation).filter_by(name=row[10].value).first()],
+                    'organisations': [session.query(Organisation).filter_by(name=row[4].value).first()],
+                    'birth_date': _excel_parse_date(float(row[5].value), book),
+                    'telephone': row[6].value,
+                    'address': row[7].value,
+                    'gender': row[8].value,
+                    'is_activist': row[9].value.lower() == YES,
+                    'activist_info': row[10].value,
                     'professions': [session.query(Profession).filter_by(name=row[11].value).first()],
                     'owner': session.query(User).filter_by(is_admin=1).first()
                 })
