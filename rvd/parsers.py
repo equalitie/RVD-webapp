@@ -174,7 +174,6 @@ def _parse_org2_docx_events(doc):
 def _org2_events_to_model(events):
     '''Convert parsed event data to model instances'''
     for i in range(len(events)):
-        print events[i]
         event = events[i]
         actor = event['actor']
         organisation = actor['organisation']
@@ -242,11 +241,11 @@ def _parse_excel_template(filename):
     cur_event = None
     while cur_row < sheet.nrows:
         row = sheet.row(cur_row)
-        print 'ROW [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
-        if 'Titulo' in row[1].value:
+        #print u'ROW [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
+        if u'Titulo' in row[1].value:
             cur_row += 1
             row = sheet.row(cur_row)
-            print 'EVENT [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+            #print u'EVENT [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
             cur_event = Event(**{
                 'title': row[1].value,
                 'description': row[2].value,
@@ -271,13 +270,13 @@ def _parse_excel_template(filename):
             cur_event.perpetrators = []
             cur_event.actions = []
             cur_event.sources = []
-        elif row[1].value == 'Actors':
-            print 'Found Actors row; current event.title = ' + cur_event.title
+        elif row[1].value == u'Actors':
+            #print u'Found Actors row; current event.title = ' + cur_event.title
             cur_row += 1
             row = sheet.row(cur_row)
             # Rely on the columns under an entity name and before the next being blank
             while row[1].value == '' and cur_row < sheet.nrows:
-                print 'ACTOR [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+                #print u'ACTOR [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
                 _type = row[2].value
                 actor = Actor(**{
                     'name': row[3].value,
@@ -291,9 +290,9 @@ def _parse_excel_template(filename):
                     'professions': [session.query(Profession).filter_by(name=row[11].value).first()],
                     'owner': session.query(User).filter_by(is_admin=1).first()
                 })
-                print 'Parsed actor<' + ', '.join(map(str, [
-                    actor.name, actor.birth_date, actor.telephone, actor.gender,
-                    actor.is_activist, actor.organisations[0].name, actor.professions[0].name])) + '>'
+                #print u'Parsed actor<' + u', '.join(map(str, [
+                    #actor.name, actor.birth_date, actor.telephone, actor.gender,
+                    #actor.is_activist, actor.organisations[0].name, actor.professions[0].name])) + u'>'
                 if _type == 'Witness':
                     cur_event.witnesses.append(actor)
                 elif _type == 'Victim':
@@ -305,33 +304,34 @@ def _parse_excel_template(filename):
                     row = sheet.row(cur_row)
                 else:
                     break
-        elif row[1].value == 'Sources':
-            print 'Found sources row'
+        elif row[1].value == u'Sources':
+            #print u'Found sources row'
             cur_row += 1
             row = sheet.row(cur_row)
             while row[1].value == '' and cur_row < sheet.nrows:
-                print 'SOURCE [' + ', '.join([str(row[i].value) for i in range(len(row))]) + ']'
+                #print u'SOURCE [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
                 row = sheet.row(cur_row)
                 source = Source(**{
                     'name': row[2].value,
                     'organisations': [session.query(Organisation).filter_by(name=row[3].value).first()]
                 })
-                print 'Parsed source<' + ', '.join(map(str, [
-                    source.name, source.organisations[0].name])) + '>'
+                #print u'Parsed source<' + u', '.join(map(str, [
+                    #source.name, source.organisations[0].name])) + u'>'
                 cur_event.sources.append(source)
                 if (cur_row + 1) < sheet.nrows and sheet.row(cur_row + 1)[1].value == '':
                     cur_row += 1
                     row = sheet.row(cur_row)
                 else:
                     break
-        elif row[1].value == 'Report':
-            print 'Found report row'
+        elif row[1].value == u'Report':
+            #print 'Found report row'
             report = Report(**{
                 'text': row[2].value,
                 'events': [cur_event]
             })
             session.add(report)
-            print 'Parsed report: ' + report.text
+            #print u'Parsed report: ' + report.text
+        '''
         if cur_event is not None:
             session.add_all(cur_event.witnesses)
             session.add_all(cur_event.victims)
@@ -339,6 +339,7 @@ def _parse_excel_template(filename):
             session.add_all(cur_event.actions)
             session.add_all(cur_event.sources)
             session.add(cur_event)
+        '''
         cur_row += 1
     session.commit()
 
@@ -373,7 +374,7 @@ def _parse_excel_template(filename):
     # Call on each entity's respective model instance builder.
     entity_names = entities.keys()
     for entity_name in entity_names:
-        print entities['finished'], entity_name
+        #print entities['finished'], entity_name
         if entity_name not in entities['finished']:
             handler = _post_collection_handlers.get(entity_name, _id)
             entities = handler(entities, book)

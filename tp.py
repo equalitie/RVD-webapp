@@ -1,5 +1,8 @@
 from rvd import parsers
 
+d = parsers._parse_excel_template('testdata/template-es.xlsx')
+
+'''
 d = parsers._parse_org2_docx('Organization 2 doc name goes here')
 print 'Parsed REPORT'
 print d['report']
@@ -16,3 +19,4 @@ for event in d['events']:
     except IndexError: pass
 
 print 'Done'
+'''
