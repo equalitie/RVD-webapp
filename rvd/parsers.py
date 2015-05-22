@@ -95,18 +95,19 @@ def _org1_events_to_model(events):
     for i in range(len(events)):
         event = events[i]
         actor = Actor(name=event['actor']['name'])
-        del event['actor']
+        del events[i]['actor']
         source = Source(name=event['source']['name'])
-        del event['source']
+        del events[i]['source']
         geocoded = utils.geocodes(event['location']['name'], include_importance=True)
-        del event['location']
+        del events[i]['location']
         if geocoded is not None and len(geocoded) > 0:
           geocoded = utils.max_by(geocoded, lambda gc: gc['importance'])
           location = Location(name=geocoded['name'],
               latitude=geocoded['latitude'], longitude=geocoded['latitude'])
-          events[i].location = location
-        events[i] = Event(**event)
-        events[i].actor = actor
+          events[i]['locations'] = [location]
+        events[i]['victims'] = [actor]
+        events[i]['sources'] = [source]
+        events[i] = Event(**events[i])
     return events
 
 def _org1_report_to_model(report, events):
