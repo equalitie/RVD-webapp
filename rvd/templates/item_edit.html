@@ -7,6 +7,53 @@
 {% block content %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/actors.css') }}" />
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+    <script>
+        $(function() {
+        function split( val ) {
+          return val.split( /,\s*/ );
+        }
+        function extractLast( term ) {
+          return split( term ).pop();
+        }
+
+        $( "#sources" )
+          .bind( "keydown", function( event ) {
+            if ( event.keyCode === $.ui.keyCode.TAB &&
+                $( this ).autocomplete( "instance" ).menu.active ) {
+              event.preventDefault();
+            }
+          })
+          .autocomplete({
+            source: function( request, response ) {
+              $.getJSON( "/search_actor", {
+                term: extractLast( request.term )
+              }, response );
+            },
+            search: function() {
+              var term = extractLast( this.value );
+              if ( term.length < 2 ) {
+                return false;
+              }
+            },
+            focus: function() {
+              return false;
+            },
+            select: function( event, ui ) {
+              var terms = split( this.value );
+              terms.pop();
+              terms.push( ui.item.label );
+              terms.push( "" );
+              this.value = terms.join( ", " );
+              return false;
+            }
+          });
+        });
+    </script>
+
     {% if needs_admin and not current_user.is_admin %}
         <div class="only_admin">Only administrators can access this section.</div>
     {% else %}
