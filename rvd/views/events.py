@@ -32,15 +32,18 @@ def gather_form_data():
     uploaded_docs = request.files.getlist("documents")
     documents_to_save = []
     event_dict['documents'] = []
+    import ipdb
+    ipdb.set_trace()
     if uploaded_docs:
         for file in uploaded_docs:
             filename = secure_filename(file.filename)
-            file.save(os.path.join(DOC_FOLDER, filename))
-            doc = Document()
-            doc.filename = filename
-            session.add(doc)
-            session.commit()
-            event_dict['documents'].append(doc)
+            if not filename == '':
+                file.save(os.path.join(DOC_FOLDER, filename))
+                doc = Document()
+                doc.filename = filename
+                session.add(doc)
+                session.commit()
+                event_dict['documents'].append(doc)
 
     location_ids = request.form.getlist('locations')
     event_dict['locations'] = [get_name_from_id(x, location_factory()) for x in location_ids]
