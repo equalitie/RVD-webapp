@@ -240,6 +240,7 @@ def _parse_excel_template(filename):
     cur_row = 0
     cur_event = None
     while cur_row < sheet.nrows:
+        import ipdb
         row = sheet.row(cur_row)
         #print u'ROW [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
         if u'Titulo' in row[1].value:
@@ -308,6 +309,7 @@ def _parse_excel_template(filename):
             #print u'Found sources row'
             cur_row += 1
             row = sheet.row(cur_row)
+            ipdb.set_trace()
             while row[1].value == '' and cur_row < sheet.nrows:
                 #print u'SOURCE [' + u', '.join([str(row[i].value) for i in range(len(row))]) + u']'
                 row = sheet.row(cur_row)
@@ -331,16 +333,18 @@ def _parse_excel_template(filename):
             })
             session.add(report)
             #print u'Parsed report: ' + report.text
-        '''
-        if cur_event is not None:
-            session.add_all(cur_event.witnesses)
-            session.add_all(cur_event.victims)
-            session.add_all(cur_event.perpetrators)
-            session.add_all(cur_event.actions)
-            session.add_all(cur_event.sources)
-            session.add(cur_event)
-        '''
         cur_row += 1
+
+
+    ipdb.set_trace()
+    if cur_event is not None:
+        session.add_all(cur_event.witnesses)
+        session.add_all(cur_event.victims)
+        session.add_all(cur_event.perpetrators)
+        session.add_all(cur_event.actions)
+        session.add_all(cur_event.sources)
+        session.add(cur_event)
+
     session.commit()
 
 '''
