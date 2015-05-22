@@ -171,15 +171,15 @@ class Event(Base):
         'description': ___('YYYY-MM-DD 00:00:00'), 'label': ___('Event end')})
     report_date = sa.Column(sa.Date, nullable=False, info={
         'description': ___('Date of report'), 'label': ___('Date of report')})
-    psych_assist = sa.Column(sa.Boolean, nullable=False, info={
+    psych_assist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Psychological assistance provided'),
         'label': ___('Psychological assistance provided')})
-    material_assist = sa.Column(sa.Boolean, nullable=False, info={
+    material_assist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Material assistance provided'),
         'label': ___('Material assistance provided')})
     consequences = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Consequences'), 'label': ___('Consequences')})
-    was_activist = sa.Column(sa.Boolean, nullable=False, info={
+    was_activist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Was an activist'), 'label': ___('Was an activist')})
     victim_is_complainant = sa.Column(sa.Boolean, nullable=False, info={
         'description': ___('Victim is complainant'), 'label': ___('Victim is complainant')})
