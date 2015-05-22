@@ -3,6 +3,8 @@
 import json
 import time
 import urllib2
+import re
+import urlparse
 import datetime
 
 class JSObject(dict):
@@ -54,12 +56,30 @@ values in the collection.'''
     return max_item
 
 
+def url_encode_non_ascii(b):
+    return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
+
+
+def iri_to_uri(iri):
+    parts = urlparse.urlparse(iri)
+    return urlparse.urlunparse(
+        part.encode('idna') if parti == 1 else url_encode_non_ascii(part.encode('utf-8'))
+        for parti, part in enumerate(parts))
+
+_geocode_memo = {}
+# This function currently ignores the include_importance parameter,
+# but retains it until it can be refactored out of all calls
 def geocodes(location_name, include_importance=False):
     '''Obtain the geographical coordinates of a place based on the name.
 Returns an array of dictionaries containing latitude, longitude, and name of the location.'''
 
     nominatim_url = 'https://nominatim.openstreetmap.org/search?format=json&q='
-    req = urllib2.urlopen(nominatim_url + location_name.replace(' ', '+')).read()
+    req_url = iri_to_uri(nominatim_url + u'+'.join(location_name.split()))
+    print u'~*~ Geocoding request url = ' + req_url
+    # If we've already done a lookup for the requested url, pull it from the memo.
+    if req_url in _geocode_memo:
+        return _geocode_memo[req_url]
+    req = urllib2.urlopen(req_url).read()
     data = json.loads(req)
     # Build array of dictionaries in a way that is compatible with older Python versions
     geocodings = []
@@ -67,11 +87,11 @@ Returns an array of dictionaries containing latitude, longitude, and name of the
         new_entry = {
             'name': match['display_name'],
             'longitude': match['lon'],
-            'latitude': match['lat']
+            'latitude': match['lat'],
+            'importance': match['importance']
         }
-        if include_importance:
-            new_entry['importance'] = match['importance']
         geocodings.append(new_entry)
+    _geocode_memo[req_url] = geocodings
     return geocodings
 
 
