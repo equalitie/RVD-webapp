@@ -92,18 +92,23 @@ def _parse_org1_docx_events(doc):
 
 def _org1_events_to_model(events):
     '''Convert a collection of events into instances of the Event model'''
+    found_locations = {}
     for i in range(len(events)):
         event = events[i]
         actor = Actor(name=event['actor']['name'])
         del events[i]['actor']
         source = Source(name=event['source']['name'])
         del events[i]['source']
-        location = _get_location(event['location']['name'])
-        del events[i]['location']
+        if event['location']['name'] in found_locations:
+            location = found_locations[event['location']['name']]
+        else:
+            location = _get_location(event['location']['name'])
         if location is not None:
             events[i]['locations'] = [location]
+            found_locations[event['location']['name']] = location
         else:
             events[i]['locations'] = []
+        del events[i]['location']
         events[i]['victims'] = [actor]
         events[i]['sources'] = [source]
         events[i] = Event(**events[i])
@@ -180,6 +185,7 @@ def _parse_org2_docx_events(doc):
 
 def _org2_events_to_model(events):
     '''Convert parsed event data to model instances'''
+    found_locations = {}
     for i in range(len(events)):
         event = events[i]
         actor = event['actor']
@@ -190,9 +196,13 @@ def _org2_events_to_model(events):
         location = event['location']['name']
         if location.endswith('.'):
             location = location[:-1]
-        location = _get_location(location)
+        if location in found_locations:
+            location = found_locations[location]
+        else:
+            location = _get_location(location)
         if location is not None:
             event['locations'] = [location]
+            found_locations[event['location']['name']] = location
         else:
             event['locations'] = []
         prison = event['prison']
