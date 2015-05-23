@@ -100,7 +100,10 @@ def _org1_events_to_model(events):
         del events[i]['source']
         location = _get_location(event['location']['name'])
         del events[i]['location']
-        events[i]['locations'] = [location]
+        if location is not None:
+            events[i]['locations'] = [location]
+        else:
+            events[i]['locations'] = []
         events[i]['victims'] = [actor]
         events[i]['sources'] = [source]
         events[i] = Event(**events[i])
@@ -188,7 +191,10 @@ def _org2_events_to_model(events):
         if location.endswith('.'):
             location = location[:-1]
         location = _get_location(location)
-        event['locations'] = [location]
+        if location is not None:
+            event['locations'] = [location]
+        else:
+            event['locations'] = []
         prison = event['prison']
         prison = Prison(name=prison['name'])
         source = event['source']
@@ -271,7 +277,7 @@ def _parse_excel_template(filename):
                 'allow_representation': row[11].value.lower() == YES,
                 'data_is_sensitive': row[12].value.lower() == YES,
                 'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[13].value)).first()],
-                'locations': [_get_location(row[14].value)],
+                'locations': (lambda loc: [] if loc is None else [loc])(_get_location(row[14].value)),
                 'prisons': [session.query(Prison).filter_by(name=row[15].value).first()],
                 'event_types': [session.query(EventType).filter_by(name=row[16].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()
