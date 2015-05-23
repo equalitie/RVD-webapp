@@ -168,6 +168,7 @@ def _parse_org2_docx_events(doc):
             parsed['charges'] = clean_text(doc.paragraphs[i + 4])
             parsed['prison']['name'] = clean_text(doc.paragraphs[i + 5])
             parsed['actor']['telephone'] = clean_text(doc.paragraphs[i + 6])
+            parsed['description'] = clean_text(doc.paragraphs[i + 7])
             parsed['source']['name'] = clean_text(doc.paragraphs[i + 8])
             parsed['report_date'] = clean_text(doc.paragraphs[i + 9])
             # If a report date was supplied, parse it out and convert it to a datetime object.
