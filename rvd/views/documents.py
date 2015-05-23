@@ -30,6 +30,7 @@ def documents_uploads():
         for file in uploaded_files:
             if allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+                print '### Got filename ' + filename
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
                 f = os.path.join(UPLOAD_FOLDER, filename)
                 #org_name = request.form['organisation_name']
@@ -38,9 +39,10 @@ def documents_uploads():
                 user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
                 parsed_docx = False
                 if user.organisation_id is not None:
-                    org = rvd.models.session.query(rvd.models.Organisation).filter_by(
+                    org = rvd.models.session.query(rvd.models.UserOrganisation).filter_by(
                         id=user.organisation_id).first()
                     if org is not None and filename.split('.')[-1].lower() == 'docx':
+                        print '### User is from ' + org.name
                         if 'ccdhrn' in org.name.lower():
                             print '### Parsing org1\'s docx file'
                             try: parsers.parse(f, parsers.ORG1_DOCX)
