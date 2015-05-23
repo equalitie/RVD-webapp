@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, abort
 import json
 from flask_login import login_required
 from rvd.forms.Actor import ActorForm
@@ -120,3 +120,15 @@ def edit_actor(actor_id):
     data['data'] = actor
 
     return render_template("item_edit.html", data=data, form=actor_form, action='edit')
+
+
+@actors_bp.route('/search_witnesses')
+@actors_bp.route('/search_victims')
+@actors_bp.route('/search_perpetrators')
+@login_required
+def search_witnesses():
+    term = request.args.get('term', None)
+    if term is None:
+        abort(401, "Missing term parameter")
+    result = session.query(Actor).filter(Actor.name.like(("%{}%".format(term)))).all()
+    return json.dumps([{"label": x.name, "value": x.id} for x in result])
