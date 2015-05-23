@@ -28,15 +28,17 @@ find_things_by_name = lambda x, thing: session.query(thing).filter(thing.name.in
 
 
 def gather_form_data(event_id=None):
-    event_dict = defaultdict(lambda: None, {value: field if field else None for value, field in request.form.iteritems()})
+    event_dict = defaultdict(
+        lambda: None, {value: field if field else None for value, field in request.form.iteritems()}
+    )
 
     uploaded_docs = request.files.getlist("documents")
     event_dict['documents'] = []
     if uploaded_docs:
-        for file in uploaded_docs:
-            filename = secure_filename(file.filename)
+        for uploaded_file in uploaded_docs:
+            filename = secure_filename(uploaded_file.filename)
             if not filename == '':
-                file.save(os.path.join(DOC_FOLDER, filename))
+                uploaded_file.save(os.path.join(DOC_FOLDER, filename))
                 doc = Document()
                 doc.filename = filename
                 session.add(doc)
@@ -127,10 +129,17 @@ def view_event(event_id):
 @login_required
 def events_by_type():
     event_types = request.args.get("event_types", None)
-    event_types_list = event_types.split(",") if event_types else []
+
+    if event_types is not None:
+        event_types_list = event_types.split(",")
+    else:
+        event_types_list = None
 
     locations = request.args.get("locations", None)
-    locations_list = locations.split(",")
+    if locations is not None:
+        locations_list = locations.split(",")
+    else:
+        locations_list = None
 
     violations_start_date = request.args.get("start_date", None)
     violations_end_date = request.args.get("end_date", None)
@@ -141,8 +150,13 @@ def events_by_type():
     event_types = [x for x in event_type_factory()]
     event_type_names = [{"id": x.id, "name": x.name} for x in event_types]
 
-    ands = [EventType.id.in_(event_types_list), Event.report_date >= violations_start_date,
-            Event.report_date <= violations_end_date, Location.id.in_(locations_list)]
+    ands = [Event.report_date >= violations_start_date, Event.report_date <= violations_end_date]
+
+    if event_types_list is not None:
+        ands.append(EventType.id.in_(event_types_list))
+
+    if locations_list is not None:
+        ands.append(Location.id.in_(locations_list))
 
     # add extra restriction about user/owner if logged in user is not an admin
     if not current_user.is_admin:
@@ -158,7 +172,7 @@ def events_by_type():
         Event.owner
     ).filter(
         and_(x for x in ands)
-    )
+    ).all()
 
     grouped_events = []
     locations = []
