@@ -151,7 +151,7 @@ def events_by_type():
     all_events = session.query(
         Event
     ).join(
-        Event.event_type
+        Event.event_types
     ).join(
         Event.locations
     ).join(
