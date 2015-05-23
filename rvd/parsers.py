@@ -98,13 +98,9 @@ def _org1_events_to_model(events):
         del events[i]['actor']
         source = Source(name=event['source']['name'])
         del events[i]['source']
-        geocoded = utils.geocodes(event['location']['name'], include_importance=True)
+        location = _get_location(event['location']['name'])
         del events[i]['location']
-        if geocoded is not None and len(geocoded) > 0:
-          geocoded = utils.max_by(geocoded, lambda gc: gc['importance'])
-          location = Location(name=geocoded['name'],
-              latitude=geocoded['latitude'], longitude=geocoded['latitude'])
-          events[i]['locations'] = [location]
+        events[i]['locations'] = [location]
         events[i]['victims'] = [actor]
         events[i]['sources'] = [source]
         events[i] = Event(**events[i])
@@ -191,12 +187,8 @@ def _org2_events_to_model(events):
         location = event['location']['name']
         if location.endswith('.'):
             location = location[:-1]
-        geocodes = utils.geocodes(location, include_importance=True)
-        location = utils.max_by(geocodes, lambda gc: gc['importance'])
-        if len(geocodes) > 0 and location is not None:
-            location = Location(name=location['name'],
-                latitude=location['latitude'], longitude=location['longitude'])
-            event['locations'] = [location]
+        location = _get_location(location)
+        event['locations'] = [location]
         prison = event['prison']
         prison = Prison(name=prison['name'])
         source = event['source']
@@ -240,7 +232,6 @@ def _parse_org2_docx(_file):
     }
 
 def _get_location(loc_name):
-    import ipdb
     location = session.query(Location).filter_by(name=loc_name).first()
     if location is not None:
         return location
