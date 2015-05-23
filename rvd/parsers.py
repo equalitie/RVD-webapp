@@ -124,6 +124,14 @@ def _parse_org1_docx(_file):
     events = _parse_org1_docx_events(doc)
     events = _org1_events_to_model(events)
     report = _org1_report_to_model(report, events)
+    session.add(report)
+    for i, event in enumerate(events):
+        event.title = 'Evento ' + str(i)
+        session.add_all(event.locations)
+        session.add_all(event.victims)
+        session.add_all(event.sources)
+        session.add(event)
+    session.commit()
     return {
         'report': report,
         'events': events
@@ -217,6 +225,15 @@ def _parse_org2_docx(_file):
     events = _parse_org2_docx_events(doc)
     events = _org2_events_to_model(events)
     report = _org2_report_to_model(report, events)
+    session.add(report)
+    for i, event in enumerate(events):
+        event.title = 'Evento ' + str(i)
+        session.add_all(event.locations)
+        session.add_all(event.victims)
+        session.add_all(event.prisons)
+        session.add_all(event.sources)
+        session.add(event)
+    session.commit()
     return {
         'report': report,
         'events': events
