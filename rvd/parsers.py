@@ -238,10 +238,12 @@ def _get_location(loc_name):
     # Create a new Location based on the data pulled from OSM if the location
     # isn't already in the database
     locations = utils.geocodes(loc_name, include_importance=True)
-    location = utils.max_by(locations, lambda l: l['importance'])
-    location = Location(name=location['name'],
-        longitude=location['longitude'], latitude=location['latitude'])
-    return location
+    if len(locations) > 0: 
+        location = utils.max_by(locations, lambda l: l['importance'])
+        location = Location(name=location['name'],
+            longitude=location['longitude'], latitude=location['latitude'])
+        return location
+    return None
 
 def _parse_excel_template(filename):
     book = xlrd.open_workbook(filename)
