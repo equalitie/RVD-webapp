@@ -129,6 +129,7 @@ def view_event(event_id):
 @login_required
 def events_by_type():
     event_types = request.args.get("event_types", None)
+
     if event_types is not None:
         event_types_list = event_types.split(",")
     else:

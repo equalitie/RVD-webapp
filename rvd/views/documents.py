@@ -24,25 +24,44 @@ def documents_add():
 @documents_bp.route('/document/upload', methods=('POST',))
 @login_required
 def documents_uploads():
-    print '### In documents_uploads()'
     uploaded_files = request.files.getlist("file[]")
 
-    print '### Got uploaded files ' + str(uploaded_files)
     if uploaded_files:
         for file in uploaded_files:
-            print '### Found file ' + file.filename
             if allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                print '### Trying to save ' + filename
+                print '### Got filename ' + filename
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
-                print '### Saved'
                 f = os.path.join(UPLOAD_FOLDER, filename)
                 #org_name = request.form['organisation_name']
                 #print '### Got organisation name ' + org_name
-                parsers.parse(f, parsers.EXCEL_DOC) #org_name)
-                print '### Succeeded in parsing document'
-                #user_id = current_user.id
-                #user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
+                user_id = current_user.id
+                user = rvd.models.session.query(rvd.models.User).filter_by(id=user_id).first()
+                parsed_docx = False
+                if user.organisation_id is not None:
+                    org = rvd.models.session.query(rvd.models.UserOrganisation).filter_by(
+                        id=user.organisation_id).first()
+                    if org is not None and filename.split('.')[-1].lower() == 'docx':
+                        print '### User is from ' + org.name
+                        if 'ccdhrn' in org.name.lower():
+                            print '### Parsing org1\'s docx file'
+                            try: parsers.parse(f, parsers.ORG1_DOCX)
+                            except Exception as ex:
+                                print '!!! Failed to parse org1 docx' 
+                                print ex.message
+                            else: parsed_docx = True
+                        elif 'cihpress' in org.name.lower():
+                            print '### Parsing org2\'s docx file'
+                            try: parsers.parse(f, parsers.ORG2_DOCX)
+                            except Exception as ex:
+                                print '!!! Failed to parse org2 docx'
+                                print ex.message
+                            else: parsed_docx = True
+                if not parsed_docx:
+                    try: parsers.parse(f, parsers.EXCEL_DOC) #org_name)
+                    except Exception as ex:
+                        print '!!! Failed to parse file provided.'
+                        print ex.message
     return render_template("document_add.html")
 
 

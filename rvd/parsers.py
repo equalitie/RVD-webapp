@@ -92,19 +92,23 @@ def _parse_org1_docx_events(doc):
 
 def _org1_events_to_model(events):
     '''Convert a collection of events into instances of the Event model'''
+    found_locations = {}
     for i in range(len(events)):
         event = events[i]
         actor = Actor(name=event['actor']['name'])
         del events[i]['actor']
         source = Source(name=event['source']['name'])
         del events[i]['source']
-        geocoded = utils.geocodes(event['location']['name'], include_importance=True)
+        if event['location']['name'] in found_locations:
+            location = found_locations[event['location']['name']]
+        else:
+            location = _get_location(event['location']['name'])
+        if location is not None:
+            events[i]['locations'] = [location]
+            found_locations[event['location']['name']] = location
+        else:
+            events[i]['locations'] = []
         del events[i]['location']
-        if geocoded is not None and len(geocoded) > 0:
-          geocoded = utils.max_by(geocoded, lambda gc: gc['importance'])
-          location = Location(name=geocoded['name'],
-              latitude=geocoded['latitude'], longitude=geocoded['latitude'])
-          events[i]['locations'] = [location]
         events[i]['victims'] = [actor]
         events[i]['sources'] = [source]
         events[i] = Event(**events[i])
@@ -124,6 +128,14 @@ def _parse_org1_docx(_file):
     events = _parse_org1_docx_events(doc)
     events = _org1_events_to_model(events)
     report = _org1_report_to_model(report, events)
+    session.add(report)
+    for i, event in enumerate(events):
+        event.title = 'Evento ' + str(i)
+        session.add_all(event.locations)
+        session.add_all(event.victims)
+        session.add_all(event.sources)
+        session.add(event)
+    session.commit()
     return {
         'report': report,
         'events': events
@@ -173,6 +185,7 @@ def _parse_org2_docx_events(doc):
 
 def _org2_events_to_model(events):
     '''Convert parsed event data to model instances'''
+    found_locations = {}
     for i in range(len(events)):
         event = events[i]
         actor = event['actor']
@@ -183,12 +196,15 @@ def _org2_events_to_model(events):
         location = event['location']['name']
         if location.endswith('.'):
             location = location[:-1]
-        geocodes = utils.geocodes(location, include_importance=True)
-        location = utils.max_by(geocodes, lambda gc: gc['importance'])
-        if len(geocodes) > 0 and location is not None:
-            location = Location(name=location['name'],
-                latitude=location['latitude'], longitude=location['longitude'])
+        if location in found_locations:
+            location = found_locations[location]
+        else:
+            location = _get_location(location)
+        if location is not None:
             event['locations'] = [location]
+            found_locations[event['location']['name']] = location
+        else:
+            event['locations'] = []
         prison = event['prison']
         prison = Prison(name=prison['name'])
         source = event['source']
@@ -217,23 +233,33 @@ def _parse_org2_docx(_file):
     events = _parse_org2_docx_events(doc)
     events = _org2_events_to_model(events)
     report = _org2_report_to_model(report, events)
+    session.add(report)
+    for i, event in enumerate(events):
+        event.title = 'Evento ' + str(i)
+        session.add_all(event.locations)
+        session.add_all(event.victims)
+        session.add_all(event.prisons)
+        session.add_all(event.sources)
+        session.add(event)
+    session.commit()
     return {
         'report': report,
         'events': events
     }
 
 def _get_location(loc_name):
-    import ipdb
     location = session.query(Location).filter_by(name=loc_name).first()
     if location is not None:
         return location
     # Create a new Location based on the data pulled from OSM if the location
     # isn't already in the database
     locations = utils.geocodes(loc_name, include_importance=True)
-    location = utils.max_by(locations, lambda l: l['importance'])
-    location = Location(name=location['name'],
-        longitude=location['longitude'], latitude=location['latitude'])
-    return location
+    if len(locations) > 0: 
+        location = utils.max_by(locations, lambda l: l['importance'])
+        location = Location(name=location['name'],
+            longitude=location['longitude'], latitude=location['latitude'])
+        return location
+    return None
 
 def _parse_excel_template(filename):
     book = xlrd.open_workbook(filename)
@@ -261,7 +287,7 @@ def _parse_excel_template(filename):
                 'allow_representation': row[11].value.lower() == YES,
                 'data_is_sensitive': row[12].value.lower() == YES,
                 'release_types': [session.query(ReleaseType).filter_by(type_code=int(row[13].value)).first()],
-                'locations': [_get_location(row[14].value)],
+                'locations': (lambda loc: [] if loc is None else [loc])(_get_location(row[14].value)),
                 'prisons': [session.query(Prison).filter_by(name=row[15].value).first()],
                 'event_types': [session.query(EventType).filter_by(name=row[16].value).first()],
                 'owner': session.query(User).filter_by(is_admin=1).first()

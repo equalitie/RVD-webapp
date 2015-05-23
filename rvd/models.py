@@ -76,22 +76,22 @@ class Actor(Base):
 
     id = sa.Column(sa.BigInteger, autoincrement=True, primary_key=True)
     name = sa.Column(sa.Unicode(200), nullable=False, info={'description': ___('Name'), 'label': ___('Name')})
-    birth_date = sa.Column(sa.Date, nullable=False, info={'description': ___('Date of birth'), 'label': ___('Date of birth')})
+    birth_date = sa.Column(sa.Date, nullable=True, info={'description': ___('Date of birth'), 'label': ___('Date of birth')})
     # telephone = sa.Column(PhoneNumberType(), info={
     telephone = sa.Column(sa.Unicode(16), info={
         'description': ___('+1 819 987-6543'), 'label': ___('Phone number')})
-    address = sa.Column(sa.Unicode(250), nullable=False, info={'description': ___('Address'), 'label': ___('Address')})
+    address = sa.Column(sa.Unicode(250), nullable=True, info={'description': ___('Address'), 'label': ___('Address')})
     organisations = relationship('Organisation', secondary=actor_organisation, backref='members')
     professions = relationship('Profession', secondary=actor_profession, backref='practitioners')
     locations = relationship('Location', secondary=actor_location, backref='locals')
-    gender = sa.Column(sa.Text, nullable=False, info={'description': ___('Gender'), 'label': ___('Gender')})
-    is_activist = sa.Column(sa.Boolean, nullable=False, info={
+    gender = sa.Column(sa.Text, nullable=True, info={'description': ___('Gender'), 'label': ___('Gender')})
+    is_activist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Is activist'), 'label': ___('Is activist')})
     activist_info = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Activist info'), 'label': ___('Activist info')})
     owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='actor_owner')
-    public = sa.Column(sa.Boolean, nullable=False, info={
+    public = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Public'), 'label': ___('Public')
     }, default=0)
 
@@ -165,11 +165,11 @@ class Event(Base):
         'description': ___('Description'), 'label': ___('Description')})
     charges = sa.Column(sa.Text, nullable=True, info={
         'description': ___('Charges'), 'label': ___('Charges against victim')})
-    event_start = sa.Column(sa.DateTime, nullable=False, info={
+    event_start = sa.Column(sa.DateTime, nullable=True, info={
         'description': ___('YYYY-MM-DD 00:00:00'), 'label': ___('Event start')})
     event_end = sa.Column(sa.DateTime, nullable=True, info={
         'description': ___('YYYY-MM-DD 00:00:00'), 'label': ___('Event end')})
-    report_date = sa.Column(sa.Date, nullable=False, info={
+    report_date = sa.Column(sa.Date, nullable=True, info={
         'description': ___('Date of report'), 'label': ___('Date of report')})
     psych_assist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Psychological assistance provided'),
@@ -181,18 +181,18 @@ class Event(Base):
         'description': ___('Consequences'), 'label': ___('Consequences')})
     was_activist = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Was an activist'), 'label': ___('Was an activist')})
-    victim_is_complainant = sa.Column(sa.Boolean, nullable=False, info={
+    victim_is_complainant = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Victim is complainant'), 'label': ___('Victim is complainant')})
-    allow_storage = sa.Column(sa.Boolean, nullable=False, info={
+    allow_storage = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Allows storage of information'),
         'label': ___('Allows storage of information')})
-    allow_publishing = sa.Column(sa.Boolean, nullable=False, info={
+    allow_publishing = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Allows publishing of information'),
         'label': ___('Allows publishing of information')})
-    allow_representation = sa.Column(sa.Boolean, nullable=False, info={
+    allow_representation = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Allows legal representation'),
         'label': ___('Allows legal representation')})
-    data_is_sensitive = sa.Column(sa.Boolean, nullable=False, info={
+    data_is_sensitive = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Data is hyper sensitive'),
         'label': ___('Data is hyper sensitive')})
     report_id = sa.Column(sa.BigInteger, ForeignKey('reports.id'))
@@ -207,7 +207,7 @@ class Event(Base):
     documents = relationship('Document', secondary=event_documents, backref='events')
     owner_id = sa.Column(sa.BigInteger, ForeignKey('users.id'), nullable=False, default=1)
     owner = relationship('User', backref='event_owner')
-    public = sa.Column(sa.Boolean, nullable=False, info={
+    public = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Public'), 'label': ___('Public')
     }, default=0)
 
