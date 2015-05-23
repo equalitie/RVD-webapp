@@ -30,8 +30,8 @@ if ccd is None:
 # Add users belonging to either organisation
 u1e = 'user1@user1.com'
 u2e = 'user2@user2.com'
-u1 = User(email=u1e, password=hashed, password_salt=salt, organisation=cih, is_admin=True)
-u2 = User(email=u2e, password=hashed, password_salt=salt, organisation=ccd, is_admin=True)
+u1 = User(email=u1e, password=hashed, password_salt=salt, organisation=ccd, is_admin=True)
+u2 = User(email=u2e, password=hashed, password_salt=salt, organisation=cih, is_admin=True)
 session.add(u1)
 session.add(u2)
 
