@@ -126,7 +126,7 @@ def view_event(event_id):
 @login_required
 def events_by_type():
     event_types = request.args.get("event_types", None)
-    event_types_list = event_types.split(",")
+    event_types_list = event_types.split(",") if event_types else []
 
     locations = request.args.get("locations", None)
     locations_list = locations.split(",")
