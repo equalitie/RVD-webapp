@@ -33,7 +33,7 @@ class EventForm(ModelForm):
     locations = QuerySelectMultipleField(query_factory=location_factory, get_label='name')
     prisons = QuerySelectMultipleField(query_factory=prison_factory, get_label='name')
     sources = fields.StringField()
-    witnesses = QuerySelectMultipleField(query_factory=witnesses_factory, get_label=display_func)
+    witnesses = fields.StringField()
     victims = QuerySelectMultipleField(query_factory=victims_factory, get_label=display_func)
     perpetrators = QuerySelectMultipleField(query_factory=perpetrators_factory, get_label=display_func)
     event_types = QuerySelectMultipleField(query_factory=event_type_factory, get_label='name')

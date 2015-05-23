@@ -4,11 +4,11 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, EventType, Location, User, Document, Source
+from rvd.models import session, Event, EventType, Location, User, Document, Source, Actor
 from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
-from rvd.forms import location_factory, prison_factory, release_type_factory, witnesses_factory
-from rvd.forms import perpetrators_factory, victims_factory, event_type_factory
+from rvd.forms import location_factory, prison_factory, release_type_factory
+from rvd.forms import event_type_factory
 from sqlalchemy import and_
 from copy import copy
 from sqlalchemy.orm.exc import NoResultFound
@@ -53,19 +53,20 @@ def gather_form_data(event_id=None):
     event_dict['release_types'] = [get_name_from_id(x, release_type_factory()) for x in release_types_ids]
 
     sources = request.form.get('sources')
-    sources_list = list(set(sources.split(",")))
-    source_instances = find_things_by_name(sources_list, Source)
+    sources_list = list(set([x.strip() for x in sources.split(",")]))
+    event_dict['sources'] = find_things_by_name(sources_list, Source)
 
-    event_dict['sources'] = source_instances
+    witnesses = request.form.get('witnesses')
+    witnesses_list = list(set([x.strip() for x in witnesses.split(",")]))
+    event_dict['witnesses'] = find_things_by_name(witnesses_list, Actor)
 
-    witnesses_ids = request.form.getlist('witnesses')
-    event_dict['witnesses'] = [get_name_from_id(x, witnesses_factory()) for x in witnesses_ids]
+    victims = request.form.get('victims')
+    victims_list = list(set([x.strip() for x in victims.split(",")]))
+    event_dict['victims'] = find_things_by_name(victims_list, Actor)
 
-    victims_ids = request.form.getlist('victims')
-    event_dict['victims'] = [get_name_from_id(x, victims_factory()) for x in victims_ids]
-
-    perpetrators_ids = request.form.getlist('perpetrators')
-    event_dict['perpetrators'] = [get_name_from_id(x, perpetrators_factory()) for x in perpetrators_ids]
+    perpetrators = request.form.get('perpetrators')
+    perpetrators_list = list(set([x.strip() for x in perpetrators.split(",")]))
+    event_dict['perpetrators'] = find_things_by_name(perpetrators_list, Actor)
 
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
@@ -194,7 +195,7 @@ def view_all_events():
     evs = []
     for e in all_events:
         evs.append({
-            "owner": "{}: {}".format(e.owner.email, e.owner.organisation),
+            "owner": "{} {}".format(e.owner.email, ": {}".format(e.owner.organisation) if e.owner.organisation else ""),
             "report_date": e.report_date,
             "title": e.title,
             "id": e.id
