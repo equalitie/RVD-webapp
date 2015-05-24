@@ -83,9 +83,7 @@ def _parse_org1_docx_events(doc):
             parsed['report_date'] = time.strptime(row[0].text.strip(), '%d.%m.%y')
             parsed['report_date'] = utils.to_datetime(parsed['report_date'])
             parsed['location']['name'] = row[1].text.strip()
-            # TODO
-            # Think of how this field fits into the schema we have.
-            # parsed['type'] = row[3].text.strip()
+            parsed['description'] = row[3].text.strip()
             parsed['source']['name'] = row[4].text.strip()
             events.append(parsed)
     return events
