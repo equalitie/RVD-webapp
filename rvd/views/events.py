@@ -4,7 +4,7 @@ from flask_login import login_required
 from rvd.forms.Event import EventForm
 from flask_admin import helpers
 from collections import defaultdict
-from rvd.models import session, Event, EventType, Location, User, Document, Source, Actor
+from rvd.models import session, Event, EventType, Location, User, Document, Source, Actor, Report
 from rvd.views import flatten_instance, get_name_from_id
 from flask_login import current_user
 from rvd.forms import location_factory, prison_factory, release_type_factory
@@ -27,7 +27,7 @@ DOC_FOLDER = 'lib/static/documents'
 find_things_by_name = lambda x, thing: session.query(thing).filter(thing.name.in_(x)).all()
 
 
-def gather_form_data(event_id=None):
+def gather_form_data(event=None):
     event_dict = defaultdict(
         lambda: None, {value: field if field else None for value, field in request.form.iteritems()}
     )
@@ -73,11 +73,13 @@ def gather_form_data(event_id=None):
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
 
+    event_dict['report'] = Report(text=request.form.get('report'), id=event.report_id if event else None)
+
     event_dict['owner_id'] = current_user.id
     event_instance = Event(**event_dict)
-    event_instance.id = event_id
+    event_instance.id = event.id if event else None
 
-    if event_id is not None:
+    if event is not None:
         session.merge(event_instance)
     else:
         session.add(event_instance)
@@ -121,7 +123,6 @@ def view_event(event_id):
     except NoResultFound:
         return redirect('/events/all')
     data['data'] = fields
-
     return render_template("item_view_single.html", data=data, event=event.__dict__)
 
 
@@ -247,9 +248,10 @@ def edit_event(event_id):
         return redirect('/events/all')
 
     event_form = EventForm(request.form, obj=event)
+    event_form.report.data = event.report.text
 
     if helpers.validate_form_on_submit(event_form):
-        event_instance = gather_form_data(event_id)
+        event_instance = gather_form_data(event)
         return redirect('/events/{}?success=1'.format(event_instance.id))
 
     data = copy(names)

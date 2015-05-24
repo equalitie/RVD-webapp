@@ -17,7 +17,7 @@ class EventForm(ModelForm):
 
     __order = (
         'event_types', 'title', 'description', 'event_start', 'event_end', 'report_date',
-        'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist',
+        'charges', 'consequences', 'psych_assist', 'material_assist', 'was_activist', 'report',
         'victim_is_complainant', 'allow_storage', 'allow_publishing', 'allow_representation',
         'data_is_sensitive', 'locations', 'prisons', 'release_types', 'sources',
         'witnesses', 'victims', 'perpetrators', 'public', 'documents'
@@ -52,6 +52,7 @@ class EventForm(ModelForm):
                                       validators=[validators.required()],
                                       choices=[
                                           (1, ___('Yes')), (0, ___('No'))], coerce=bool)
+    report = fields.TextAreaField()
     victim_is_complainant = fields.SelectField(___('Victim is complainant'),
                                                validators=[validators.required()],
                                                choices=[

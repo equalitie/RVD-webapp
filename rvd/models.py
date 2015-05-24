@@ -195,7 +195,8 @@ class Event(Base):
     data_is_sensitive = sa.Column(sa.Boolean, nullable=True, info={
         'description': ___('Data is hyper sensitive'),
         'label': ___('Data is hyper sensitive')})
-    report_id = sa.Column(sa.BigInteger, ForeignKey('reports.id'))
+    report_id = sa.Column(sa.BigInteger, ForeignKey('reports.id'), info={'description': 'report id', 'label': 'report id'})
+    report = relationship('Report', backref='event_report')
     release_types = relationship('ReleaseType', secondary=event_releasetype, backref='events')
     locations = relationship('Location', secondary=event_location)
     prisons = relationship('Prison', secondary=event_prison, backref='events')
