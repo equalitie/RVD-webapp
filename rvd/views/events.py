@@ -235,7 +235,7 @@ def view_all_events():
     evs = []
     for e in all_events:
         evs.append({
-            "owner": "{} {}".format(e.owner.email, ": {}".format(e.owner.organisation) if e.owner.organisation else ""),
+            "owner": "{} {}".format(e.owner.email, ": {}".format(e.owner.organisation.name) if e.owner.organisation else ""),
             "report_date": e.report_date,
             "title": e.title,
             "id": e.id
