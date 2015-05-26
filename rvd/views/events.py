@@ -158,17 +158,18 @@ def events_by_type():
     event_type_names = [{"id": x.id, "name": x.name} for x in event_types]
 
     ands = [Event.report_date >= violations_start_date, Event.report_date <= violations_end_date]
-
+    '''
     if event_types_list is not None:
         ands.append(EventType.id.in_(event_types_list))
 
     if locations_list is not None:
         ands.append(Location.id.in_(locations_list))
-
+    '''
     # add extra restriction about user/owner if logged in user is not an admin
     if not current_user.is_admin:
         ands.append(User.organisation_id == current_user.organisation_id)
-
+    import ipdb
+    ipdb.set_trace()
     all_events = session.query(
         Event
     #).join(
@@ -177,8 +178,8 @@ def events_by_type():
     #    Event.locations
     #).join(
     #    Event.owner
-    #).filter(
-    #    and_(x for x in ands)
+    ).filter(
+        and_(x for x in ands)
     ).all()
 
     grouped_events = []
