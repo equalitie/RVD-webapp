@@ -276,8 +276,8 @@ msgid "Release Types"
 msgstr "Tipos de liberaciones "
 
 #: ../../rvd/templates/data_template.html:32
-msgid "Rights Violations"
-msgstr "Violaciones de derechos"
+msgid "Event types"
+msgstr "Tipos de event"
 
 #: ../../rvd/templates/data_template.html:33
 msgid "Sources"
