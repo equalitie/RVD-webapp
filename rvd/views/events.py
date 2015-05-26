@@ -165,20 +165,44 @@ def events_by_type():
 
     all_events = session.query(
         Event
-    ).join(
-        Event.event_types
-    ).join(
-        Event.locations
-    ).join(
-        Event.owner
-    ).filter(
-        and_(x for x in ands)
+    #).join(
+    #    Event.event_types
+    #).join(
+    #    Event.locations
+    #).join(
+    #    Event.owner
+    #).filter(
+    #    and_(x for x in ands)
     ).all()
 
     grouped_events = []
     locations = []
-
+    detailed_events = []
     for event in all_events:
+        event_types_set = []
+        for event_type in event.event_types:
+            event_types_set.append({"name": event_type.name})
+
+        victims = []
+        for victim in event.victims:
+            victims.append({"name": victim.name})
+
+        sources = []
+        for source in event.sources:
+            sources.append({"name": source.name})
+        
+        details = {"title": event.title,
+                   "id": event.id,
+                   "report_date": event.report_date.strftime("%Y-%m-%d"),
+                   #"event_start": event.event_start,
+                   #"event_end": event.event_end,
+                   "description": event.description,
+                   "location": event.locations[0].name if event.locations else '',
+                   "victims": victims,
+                   "sources": sources,
+                   "event_types": event_types_set
+                  }
+        detailed_events.append(details)
         event_locations = event.locations
         for location in event_locations:
             locations.append([getattr(location, 'latitude'), getattr(location, 'longitude')])
@@ -196,8 +220,9 @@ def events_by_type():
                     label = "{}".format(v)
                     date_types[label] += 1
         grouped_events.append(date_types)
-
-    return jsonify({"events": grouped_events, "locations": locations, "names": event_type_names})
+    data = copy(names)
+    data['data'] = detailed_events
+    return jsonify({"data": data, "events": grouped_events, "locations": locations, "names": event_type_names})
 
 
 @events_bp.route('/events/all')
