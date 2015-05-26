@@ -72,20 +72,26 @@ def gather_form_data(event=None):
 
     event_types = request.form.getlist('event_types')
     event_dict['event_types'] = [get_name_from_id(x, event_type_factory()) for x in event_types]
-
-    event_dict['report'] = Report(text=request.form.get('report'), id=event.report_id if event else None)
+    if event.report_id:
+        report = session.query(Report).get(event.report_id)
+        report.text = request.form.get('report')
+        event_dict['report'] = report
+    else:
+        event_dict['report'] = Report(text=request.form.get('report'))
 
     event_dict['owner_id'] = current_user.id
-    event_instance = Event(**event_dict)
-    event_instance.id = event.id if event else None
+    #event_instance = Event(**event_dict)
+    #event_instance.id = event.id if event else None
 
     if event is not None:
-        session.merge(event_instance)
+        for key, value in event_dict.iteritems():
+            setattr(event, key, value)
+        session.merge(event)
     else:
         session.add(event_instance)
     session.flush()
 
-    return event_instance
+    return event
 
 
 @events_bp.route('/events/add', methods=('GET', 'POST'))
