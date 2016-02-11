@@ -1,0 +1,335 @@
+#
+# Translators:
+# Erik Jennische <Erik.Jennische@civilrightsdefenders.org>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: RVD\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-05-13 22:31-0400\n"
+"PO-Revision-Date: 2016-02-11 12:33+0300\n"
+"Last-Translator: vladimir\n"
+"Language-Team: Russian (http://www.transifex.com/projects/p/rvd/language/ru/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#: ../../rvd/models.py:40
+msgid "Complaint to state authority"
+msgstr "Жалоба государственным органам власти"
+
+#: ../../rvd/models.py:42
+msgid "Response from state authority"
+msgstr "Ответ государственного органа"
+
+#: ../../rvd/models.py:44 ../../rvd/models.py:45
+msgid "Complaint to international authority"
+msgstr "Жалоба международным органам"
+
+#: ../../rvd/models.py:47
+msgid "Response from international authority"
+msgstr "Ответ международного органа"
+
+#: ../../rvd/models.py:77 ../../rvd/models.py:217 ../../rvd/models.py:233
+#: ../../rvd/models.py:247 ../../rvd/models.py:269 ../../rvd/models.py:295
+#: ../../rvd/models.py:309 ../../rvd/models.py:320 ../../rvd/models.py:344
+#: ../../rvd/models.py:362 ../../rvd/models.py:375 ../../rvd/models.py:388
+msgid "Name"
+msgstr "Имя"
+
+#: ../../rvd/models.py:78
+msgid "Date of birth"
+msgstr "Дата рождения"
+
+#: ../../rvd/models.py:81
+msgid "+1 819 987-6543"
+msgstr "+1 819 987-6543"
+
+#: ../../rvd/models.py:81
+msgid "Phone number"
+msgstr "Номер телефона"
+
+#: ../../rvd/models.py:82
+msgid "Address"
+msgstr "Адрес"
+
+#: ../../rvd/models.py:86 ../../rvd/forms/Actor.py:27
+msgid "Gender"
+msgstr "Пол"
+
+#: ../../rvd/models.py:88 ../../rvd/forms/Actor.py:29
+msgid "Is activist"
+msgstr "Является активистом"
+
+#: ../../rvd/models.py:90
+msgid "Activist info"
+msgstr "Информация об активисте"
+
+#: ../../rvd/models.py:94 ../../rvd/models.py:204 ../../rvd/forms/Actor.py:31
+#: ../../rvd/forms/Event.py:68
+msgid "Public"
+msgstr "Публичность"
+
+#: ../../rvd/models.py:107
+msgid "Content of report"
+msgstr "Содержание отчёта"
+
+#: ../../rvd/models.py:157
+msgid "Title"
+msgstr "Заголовок"
+
+#: ../../rvd/models.py:159 ../../rvd/models.py:219 ../../rvd/models.py:235
+#: ../../rvd/models.py:271 ../../rvd/models.py:346 ../../rvd/models.py:377
+msgid "Description"
+msgstr "Описание"
+
+#: ../../rvd/models.py:161
+msgid "Charges"
+msgstr "Обвинения"
+
+#: ../../rvd/models.py:163
+msgid "Date of detention"
+msgstr "Дата задержания"
+
+#: ../../rvd/models.py:165
+msgid "Date of release"
+msgstr "Дата освобождения"
+
+#: ../../rvd/models.py:167
+msgid "Date of report"
+msgstr "Дата сообщения"
+
+#: ../../rvd/models.py:169 ../../rvd/models.py:170 ../../rvd/forms/Event.py:36
+msgid "Psychological assistance provided"
+msgstr "Оказывалась психологическая помощь"
+
+#: ../../rvd/models.py:172 ../../rvd/models.py:173 ../../rvd/forms/Event.py:40
+msgid "Material assistance provided"
+msgstr "Оказывалась материальная помощь"
+
+#: ../../rvd/models.py:175
+msgid "Consequences"
+msgstr "Последствия"
+
+#: ../../rvd/models.py:177 ../../rvd/forms/Event.py:44
+msgid "Was an activist"
+msgstr "Был активистом"
+
+#: ../../rvd/models.py:179 ../../rvd/forms/Event.py:48
+msgid "Victim is complainant"
+msgstr "Жертва является лицом подающим жалобу"
+
+#: ../../rvd/models.py:181 ../../rvd/models.py:182 ../../rvd/forms/Event.py:52
+msgid "Allows storage of information"
+msgstr "Разрешает хранение информации"
+
+#: ../../rvd/models.py:184 ../../rvd/models.py:185 ../../rvd/forms/Event.py:56
+msgid "Allows publishing of information"
+msgstr "Разрешает публикацию информации"
+
+#: ../../rvd/models.py:187 ../../rvd/models.py:188 ../../rvd/forms/Event.py:60
+msgid "Allows legal representation"
+msgstr "Разрешает представлять свои интересы"
+
+#: ../../rvd/models.py:190 ../../rvd/models.py:191 ../../rvd/forms/Event.py:64
+msgid "Data is hyper sensitive"
+msgstr "Информация гиперчувствительна"
+
+#: ../../rvd/models.py:249
+msgid "Longitude"
+msgstr "Долгота"
+
+#: ../../rvd/models.py:251
+msgid "Latitude"
+msgstr "Ширина"
+
+#: ../../rvd/models.py:332
+msgid "Type code"
+msgstr "Тип кода"
+
+#: ../../rvd/models.py:397
+msgid "Email"
+msgstr "Email"
+
+#: ../../rvd/models.py:398
+msgid "Password"
+msgstr "Пароль"
+
+#: ../../rvd/models.py:401 ../../rvd/forms/User.py:27
+msgid "Is admin"
+msgstr "Является администратором"
+
+#: ../../rvd/parsers.py:26
+msgid "yes"
+msgstr "да"
+
+#: ../../rvd/parsers.py:27
+msgid "no"
+msgstr "нет"
+
+#: ../../rvd/parsers.py:28
+msgid "male"
+msgstr "мужчина"
+
+#: ../../rvd/parsers.py:29
+msgid "female"
+msgstr "женщина"
+
+#: ../../rvd/forms/Actor.py:28
+msgid "Male"
+msgstr "Мужчина"
+
+#: ../../rvd/forms/Actor.py:28
+msgid "Female"
+msgstr "Женщина"
+
+#: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
+#: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
+#: ../../rvd/forms/Event.py:47 ../../rvd/forms/Event.py:51
+#: ../../rvd/forms/Event.py:55 ../../rvd/forms/Event.py:59
+#: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
+#: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
+msgid "Yes"
+msgstr "Да"
+
+#: ../../rvd/forms/Actor.py:30 ../../rvd/forms/Actor.py:32
+#: ../../rvd/forms/Event.py:39 ../../rvd/forms/Event.py:43
+#: ../../rvd/forms/Event.py:47 ../../rvd/forms/Event.py:51
+#: ../../rvd/forms/Event.py:55 ../../rvd/forms/Event.py:59
+#: ../../rvd/forms/Event.py:63 ../../rvd/forms/Event.py:67
+#: ../../rvd/forms/Event.py:69 ../../rvd/forms/User.py:27
+msgid "No"
+msgstr "Нет"
+
+#: ../../rvd/forms/DocumentUpload.py:5
+msgid "Organisation Name"
+msgstr "Название организации"
+
+#: ../../rvd/forms/Login.py:14
+msgid "email"
+msgstr "email"
+
+#: ../../rvd/forms/Login.py:19
+msgid "password"
+msgstr "пароль"
+
+#: ../../rvd/templates/base.html:12
+msgid "Rights Violation Documentation"
+msgstr "Документация по нарушению прав"
+
+#: ../../rvd/templates/data_template.html:9
+msgid "Actors"
+msgstr "Участники"
+
+#: ../../rvd/templates/data_template.html:11
+msgid "Add actor"
+msgstr "Добавить участника"
+
+#: ../../rvd/templates/data_template.html:12
+msgid "View all actors"
+msgstr "Все участники"
+
+#: ../../rvd/templates/data_template.html:16
+msgid "Events"
+msgstr "События"
+
+#: ../../rvd/templates/data_template.html:18
+msgid "Add event"
+msgstr "Добавить событие"
+
+#: ../../rvd/templates/data_template.html:19
+msgid "View all events"
+msgstr "Просмотреть все события"
+
+#: ../../rvd/templates/data_template.html:23
+msgid "Meta"
+msgstr "Мета"
+
+#: ../../rvd/templates/data_template.html:25
+msgid "Organisations"
+msgstr "Организации"
+
+#: ../../rvd/templates/data_template.html:26
+msgid "Locations"
+msgstr "Места"
+
+#: ../../rvd/templates/data_template.html:27
+msgid "Professions"
+msgstr "Профессии"
+
+#: ../../rvd/templates/data_template.html:28
+msgid "International Authorities"
+msgstr "Международные органы"
+
+#: ../../rvd/templates/data_template.html:29
+msgid "Prison Types"
+msgstr "Типы тюрем"
+
+#: ../../rvd/templates/data_template.html:30
+msgid "Prisons"
+msgstr "Тюрьмы"
+
+#: ../../rvd/templates/data_template.html:31
+msgid "Release Types"
+msgstr "Типы освобождений"
+
+#: ../../rvd/templates/data_template.html:32
+msgid "Event types"
+msgstr "Типы событий"
+
+#: ../../rvd/templates/data_template.html:33
+msgid "Sources"
+msgstr "Источники"
+
+#: ../../rvd/templates/data_template.html:34
+msgid "State Authorities"
+msgstr "Государственные органы власти"
+
+#: ../../rvd/templates/data_template.html:35
+msgid "Evidence Type"
+msgstr "Тип доказательства"
+
+#: ../../rvd/templates/data_template.html:39
+#: ../../rvd/templates/data_template.html:41
+msgid "Upload documents"
+msgstr "Загрузить документы"
+
+#: ../../rvd/templates/data_template.html:58
+#: ../../rvd/templates/report_template.html:19
+msgid "users"
+msgstr "пользователи"
+
+#: ../../rvd/templates/data_template.html:59
+#: ../../rvd/templates/report_template.html:20
+msgid "data"
+msgstr "данные"
+
+#: ../../rvd/templates/data_template.html:60
+#: ../../rvd/templates/report_template.html:21
+msgid "reports"
+msgstr "отчёты"
+
+#: ../../rvd/templates/data_template.html:61
+#: ../../rvd/templates/report_template.html:22
+msgid "language"
+msgstr "язык"
+
+#: ../../rvd/templates/data_template.html:62
+#: ../../rvd/templates/report_template.html:23
+msgid "logout"
+msgstr "выйти"
+
+#: ../../rvd/templates/lang.html:6
+msgid "Current language"
+msgstr "Текущий язык"
+
+#: ../../rvd/templates/login.html:29
+msgid "Log in"
+msgstr "Войти"
+
+#: ../../rvd/templates/reports.html:15
+msgid "Data filters"
+msgstr "Фильтры данных"
